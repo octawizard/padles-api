@@ -4,8 +4,8 @@ plugins {
     kotlin("jvm") version "1.4.10"
     application
 }
-group = "me.user"
-version = "1.0-SNAPSHOT"
+group = "com.octawizard"
+version = "0.1-SNAPSHOT"
 
 repositories {
     mavenCentral()
@@ -24,8 +24,8 @@ dependencies {
     implementation("io.ktor:ktor-gson:1.4.0")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2")
 
+    // Dependency Injection
     implementation("org.kodein.di:kodein-di-jvm:7.1.0")
-
 
     //dao
     implementation("org.jetbrains.exposed", "exposed-core", "0.24.1")

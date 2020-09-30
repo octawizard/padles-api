@@ -51,12 +51,6 @@ fun main() {
 
     val controller = kodein.direct.instance<Controller>()
 
-//    val user = User(Email("roberto@padles.es"), "Roberto", LocalDateTime.now())
-//    runBlocking { controller.createUser(user) }
-
-//    Database.connect("jdbc:postgresql://localhost:5432/padles", driver = "org.postgresql.Driver",
-//            user = "padles_admin", password = "local")
-
     embeddedServer(Netty, port = 8080, host = "127.0.0.1") {
         install(ContentNegotiation) {
             gson { }

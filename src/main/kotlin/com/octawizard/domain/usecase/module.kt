@@ -1,5 +1,8 @@
 package com.octawizard.domain.usecase
 
+import com.octawizard.domain.usecase.match.CreateMatch
+import com.octawizard.domain.usecase.match.FindAvailableMatches
+import com.octawizard.domain.usecase.match.JoinMatch
 import com.octawizard.domain.usecase.user.CreateUser
 import com.octawizard.domain.usecase.user.GetUser
 import com.octawizard.domain.usecase.user.UpdateUser

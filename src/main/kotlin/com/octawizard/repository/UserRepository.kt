@@ -2,7 +2,6 @@ package com.octawizard.repository
 
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
-import java.util.*
 
 interface UserRepository {
 
