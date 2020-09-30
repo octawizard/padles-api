@@ -1,2 +1,2 @@
 # Padles API
-Small REST API project using Ktor and Exposed frameworks.
+Small REST API project using Ktor, Kodein and Exposed frameworks.
