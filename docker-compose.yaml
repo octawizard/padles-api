@@ -1,0 +1,14 @@
+version: '2'
+services:
+  peepsphonedb:
+    image: library/postgres:13.0-alpine
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_DB: padles
+      POSTGRES_PASSWORD: local
+      POSTGRES_USER: padles_admin
+  redis:
+    image: library/redis:6.0.8-alpine
+    ports:
+      - 6379:6379
