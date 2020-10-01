@@ -36,6 +36,12 @@ dependencies {
     // driver and connection pool
     implementation("org.postgresql:postgresql:42.2.16")
     implementation("com.zaxxer:HikariCP:3.4.5")
+
+    // logging
+    implementation("io.github.microutils:kotlin-logging-jvm:2.0.3")
+    implementation("org.apache.logging.log4j:log4j-core:2.13.3")
+    implementation("org.slf4j:slf4j-log4j12:1.7.30")
+
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"

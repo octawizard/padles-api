@@ -1,7 +1,11 @@
-package com.octawizard.repository
+package com.octawizard.repository.user
 
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
+import com.octawizard.repository.StringIdTable
+import org.jetbrains.exposed.dao.Entity
+import org.jetbrains.exposed.dao.EntityClass
+import org.jetbrains.exposed.dao.id.EntityID
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.`java-time`.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -11,7 +15,7 @@ class DatabaseUserRepository : UserRepository {
     override fun createUser(user: User): User {
         transaction {
             Users.insert {
-                it[email] = user.email.value
+                it[id] = EntityID(user.email.value, Users)
                 it[name] = user.name
                 it[createdAt] = user.createdAt
             }
@@ -21,16 +25,14 @@ class DatabaseUserRepository : UserRepository {
 
     override fun getUser(email: Email): User? {
         return transaction {
-            Users.select { Users.email eq email.value }
-                .map { User(Email(it[Users.email]), it[Users.name], it[Users.createdAt]) }
-                .firstOrNull()
+            UsersEntity.findById(email.value)?.toUser()
         }
     }
 
     override fun updateUser(user: User): User {
         transaction {
-            Users.update({ Users.email eq user.email.value }) {
-                it[email] = user.email.value
+            Users.update({ Users.id eq user.email.value }) {
+                it[id] = EntityID(user.email.value, Users)
                 it[name] = user.name
                 it[createdAt] = user.createdAt
             }
@@ -39,10 +41,16 @@ class DatabaseUserRepository : UserRepository {
     }
 }
 
-object Users : Table("users") {
-    val email: Column<String> = varchar("email", 250)
+object Users : StringIdTable("users", "email", 250) {
     val name: Column<String> = varchar("name", 50)
     val createdAt: Column<LocalDateTime> = datetime("created_at")
+}
 
-    override val primaryKey by lazy { super.primaryKey ?: PrimaryKey(email) }
+class UsersEntity(id: EntityID<String>) : Entity<String>(id) {
+    companion object : EntityClass<String, UsersEntity>(Users)
+
+    var name by Users.name
+    var createdAt by Users.createdAt
+
+    fun toUser(): User = User(Email(id.value), name, createdAt)
 }

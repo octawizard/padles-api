@@ -4,8 +4,10 @@ import com.octawizard.controller.Controller
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
 import com.octawizard.domain.usecase.useCaseModule
-import com.octawizard.repository.Users
+import com.octawizard.repository.match.Matches
+import com.octawizard.repository.user.Users
 import com.octawizard.repository.repositoryModule
+import com.octawizard.server.input.CreateMatchInput
 import com.octawizard.server.input.UserInput
 import com.octawizard.server.input.UserUpdateInput
 import com.octawizard.server.input.toUser
@@ -20,13 +22,13 @@ import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
-import kotlinx.coroutines.runBlocking
 import kotlinx.html.*
+import mu.KotlinLogging
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.kodein.di.*
-import java.time.LocalDateTime
+import java.util.*
 
 
 fun HTML.index(user: User) {
@@ -39,12 +41,24 @@ fun HTML.index(user: User) {
         }
     }
 }
+private val logger = KotlinLogging.logger {}
 
 fun main() {
+    logger.info { "Hello world" }
     val kodein = DI {
         import(useCaseModule)
         import(repositoryModule)
-        bind<Controller>() with singleton { Controller(instance(), instance(), instance(), instance(), instance(), instance()) }
+        bind<Controller>() with singleton {
+            Controller(
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance()
+            )
+        }
     }
 
     initDatabase()
@@ -59,6 +73,7 @@ fun main() {
         install(CallLogging)
         routing {
             userRoutes(controller)
+            matchRoutes(controller)
         }
     }.start(wait = true)
 }
@@ -76,8 +91,8 @@ private fun initDatabase() {
     Database.connect(dataSource)
 
     transaction {
-        SchemaUtils.create(Users)
-        SchemaUtils.createMissingTablesAndColumns(Users)
+        SchemaUtils.create(Users, Matches)
+        SchemaUtils.createMissingTablesAndColumns(Users, Matches)
     }
 }
 
@@ -86,9 +101,15 @@ private fun Routing.userRoutes(controller: Controller) {
 
     get("/user/{$emailParam}") {
         val emailString = call.parameters[emailParam]
-                ?: throw BadRequestException("$emailParam must be present in path")
+            ?: throw BadRequestException("$emailParam must be present in path")
         val u = controller.getUser(emailString) ?: throw NotFoundException("User $emailString not found")
         call.respond(HttpStatusCode.OK, u)
+    }
+
+
+    // all matches where the user plays/played
+    get("/user/{$emailParam}/match") {
+        TODO("to implement")
     }
 
     post("/user") {
@@ -99,10 +120,35 @@ private fun Routing.userRoutes(controller: Controller) {
 
     put("/user/{$emailParam}") {
         val emailString = call.parameters[emailParam]
-                ?: throw BadRequestException("$emailParam must be present in path")
+            ?: throw BadRequestException("$emailParam must be present in path")
         val email = Email(emailString)
         val updated = call.receive<UserUpdateInput>().toUser(email)
         val updatedUser = controller.updateUser(updated) ?: throw NotFoundException("User $emailString not found")
         call.respond(HttpStatusCode.OK, updatedUser)
+    }
+}
+
+private fun Routing.matchRoutes(controller: Controller) {
+    val matchId = "matchId"
+    val userEmail = "userEmail"
+    post("/match") {
+        val input = call.receive<CreateMatchInput>()
+        val createdMatch = controller.createMatch(input.player1, input.player2, input.player3, input.player4)
+        call.respond(HttpStatusCode.Created, createdMatch)
+    }
+
+    get("/match/{$matchId}") {
+        val inputMatchId = UUID.fromString(call.parameters[matchId])
+        val match = controller.getMatch(inputMatchId) ?: throw NotFoundException()
+        call.respond(HttpStatusCode.OK, match)
+    }
+
+    put("/match/{$matchId}") {
+        TODO("to implement")
+    }
+
+    // all matches that needs at least one player
+    get("/match") {
+        call.respond(HttpStatusCode.OK, controller.getAllAvailableMatches())
     }
 }

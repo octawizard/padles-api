@@ -11,7 +11,8 @@ data class Match(
     val player4: User?,
     val createdAt: LocalDateTime,
     val status: MatchStatus,
-    val reservation: Reservation?
+//    val reservation: Reservation?
+    val reservationId: UUID?
 )
 
 enum class MatchStatus {
