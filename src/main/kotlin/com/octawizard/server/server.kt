@@ -7,10 +7,7 @@ import com.octawizard.domain.usecase.useCaseModule
 import com.octawizard.repository.match.Matches
 import com.octawizard.repository.user.Users
 import com.octawizard.repository.repositoryModule
-import com.octawizard.server.input.CreateMatchInput
-import com.octawizard.server.input.UserInput
-import com.octawizard.server.input.UserUpdateInput
-import com.octawizard.server.input.toUser
+import com.octawizard.server.input.*
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import io.ktor.application.*
@@ -50,6 +47,8 @@ fun main() {
         import(repositoryModule)
         bind<Controller>() with singleton {
             Controller(
+                instance(),
+                instance(),
                 instance(),
                 instance(),
                 instance(),
@@ -130,7 +129,7 @@ private fun Routing.userRoutes(controller: Controller) {
 
 private fun Routing.matchRoutes(controller: Controller) {
     val matchId = "matchId"
-    val userEmail = "userEmail"
+
     post("/match") {
         val input = call.receive<CreateMatchInput>()
         val createdMatch = controller.createMatch(input.player1, input.player2, input.player3, input.player4)
@@ -143,8 +142,17 @@ private fun Routing.matchRoutes(controller: Controller) {
         call.respond(HttpStatusCode.OK, match)
     }
 
-    put("/match/{$matchId}") {
-        TODO("to implement")
+    patch("/match/{$matchId}") {
+        val input = call.receive<PatchMatchInput>()
+        val inputMatchId = UUID.fromString(call.parameters[matchId])
+        val updateMatch = controller.patchMatch(input, inputMatchId) ?: throw NotFoundException()
+        call.respond(HttpStatusCode.OK, updateMatch)
+    }
+
+    delete("/match/{$matchId}"){
+        val inputMatchId = UUID.fromString(call.parameters[matchId])
+        controller.deleteMatch(inputMatchId)
+        call.respond(HttpStatusCode.NoContent)
     }
 
     // all matches that needs at least one player

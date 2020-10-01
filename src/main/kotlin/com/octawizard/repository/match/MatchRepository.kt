@@ -8,6 +8,8 @@ interface MatchRepository {
 
     fun createMatch(user1: User, user2: User?, user3: User?, user4: User?): Match
     fun getMatch(id: UUID): Match?
-    fun joinMatch(user: User, match: Match): Match
+    fun joinMatch(user: User, matchId: UUID): Unit
     fun allAvailableMatches(): List<Match>
+    fun leaveMatch(user: User, matchId: UUID)
+    fun deleteMatch(matchId: UUID): Int
 }

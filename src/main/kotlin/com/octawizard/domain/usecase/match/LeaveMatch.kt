@@ -5,10 +5,10 @@ import com.octawizard.domain.model.User
 import com.octawizard.repository.match.MatchRepository
 import java.util.*
 
-class JoinMatch(private val matchRepository: MatchRepository){
+class LeaveMatch(private val matchRepository: MatchRepository){
 
     operator fun invoke(user: User, matchId: UUID): Match? {
-        matchRepository.joinMatch(user, matchId)
+        matchRepository.leaveMatch(user, matchId)
         return matchRepository.getMatch(matchId)
     }
 }
