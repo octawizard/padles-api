@@ -1,8 +1,9 @@
 package com.octawizard.domain.model
 
+import java.io.Serializable
 import java.lang.IllegalArgumentException
 
-class Email(val value: String) {
+class Email(val value: String): Serializable {
 
     init {
         if (!value.isValidEmail()) {

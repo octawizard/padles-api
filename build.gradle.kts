@@ -42,6 +42,9 @@ dependencies {
     implementation("org.apache.logging.log4j:log4j-core:2.13.3")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
 
+    // redis
+    implementation("org.redisson:redisson:3.13.5")
+
 }
 tasks.withType<KotlinCompile>() {
     kotlinOptions.jvmTarget = "1.8"
