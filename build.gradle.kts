@@ -21,6 +21,8 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.testcontainers:testcontainers:1.14.3")
     testImplementation("org.testcontainers:junit-jupiter:1.14.3")
+    testImplementation("io.mockk:mockk:1.10.2")
+    testRuntimeOnly("com.h2database:h2:1.4.200")
 
     implementation("io.ktor:ktor-server-netty:1.4.0")
     implementation("io.ktor:ktor-html-builder:1.4.0")
