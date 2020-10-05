@@ -19,6 +19,9 @@ repositories {
 }
 dependencies {
     testImplementation(kotlin("test-junit5"))
+    testImplementation("org.testcontainers:testcontainers:1.14.3")
+    testImplementation("org.testcontainers:junit-jupiter:1.14.3")
+
     implementation("io.ktor:ktor-server-netty:1.4.0")
     implementation("io.ktor:ktor-html-builder:1.4.0")
     implementation("io.ktor:ktor-gson:1.4.0")

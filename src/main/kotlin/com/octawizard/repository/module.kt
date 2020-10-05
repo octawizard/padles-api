@@ -18,7 +18,7 @@ val repositoryModule = DI.Module("repository") {
     bind<UserRepository>() with
             singleton { CacheUserRepository(instance("userCache"), instance("db")) }
     bind<MatchRepository>() with singleton { DatabaseMatchRepository() }
-    bind<RedissonClient>() with singleton { RedissonClientFactory.create("redis://127.0.0.1:6379") } //todo put in config
+    bind<RedissonClient>() with singleton { RedissonClientFactory.create("redis://127.0.0.1:6379", 5000) } //todo put in config
     bind<RedisCache<String, User>>(tag = "userCache") with
             singleton { RedisCache(instance(), "users", 24, TimeUnit.HOURS) } //todo put in config
 }
