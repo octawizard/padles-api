@@ -16,8 +16,8 @@ data class Match(
 )
 
 enum class MatchStatus {
-    Draft,
-    Confirmed,
-    Finished,
-    Canceled
+    Draft,  // missing reservation/players
+    Confirmed, // reservation confirmed && players == 4
+    Finished, // match has been played TODO maybe to be removed, match effective date will be inside reservation
+    Canceled    // match has been canceled whenever a reservation was present
 }

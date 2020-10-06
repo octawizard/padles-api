@@ -7,9 +7,6 @@ import java.util.*
 class DeleteMatch(private val matchRepository: MatchRepository){
 
     operator fun invoke(matchId: UUID) {
-        val d = matchRepository.deleteMatch(matchId)
-        if (d == 0) {
-            throw NotFoundException("match $matchId not found")
-        }
+        matchRepository.deleteMatch(matchId)
     }
 }

@@ -20,9 +20,8 @@ import java.util.*
 
 class DatabaseMatchRepository : MatchRepository {
 
-    override fun createMatch(user1: User, user2: User?, user3: User?, user4: User?): Match {
+    override fun createMatch(user1: User, user2: User?, user3: User?, user4: User?, matchStatus: MatchStatus): Match {
         val now = LocalDateTime.now()
-        val draftStatus = MatchStatus.Draft
         val matchId = transaction {
             Matches.insertAndGetId {
                 it[player1] = EntityID(user1.email.value, Users)
@@ -30,11 +29,11 @@ class DatabaseMatchRepository : MatchRepository {
                 it[player3] = user3?.let { u -> EntityID(u.email.value, Users) }
                 it[player4] = user4?.let { u -> EntityID(u.email.value, Users) }
                 it[createdAt] = now
-                it[status] = draftStatus
+                it[status] = matchStatus
                 it[reservation] = null
             }
         }
-        return Match(matchId.value, user1, user2, user3, user4, now, draftStatus, null)
+        return Match(matchId.value, user1, user2, user3, user4, now, matchStatus, null)
     }
 
     override fun getMatch(id: UUID): Match? {
@@ -65,7 +64,6 @@ class DatabaseMatchRepository : MatchRepository {
                 it[player3] = updatedPlayers.player3?.let { email -> EntityID(email, Users) }
                 it[player4] = updatedPlayers.player4?.let { email -> EntityID(email, Users) }
             }
-
         }
     }
 
@@ -104,6 +102,7 @@ class DatabaseMatchRepository : MatchRepository {
                     players.player2 -> player2
                     players.player3 -> player3
                     players.player4 -> player4
+                    players.player1 -> throw IllegalArgumentException("user ${user.email.value} is the match creator, cannot leave the match, only delete it")
                     else -> throw IllegalArgumentException("user ${user.email.value} not found in match $matchId")
                 }
 
@@ -113,9 +112,12 @@ class DatabaseMatchRepository : MatchRepository {
         }
     }
 
-    override fun deleteMatch(matchId: UUID): Int {
-        return transaction {
+    override fun deleteMatch(matchId: UUID) {
+        val res = transaction {
             Matches.deleteWhere { Matches.id eq matchId }
+        }
+        if (res == 0) {
+            throw NotFoundException("match $matchId not found")
         }
     }
 }

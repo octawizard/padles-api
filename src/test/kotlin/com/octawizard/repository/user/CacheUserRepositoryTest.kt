@@ -11,7 +11,9 @@ import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.TestInstance
 
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CacheUserRepositoryTest {
     private val cache = mockk<RedisCache<String, User>>(relaxed = true)
     private val userRepository = mockk<UserRepository>(relaxed = true)
