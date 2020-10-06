@@ -2,6 +2,7 @@ package com.octawizard.repository.user
 
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
+import io.ktor.features.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
@@ -73,6 +74,16 @@ class DatabaseUserRepositoryTest {
         assertEquals(updatedName, updatedUser.name)
         assertNotEquals(previousName, updatedUser.name)
         assertEquals(createdAt, updatedUser.createdAt)
+    }
+
+    @Test
+    fun `DatabaseUserRepository returns exception when trying to updat not existing user`() {
+        val email = Email("test@test.com")
+        val createdAt = LocalDateTime.now()
+        val updatedName = "Test User Updated"
+        val user = User(email, updatedName, createdAt)
+
+        assertThrows(NotFoundException::class.java) { repository.updateUser(user)  }
     }
 
 }
