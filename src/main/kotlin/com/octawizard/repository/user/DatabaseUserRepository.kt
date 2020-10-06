@@ -3,6 +3,7 @@ package com.octawizard.repository.user
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
 import com.octawizard.repository.StringIdTable
+import io.ktor.features.*
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
@@ -30,14 +31,17 @@ class DatabaseUserRepository : UserRepository {
     }
 
     override fun updateUser(user: User): User {
-        transaction {
+        val updated = transaction {
             Users.update({ Users.id eq user.email.value }) {
                 it[id] = EntityID(user.email.value, Users)
                 it[name] = user.name
                 it[createdAt] = user.createdAt
             }
         }
-        return user
+        return when (updated) {
+            1 -> user
+            else -> throw NotFoundException("user ${user.email} not found, cannot update")
+        }
     }
 }
 
