@@ -1,5 +1,6 @@
 package com.octawizard.domain.model
 
+import java.io.Serializable
 import java.time.LocalDateTime
 import java.util.*
 
@@ -13,9 +14,9 @@ data class Match(
     val status: MatchStatus,
 //    val reservation: Reservation?
     val reservationId: UUID?
-)
+): Serializable
 
-enum class MatchStatus {
+enum class MatchStatus: Serializable {
     Draft,  // missing reservation/players
     Confirmed, // reservation confirmed && players == 4
     Finished, // match has been played TODO maybe to be removed, match effective date will be inside reservation

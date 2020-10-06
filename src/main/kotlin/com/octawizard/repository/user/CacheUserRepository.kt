@@ -7,7 +7,7 @@ import com.octawizard.repository.RedisCache
 class CacheUserRepository(private val cache: RedisCache<String, User>, private val userRepository: UserRepository) : UserRepository {
     override fun createUser(user: User): User {
         val createdUser = userRepository.createUser(user)
-        cache.put(createdUser.email.value, createdUser)
+        cache.put(createdUser.email.value, createdUser) //todo make this async
         return createdUser
     }
 

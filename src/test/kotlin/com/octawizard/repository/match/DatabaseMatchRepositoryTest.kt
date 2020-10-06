@@ -64,7 +64,7 @@ class DatabaseMatchRepositoryTest {
     fun `DatabaseMatchRepository should create a match and return it`() {
         addUsersToDb(user1, user2)
 
-        val (id, player1, player2, player3, player4, createdAt, status, reservationId) =
+        val (_, player1, player2, player3, player4, _, status, _) =
                 repository.createMatch(user1, user2, null, null, MatchStatus.Draft)
 
         assertEquals(user1, player1)
