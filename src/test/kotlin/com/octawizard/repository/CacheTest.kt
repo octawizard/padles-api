@@ -79,4 +79,20 @@ class CacheTest {
 
         assertNull(redisCache.get(key))
     }
+
+    @Test
+    fun `RedisCache delete value given a key`() {
+        val client = RedissonClientFactory.create("redis://$host:$port", timeout)
+        val ttl = 100L
+        val redisCache = RedisCache<Int, String>(client, "deleteTest", ttl, TimeUnit.MILLISECONDS)
+
+        val key = 1
+        val value = key.toString()
+        redisCache.put(key, value)
+        assertEquals(value, redisCache.get(key))
+
+        redisCache.delete(key)
+
+        assertNull(redisCache.get(key))
+    }
 }
