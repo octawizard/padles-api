@@ -6,6 +6,7 @@ import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.junit.jupiter.api.Assertions.assertThrows
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UtilsTest {
@@ -38,6 +39,13 @@ class UtilsTest {
         runBlocking { retry(5) { block() } }
 
         coVerify(exactly = 2) { block() }
+    }
+
+    @Test
+    fun `retry function should throw exception when providing retry times is below 1`() {
+        val block = mockk<suspend () -> Unit>()
+
+        assertThrows(IllegalArgumentException::class.java) { runBlocking { retry(0) { block() } } }
     }
 
 }
