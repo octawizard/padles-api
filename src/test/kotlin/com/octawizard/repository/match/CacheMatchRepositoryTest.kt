@@ -5,11 +5,7 @@ import com.octawizard.domain.model.Match
 import com.octawizard.domain.model.MatchStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.RedisCache
-import io.mockk.Called
-import io.mockk.clearAllMocks
-import io.mockk.every
-import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -37,9 +33,8 @@ class CacheMatchRepositoryTest {
         every { matchRepository.createMatch(any(), any(), any(), any(), any()) } returns match
 
         val createdMatch = cacheMatchRepository.createMatch(user, null, null, null, MatchStatus.Draft)
-        Thread.sleep(50)
 
-        verify {
+        verify(timeout = 50) {
             matchRepository.createMatch(user, null, null, null, MatchStatus.Draft)
             cache.put(id, createdMatch)
         }
@@ -54,9 +49,8 @@ class CacheMatchRepositoryTest {
         every { cache.get(id) } returns match
 
         val returnedMatch = cacheMatchRepository.getMatch(id)
-        Thread.sleep(50)
 
-        verify { cache.get(id) }
+        verify(timeout = 50) { cache.get(id) }
         verify(inverse = true) { matchRepository.getMatch(id) }
         assertEquals(match, returnedMatch)
     }
@@ -70,9 +64,8 @@ class CacheMatchRepositoryTest {
         every { matchRepository.getMatch(id) } returns match
 
         val returnedMatch = cacheMatchRepository.getMatch(id)
-        Thread.sleep(50)
 
-        verify {
+        verify(timeout = 50) {
             cache.get(id)
             matchRepository.getMatch(id)
             cache.put(id, returnedMatch!!)
@@ -87,13 +80,12 @@ class CacheMatchRepositoryTest {
 
         val id = UUID.randomUUID()
         val returnedUser = cacheMatchRepository.getMatch(id)
-        Thread.sleep(50)
 
-        verify {
+        verify(timeout = 50) {
             cache.get(id)
             matchRepository.getMatch(id)
         }
-        verify(inverse = true) { cache.put(id, any()) }
+        verify(inverse = true, timeout = 50) { cache.put(id, any()) }
         assertNull(returnedUser)
     }
 

@@ -32,9 +32,8 @@ class CacheUserRepositoryTest {
         every { cache.get(email.value) } returns user
 
         val returnedUser = cacheUserRepository.getUser(email)
-        Thread.sleep(50)
 
-        verify { cache.get(email.value) }
+        verify(timeout = 50) { cache.get(email.value) }
         verify(inverse = true) { userRepository.getUser(email) }
         assertEquals(user, returnedUser)
     }
@@ -48,9 +47,8 @@ class CacheUserRepositoryTest {
         every { userRepository.getUser(email) } returns user
 
         val returnedUser = cacheUserRepository.getUser(email)
-        Thread.sleep(50)
 
-        verify {
+        verify(timeout = 50) {
             cache.get(email.value)
             userRepository.getUser(email)
             cache.put(email.value, returnedUser!!)
@@ -66,13 +64,12 @@ class CacheUserRepositoryTest {
         every { userRepository.getUser(email) } returns null
 
         val returnedUser = cacheUserRepository.getUser(email)
-        Thread.sleep(50)
 
-        verify {
+        verify(timeout = 50) {
             cache.get(email.value)
             userRepository.getUser(email)
         }
-        verify(inverse = true) { cache.put(email.value, any()) }
+        verify(inverse = true, timeout = 50) { cache.put(email.value, any()) }
         assertNull(returnedUser)
     }
 
@@ -83,9 +80,8 @@ class CacheUserRepositoryTest {
         every { userRepository.updateUser(user) } returns user
 
         val updatedUser = cacheUserRepository.updateUser(user)
-        Thread.sleep(50)
 
-        verify {
+        verify(timeout = 50) {
             userRepository.updateUser(user)
             cache.put(user.email.value, updatedUser)
         }
@@ -99,9 +95,8 @@ class CacheUserRepositoryTest {
         every { userRepository.createUser(user) } returns user
 
         val createdUser = cacheUserRepository.createUser(user)
-        Thread.sleep(50)
 
-        verify {
+        verify(timeout = 50) {
             userRepository.createUser(user)
             cache.put(createdUser.email.value, createdUser)
         }
