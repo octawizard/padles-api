@@ -32,6 +32,7 @@ class CacheUserRepositoryTest {
         every { cache.get(email.value) } returns user
 
         val returnedUser = cacheUserRepository.getUser(email)
+        Thread.sleep(50)
 
         verify { cache.get(email.value) }
         verify(inverse = true) { userRepository.getUser(email) }
@@ -47,6 +48,7 @@ class CacheUserRepositoryTest {
         every { userRepository.getUser(email) } returns user
 
         val returnedUser = cacheUserRepository.getUser(email)
+        Thread.sleep(50)
 
         verify {
             cache.get(email.value)
@@ -64,6 +66,7 @@ class CacheUserRepositoryTest {
         every { userRepository.getUser(email) } returns null
 
         val returnedUser = cacheUserRepository.getUser(email)
+        Thread.sleep(50)
 
         verify {
             cache.get(email.value)
@@ -80,6 +83,7 @@ class CacheUserRepositoryTest {
         every { userRepository.updateUser(user) } returns user
 
         val updatedUser = cacheUserRepository.updateUser(user)
+        Thread.sleep(50)
 
         verify {
             userRepository.updateUser(user)
@@ -95,6 +99,7 @@ class CacheUserRepositoryTest {
         every { userRepository.createUser(user) } returns user
 
         val createdUser = cacheUserRepository.createUser(user)
+        Thread.sleep(50)
 
         verify {
             userRepository.createUser(user)

@@ -4,6 +4,7 @@ import com.octawizard.domain.model.Match
 import com.octawizard.domain.model.MatchStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.RedisCache
+import com.octawizard.repository.retry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -22,7 +23,7 @@ class CacheMatchRepository(
     override fun getMatch(id: UUID): Match? {
         fun fallbackToUserRepository(id: UUID): Match? {
             val match = matchRepository.getMatch(id)
-            match?.let { cache.put(it.id, it) }
+            match?.let { GlobalScope.launch { retry { cache.put(it.id, it) } } }
             return match
         }
 
@@ -47,14 +48,4 @@ class CacheMatchRepository(
         matchRepository.deleteMatch(matchId).also { runBlocking { retry { cache.delete(matchId) } } }
     }
 
-}
-
-suspend fun retry(times: Int = 3, block: suspend () -> Unit) {
-    require(times > 0)
-    for (i in 1..times) {
-        try {
-            return block()
-        } catch (e: Exception) { /* retry */ }
-    }
-    // ignore add in cache, todo send some metric to track it
 }
