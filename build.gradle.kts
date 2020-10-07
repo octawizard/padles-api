@@ -3,6 +3,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 plugins {
     kotlin("jvm") version "1.4.10"
     application
+    jacoco
 }
 group = "com.octawizard"
 version = "0.1-SNAPSHOT"
@@ -51,8 +52,20 @@ dependencies {
     implementation("org.redisson:redisson:3.13.5")
 
 }
-tasks.withType<KotlinCompile>() {
-    kotlinOptions.jvmTarget = "1.8"
+
+tasks.test {
+    finalizedBy(tasks.jacocoTestReport)
+}
+//tasks.jacocoTestReport {
+//    dependsOn(tasks.test)
+//}
+tasks.withType<KotlinCompile> {
+    kotlinOptions.jvmTarget = "11"
+}
+tasks.compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "11"
+    }
 }
 application {
     mainClassName = "ServerKt"
