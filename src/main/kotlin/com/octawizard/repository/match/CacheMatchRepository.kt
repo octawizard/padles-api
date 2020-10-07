@@ -31,8 +31,9 @@ class CacheMatchRepository(
     }
 
     override fun joinMatch(user: User, matchId: UUID) {
-        matchRepository.joinMatch(user, matchId)
-        runBlocking { retry { cache.delete(matchId) } }
+        matchRepository.joinMatch(user, matchId).also {
+            runBlocking { retry { cache.delete(matchId) } }
+        }
     }
 
     override fun allAvailableMatches(): List<Match> {
@@ -40,8 +41,9 @@ class CacheMatchRepository(
     }
 
     override fun leaveMatch(user: User, matchId: UUID) {
-        matchRepository.leaveMatch(user, matchId)
-        runBlocking { retry { cache.delete(matchId) } }
+        matchRepository.leaveMatch(user, matchId).also {
+            runBlocking { retry { cache.delete(matchId) } }
+        }
     }
 
     override fun deleteMatch(matchId: UUID) {
