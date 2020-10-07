@@ -24,6 +24,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.14.3")
     testImplementation("io.mockk:mockk:1.10.2")
     testRuntimeOnly("com.h2database:h2:1.4.200")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.0")
 
     implementation("io.ktor:ktor-server-netty:1.4.0")
     implementation("io.ktor:ktor-html-builder:1.4.0")
@@ -54,11 +55,16 @@ dependencies {
 }
 
 tasks.test {
+    useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
 }
-//tasks.jacocoTestReport {
-//    dependsOn(tasks.test)
-//}
+
+tasks.jacocoTestReport {
+    reports {
+        xml.isEnabled = true
+    }
+    dependsOn(tasks.test)
+}
 tasks.withType<KotlinCompile> {
     kotlinOptions.jvmTarget = "11"
 }
