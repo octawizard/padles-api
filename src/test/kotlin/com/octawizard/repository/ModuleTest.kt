@@ -49,7 +49,7 @@ class ModuleTest {
     }
 
     @Test
-    fun `UseCaseModule should inject dependencies for repositories`() {
+    fun `RepositoryModule should inject dependencies for repositories`() {
         val kodein = DI {
             bind<RepositoryConfiguration>() with singleton { testConfig }
             import(repositoryModule)
