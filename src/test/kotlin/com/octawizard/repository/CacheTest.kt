@@ -11,6 +11,7 @@ import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import org.testcontainers.containers.GenericContainer
+import java.time.Duration
 import java.util.concurrent.TimeUnit
 
 
@@ -18,7 +19,7 @@ import java.util.concurrent.TimeUnit
 class CacheTest {
     var host: String = ""
     var port: Int = 1234
-    private val timeout = 1000
+    private val timeout = Duration.ofSeconds(1)
 
     companion object {
         @get:ClassRule
@@ -35,7 +36,7 @@ class CacheTest {
     fun `initialize local Redis server`() {
         redis.start()
         host = redis.host
-        port = redis.firstMappedPort
+        port = redis.getMappedPort(6379)
     }
 
     @AfterAll
@@ -57,7 +58,8 @@ class CacheTest {
     @Test
     fun `RedisCache store and read value in cache`() {
         val client = RedissonClientFactory.create("redis://$host:$port", timeout)
-        val redisCache = RedisCache<Int, String>(client, "putTest", 500, TimeUnit.MILLISECONDS)
+        val ttl = Duration.ofMillis(500)
+        val redisCache = RedisCache<Int, String>(client, "putTest", ttl)
 
         val key = 1
         assertNull(redisCache.get(key))
@@ -69,13 +71,13 @@ class CacheTest {
     @Test
     fun `RedisCache expires value after given ttl`() {
         val client = RedissonClientFactory.create("redis://$host:$port", timeout)
-        val ttl = 100L
-        val redisCache = RedisCache<Int, String>(client, "expireTest", ttl, TimeUnit.MILLISECONDS)
+        val ttl = Duration.ofMillis(100)
+        val redisCache = RedisCache<Int, String>(client, "expireTest", ttl)
 
         val key = 1
         val value = key.toString()
         redisCache.put(key, value)
-        runBlocking { Thread.sleep(ttl) }
+        runBlocking { Thread.sleep(ttl.toMillis()) }
 
         assertNull(redisCache.get(key))
     }
@@ -83,8 +85,8 @@ class CacheTest {
     @Test
     fun `RedisCache delete value given a key`() {
         val client = RedissonClientFactory.create("redis://$host:$port", timeout)
-        val ttl = 100L
-        val redisCache = RedisCache<Int, String>(client, "deleteTest", ttl, TimeUnit.MILLISECONDS)
+        val ttl = Duration.ofMillis(100)
+        val redisCache = RedisCache<Int, String>(client, "deleteTest", ttl)
 
         val key = 1
         val value = key.toString()

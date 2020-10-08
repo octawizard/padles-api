@@ -5,6 +5,7 @@ import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
 import com.octawizard.domain.usecase.useCaseModule
 import com.octawizard.repository.match.Matches
+import com.octawizard.repository.repositoryConfigurationModule
 import com.octawizard.repository.repositoryModule
 import com.octawizard.repository.user.Users
 import com.octawizard.server.input.*
@@ -44,6 +45,7 @@ fun main() {
     logger.info { "Hello world" }
     val kodein = DI {
         import(useCaseModule)
+        import(repositoryConfigurationModule)
         import(repositoryModule)
         bind<Controller>() with singleton {
             Controller(
