@@ -1,6 +1,7 @@
 package com.octawizard.repository.user
 
 import com.octawizard.domain.model.Email
+import com.octawizard.domain.model.Gender
 import com.octawizard.domain.model.User
 import io.ktor.features.*
 import org.jetbrains.exposed.sql.*
@@ -50,6 +51,7 @@ class DatabaseUserRepositoryTest {
         transaction {
             UsersEntity.new(email.value) {
                 name = "Test User"
+                gender = Gender.other
                 createdAt = LocalDateTime.now()
             }
         }
@@ -62,16 +64,19 @@ class DatabaseUserRepositoryTest {
         val createdAt = LocalDateTime.now()
         val previousName = "Test User"
         val updatedName = "Test User Updated"
-        val user = User(email, updatedName, createdAt)
+        val gender = Gender.female
+        val user = User(email, updatedName, gender, createdAt)
         transaction {
             UsersEntity.new(email.value) {
                 name = previousName
+                this.gender = gender
                 this.createdAt = createdAt
             }
         }
         val updatedUser = repository.updateUser(user)
         assertEquals(email, updatedUser.email)
         assertEquals(updatedName, updatedUser.name)
+        assertEquals(gender, updatedUser.gender)
         assertNotEquals(previousName, updatedUser.name)
         assertEquals(createdAt, updatedUser.createdAt)
     }
@@ -81,7 +86,7 @@ class DatabaseUserRepositoryTest {
         val email = Email("test@test.com")
         val createdAt = LocalDateTime.now()
         val updatedName = "Test User Updated"
-        val user = User(email, updatedName, createdAt)
+        val user = User(email, updatedName, Gender.female, createdAt)
 
         assertThrows(NotFoundException::class.java) { repository.updateUser(user)  }
     }

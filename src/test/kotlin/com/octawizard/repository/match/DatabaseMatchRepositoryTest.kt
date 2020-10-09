@@ -1,6 +1,7 @@
 package com.octawizard.repository.match
 
 import com.octawizard.domain.model.Email
+import com.octawizard.domain.model.Gender
 import com.octawizard.domain.model.MatchStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.user.Users
@@ -31,10 +32,10 @@ import java.util.*
 class DatabaseMatchRepositoryTest {
     private lateinit var repository: DatabaseMatchRepository
 
-    private val user1 = User(Email("user1@mail.com"), "player1")
-    private val user2 = User(Email("user2@mail.com"), "player2")
-    private val user3 = User(Email("user3@email.com"), "player3")
-    private val user4 = User(Email("user4@email.com"), "player4")
+    private val user1 = User(Email("user1@mail.com"), "player1", Gender.male)
+    private val user2 = User(Email("user2@mail.com"), "player2", Gender.female)
+    private val user3 = User(Email("user3@email.com"), "player3", Gender.other)
+    private val user4 = User(Email("user4@email.com"), "player4", Gender.male)
 
     @BeforeAll
     fun `init database`() {
@@ -181,6 +182,7 @@ class DatabaseMatchRepositoryTest {
                 Users.batchInsert(users) { user: User ->
                     this[Users.id] = EntityID(user.email.value, Users)
                     this[Users.name] = user.name
+                    this[Users.gender] = user.gender
                     this[Users.createdAt] = user.createdAt
                 }
             }

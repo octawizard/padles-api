@@ -1,6 +1,7 @@
 package com.octawizard.repository.user
 
 import com.octawizard.domain.model.Email
+import com.octawizard.domain.model.Gender
 import com.octawizard.domain.model.User
 import com.octawizard.repository.StringIdTable
 import io.ktor.features.*
@@ -18,6 +19,7 @@ class DatabaseUserRepository : UserRepository {
             Users.insert {
                 it[id] = EntityID(user.email.value, Users)
                 it[name] = user.name
+                it[gender] = user.gender
                 it[createdAt] = user.createdAt
             }
         }
@@ -35,6 +37,7 @@ class DatabaseUserRepository : UserRepository {
             Users.update({ Users.id eq user.email.value }) {
                 it[id] = EntityID(user.email.value, Users)
                 it[name] = user.name
+                it[gender] = user.gender
                 it[createdAt] = user.createdAt
             }
         }
@@ -47,6 +50,7 @@ class DatabaseUserRepository : UserRepository {
 
 object Users : StringIdTable("users", "email", 250) {
     val name: Column<String> = varchar("name", 50)
+    val gender: Column<Gender> = enumerationByName("gender",15, Gender::class)
     val createdAt: Column<LocalDateTime> = datetime("created_at")
 }
 
@@ -54,7 +58,8 @@ class UsersEntity(id: EntityID<String>) : Entity<String>(id) {
     companion object : EntityClass<String, UsersEntity>(Users)
 
     var name by Users.name
+    var gender by Users.gender
     var createdAt by Users.createdAt
 
-    fun toUser(): User = User(Email(id.value), name, createdAt)
+    fun toUser(): User = User(Email(id.value), name, gender, createdAt)
 }
