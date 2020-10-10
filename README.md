@@ -6,3 +6,9 @@ Small REST API project using
 * Kodein
 * Exposed (with Postgres driver)
 * Redisson
+
+## How to run
+* Start the docker containers (Postgres and Redis):
+`docker-compose up`
+
+* Run the main function in `com.octawizard.server.server.kt`
