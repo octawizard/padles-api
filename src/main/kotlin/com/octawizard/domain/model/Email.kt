@@ -33,8 +33,8 @@ class Email(val value: String): Serializable {
 
 }
 
-private val Prefix = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}"
-private val Suffix = "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+"
+private const val Prefix = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}"
+private const val Suffix = "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+"
 private val EmailRegex = "$Prefix@$Suffix".toRegex()
 
 fun String.isValidEmail(): Boolean {

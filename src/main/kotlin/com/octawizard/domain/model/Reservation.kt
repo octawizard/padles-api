@@ -6,20 +6,21 @@ import java.util.*
 
 data class Reservation(
     val id: UUID,
-    val matchId: UUID,
+    val createdAt: LocalDateTime,
+    val match: Match,
     val club: Club,
-    val cost: BigDecimal,
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
     val reservedBy: User,
+    val price: BigDecimal,
     val status: ReservationStatus,
     val paymentStatus: PaymentStatus
 )
 
 enum class ReservationStatus {
-    CONFIRMED, CANCELED
+    Confirmed, Canceled
 }
 
 enum class PaymentStatus {
-    PENDING_PAYMENT, PAYED
+    PendingPayment, Payed, Refunded, ToBeRefunded
 }
