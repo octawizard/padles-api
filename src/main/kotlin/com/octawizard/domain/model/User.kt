@@ -7,7 +7,7 @@ data class User(
         val email: Email,
         val name: String,
         val gender: Gender = Gender.Other,
-        val phone: String,
+        val phone: String? = null,
         val createdAt: LocalDateTime = LocalDateTime.now()
 ) : Serializable
 

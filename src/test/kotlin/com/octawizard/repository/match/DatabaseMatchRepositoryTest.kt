@@ -32,10 +32,10 @@ import java.util.*
 class DatabaseMatchRepositoryTest {
     private lateinit var repository: DatabaseMatchRepository
 
-    private val user1 = User(Email("user1@mail.com"), "player1", Gender.male)
-    private val user2 = User(Email("user2@mail.com"), "player2", Gender.female)
-    private val user3 = User(Email("user3@email.com"), "player3", Gender.other)
-    private val user4 = User(Email("user4@email.com"), "player4", Gender.male)
+    private val user1 = User(Email("user1@mail.com"), "player1", Gender.Male)
+    private val user2 = User(Email("user2@mail.com"), "player2", Gender.Female)
+    private val user3 = User(Email("user3@email.com"), "player3", Gender.Other)
+    private val user4 = User(Email("user4@email.com"), "player4", Gender.Male)
 
     @BeforeAll
     fun `init database`() {

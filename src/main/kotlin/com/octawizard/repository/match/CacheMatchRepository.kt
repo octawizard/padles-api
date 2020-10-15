@@ -1,7 +1,6 @@
 package com.octawizard.repository.match
 
 import com.octawizard.domain.model.Match
-import com.octawizard.domain.model.MatchStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.RedisCache
 import com.octawizard.repository.retry
@@ -14,8 +13,8 @@ class CacheMatchRepository(
         private val cache: RedisCache<UUID, Match>, private val matchRepository: MatchRepository
 ) : MatchRepository {
 
-    override fun createMatch(user1: User, user2: User?, user3: User?, user4: User?, matchStatus: MatchStatus): Match {
-        val match = matchRepository.createMatch(user1, user2, user3, user4, matchStatus)
+    override fun createMatch(user1: User, user2: User?, user3: User?, user4: User?): Match {
+        val match = matchRepository.createMatch(user1, user2, user3, user4)
         GlobalScope.launch { retry { cache.put(match.id, match) } }
         return match
     }

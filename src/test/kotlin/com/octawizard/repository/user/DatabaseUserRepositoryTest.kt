@@ -51,7 +51,7 @@ class DatabaseUserRepositoryTest {
         transaction {
             UsersEntity.new(email.value) {
                 name = "Test User"
-                gender = Gender.other
+                gender = Gender.Other
                 createdAt = LocalDateTime.now()
             }
         }
@@ -64,7 +64,7 @@ class DatabaseUserRepositoryTest {
         val createdAt = LocalDateTime.now()
         val previousName = "Test User"
         val updatedName = "Test User Updated"
-        val gender = Gender.female
+        val gender = Gender.Female
         val user = User(email, updatedName, gender, createdAt)
         transaction {
             UsersEntity.new(email.value) {
@@ -86,7 +86,7 @@ class DatabaseUserRepositoryTest {
         val email = Email("test@test.com")
         val createdAt = LocalDateTime.now()
         val updatedName = "Test User Updated"
-        val user = User(email, updatedName, Gender.female, createdAt)
+        val user = User(email, updatedName, Gender.Female, createdAt)
 
         assertThrows(NotFoundException::class.java) { repository.updateUser(user)  }
     }

@@ -6,6 +6,7 @@ import com.octawizard.repository.RedisCache
 import com.octawizard.repository.retry
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 class CacheUserRepository(private val cache: RedisCache<String, User>, private val userRepository: UserRepository) : UserRepository {
     override fun createUser(user: User): User {
@@ -28,5 +29,9 @@ class CacheUserRepository(private val cache: RedisCache<String, User>, private v
         val updatedUser = userRepository.updateUser(user)
         GlobalScope.launch { retry { cache.put(updatedUser.email.value, updatedUser) } }
         return updatedUser
+    }
+
+    override fun deleteUser(email: Email) {
+        userRepository.deleteUser(email).also { runBlocking { retry { cache.delete(email.value) } } }
     }
 }

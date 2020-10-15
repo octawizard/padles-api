@@ -18,6 +18,10 @@ repositories {
         url = uri("https://dl.bintray.com/kotlin/kotlinx")
     }
 }
+
+val ktorVersion = "1.4.1"
+val exposedVersion = "0.24.1"
+
 dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.testcontainers:testcontainers:1.14.3")
@@ -26,19 +30,20 @@ dependencies {
     testRuntimeOnly("com.h2database:h2:1.4.200")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.0")
 
-    implementation("io.ktor:ktor-server-netty:1.4.0")
-    implementation("io.ktor:ktor-html-builder:1.4.0")
-    implementation("io.ktor:ktor-gson:1.4.0")
+    implementation("io.ktor:ktor-server-netty:$ktorVersion")
+    implementation("io.ktor:ktor-html-builder:$ktorVersion")
+    implementation("io.ktor:ktor-gson:$ktorVersion")
+    implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2")
 
     // Dependency Injection
     implementation("org.kodein.di:kodein-di-jvm:7.1.0")
 
     //dao
-    implementation("org.jetbrains.exposed", "exposed-core", "0.24.1")
-    implementation("org.jetbrains.exposed", "exposed-dao", "0.24.1")
-    implementation("org.jetbrains.exposed", "exposed-jdbc", "0.24.1")
-    implementation("org.jetbrains.exposed", "exposed-java-time", "0.24.1")
+    implementation("org.jetbrains.exposed", "exposed-core", exposedVersion)
+    implementation("org.jetbrains.exposed", "exposed-dao", exposedVersion)
+    implementation("org.jetbrains.exposed", "exposed-jdbc", exposedVersion)
+    implementation("org.jetbrains.exposed", "exposed-java-time", exposedVersion)
 
     // driver and connection pool
     implementation("org.postgresql:postgresql:42.2.16")

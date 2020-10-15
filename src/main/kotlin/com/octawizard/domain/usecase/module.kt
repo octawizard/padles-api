@@ -2,6 +2,7 @@ package com.octawizard.domain.usecase
 
 import com.octawizard.domain.usecase.match.*
 import com.octawizard.domain.usecase.user.CreateUser
+import com.octawizard.domain.usecase.user.DeleteUser
 import com.octawizard.domain.usecase.user.GetUser
 import com.octawizard.domain.usecase.user.UpdateUser
 import org.kodein.di.DI
@@ -20,4 +21,5 @@ val useCaseModule = DI.Module("useCase") {
     bind<JoinMatch>() with provider { JoinMatch(instance()) }
     bind<LeaveMatch>() with provider { LeaveMatch(instance()) }
     bind<UpdateUser>() with provider { UpdateUser(instance()) }
+    bind<DeleteUser>() with provider { DeleteUser(instance()) }
 }

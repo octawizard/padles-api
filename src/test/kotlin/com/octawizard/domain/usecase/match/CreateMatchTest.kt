@@ -2,7 +2,6 @@ package com.octawizard.domain.usecase.match
 
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.Match
-import com.octawizard.domain.model.MatchStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.match.MatchRepository
 import com.octawizard.repository.user.UserRepository
