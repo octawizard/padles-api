@@ -1,10 +1,8 @@
 package com.octawizard.domain.model
 
 import java.io.Serializable
-import java.util.*
 
 data class Match(
-    val id: UUID,
     val player1: User,
     val player2: User?,
     val player3: User?,

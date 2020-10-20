@@ -5,20 +5,20 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class Reservation(
-    val id: UUID,
-    val createdAt: LocalDateTime,
-    val match: Match,
-    val club: Club,
-    val startTime: LocalDateTime,
-    val endTime: LocalDateTime,
-    val reservedBy: User,
-    val price: BigDecimal,
-    val status: ReservationStatus,
-    val paymentStatus: PaymentStatus
+        val id: UUID,
+        val match: Match,
+        val club: Club,
+        val startTime: LocalDateTime,
+        val endTime: LocalDateTime,
+        val reservedBy: User,
+        val price: BigDecimal,
+        val status: ReservationStatus,
+        val paymentStatus: PaymentStatus,
+        val createdAt: LocalDateTime = LocalDateTime.now()
 )
 
 enum class ReservationStatus {
-    Confirmed, Canceled
+    Pending, Confirmed, Canceled
 }
 
 enum class PaymentStatus {
