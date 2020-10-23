@@ -34,7 +34,7 @@ dependencies {
     implementation("io.ktor:ktor-html-builder:$ktorVersion")
     implementation("io.ktor:ktor-gson:$ktorVersion")
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
-    implementation("org.jetbrains.kotlinx:kotlinx-html-jvm:0.7.2")
+    implementation("io.ktor:ktor-locations:$ktorVersion")
 
     // Dependency Injection
     implementation("org.kodein.di:kodein-di-jvm:7.1.0")
