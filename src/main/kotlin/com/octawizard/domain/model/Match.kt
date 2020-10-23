@@ -2,13 +2,13 @@ package com.octawizard.domain.model
 
 import java.io.Serializable
 
-data class Match(
-    val player1: User,
-    val player2: User?,
-    val player3: User?,
-    val player4: User?,
-    val result: MatchResult?
-): Serializable
+data class Match(val players: List<User>, val result: MatchResult? = null): Serializable {
+    init {
+        if (players.isEmpty() || players.size > 4) {
+            throw IllegalArgumentException("players should contain at least one player and less than four")
+        }
+    }
+}
 
 data class MatchResult(val sets: List<MatchSet>): Serializable
 
