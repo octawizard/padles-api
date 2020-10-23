@@ -1,6 +1,7 @@
 package com.octawizard.server.route
 
 import com.octawizard.controller.Controller
+import com.octawizard.domain.model.MatchResult
 import com.octawizard.domain.model.Reservation
 import com.octawizard.server.AuthorizationException
 import com.octawizard.server.input.PatchMatchInput
@@ -38,7 +39,8 @@ fun Routing.reservationRoutes(controller: Controller) {
         post("/reservation") {
             val input = call.receive<ReservationInput>()
             val reservation = controller.createReservation(
-                    input.reservedBy, input.clubId, input.startTime, input.endTime, input.price, input.match
+                    input.reservedBy, input.clubId, input.startTime, input.endTime, input.price,
+                    input.matchEmailPlayer2, input.matchEmailPlayer3, input.matchEmailPlayer4
             )
             call.respond(HttpStatusCode.Created, reservation)
         }
