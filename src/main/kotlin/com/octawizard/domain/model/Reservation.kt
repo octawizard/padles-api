@@ -7,7 +7,7 @@ import java.util.*
 data class Reservation(
         val id: UUID,
         val match: Match,
-        val club: Club,
+        val clubReservationInfo: ClubReservationInfo,
         val startTime: LocalDateTime,
         val endTime: LocalDateTime,
         val reservedBy: User,
@@ -24,3 +24,5 @@ enum class ReservationStatus {
 enum class PaymentStatus {
     PendingPayment, Payed, Refunded, ToBeRefunded
 }
+
+data class ClubReservationInfo(val clubId: UUID, val name: String, val field: Field, val clubLocation: GeoLocation)

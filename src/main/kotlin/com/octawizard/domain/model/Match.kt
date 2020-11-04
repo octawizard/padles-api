@@ -4,8 +4,8 @@ import java.io.Serializable
 
 data class Match(val players: List<User>, val result: MatchResult? = null): Serializable {
     init {
-        if (players.isEmpty() || players.size > 4) {
-            throw IllegalArgumentException("players should contain at least one player and less than four")
+        check(players.isEmpty() || players.size > 4) {
+            "players should contain at least one player and less than four"
         }
     }
 }
