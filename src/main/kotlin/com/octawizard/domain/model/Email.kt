@@ -5,7 +5,7 @@ import java.io.Serializable
 class Email(val value: String): Serializable {
 
     init {
-        check(!value.isValidEmail()) {
+        check(value.isValidEmail()) {
             "not a valid email: $value"
         }
     }
