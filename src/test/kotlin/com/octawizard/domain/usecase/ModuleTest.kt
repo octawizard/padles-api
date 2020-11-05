@@ -4,8 +4,8 @@ import com.octawizard.domain.usecase.match.CreateMatch
 import com.octawizard.domain.usecase.match.DeleteMatch
 import com.octawizard.domain.usecase.match.FindAvailableMatches
 import com.octawizard.domain.usecase.match.GetMatch
-import com.octawizard.domain.usecase.match.JoinMatch
-import com.octawizard.domain.usecase.match.LeaveMatch
+import com.octawizard.domain.usecase.reservation.JoinMatch
+import com.octawizard.domain.usecase.reservation.LeaveMatch
 import com.octawizard.domain.usecase.user.CreateUser
 import com.octawizard.domain.usecase.user.GetUser
 import com.octawizard.domain.usecase.user.UpdateUser

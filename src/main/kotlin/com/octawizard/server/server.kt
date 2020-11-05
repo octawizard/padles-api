@@ -11,6 +11,7 @@ import io.ktor.auth.*
 import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.http.*
+import io.ktor.locations.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -31,16 +32,17 @@ fun main() {
         import(repositoryModule)
         bind<Controller>() with singleton {
             Controller(
-                    instance(),
-                    instance(),
-                    instance(),
-                    instance(),
-                    instance(),
-                    instance(),
-                    instance(),
-                    instance(),
-                    instance(),
-                    instance()
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
             )
         }
     }
@@ -53,6 +55,7 @@ fun main() {
         }
         install(DefaultHeaders)
         install(CallLogging)
+        install(Locations)
         install(Authentication) {
             authenticationConfig()
         }
@@ -63,43 +66,11 @@ fun main() {
             }
         }
         routing {
-            userRoutes(controller)
-//            matchRoutes(controller)
-            reservationRoutes(controller)
+            with(controller) {
+                userRoutes(this)
+                reservationRoutes(controller)
+//            clubRoutes(controller) TODO
+            }
         }
     }.start(wait = true)
 }
-
-//private fun Routing.matchRoutes(controller: Controller) {
-//    val matchId = "matchId"
-//
-//    post("/match") {
-//        val input = call.receive<CreateMatchInput>()
-//        val createdMatch = controller.createMatch(input.player1, input.player2, input.player3, input.player4)
-//        call.respond(HttpStatusCode.Created, createdMatch)
-//    }
-//
-//    get("/match/{$matchId}") {
-//        val inputMatchId = UUID.fromString(call.parameters[matchId])
-//        val match = controller.getMatch(inputMatchId) ?: throw NotFoundException()
-//        call.respond(HttpStatusCode.OK, match)
-//    }
-//
-//    patch("/match/{$matchId}") {
-//        val input = call.receive<PatchMatchInput>()
-//        val inputMatchId = UUID.fromString(call.parameters[matchId])
-//        val updateMatch = controller.patchMatch(input, inputMatchId) ?: throw NotFoundException()
-//        call.respond(HttpStatusCode.OK, updateMatch)
-//    }
-//
-//    delete("/match/{$matchId}") {
-//        val inputMatchId = UUID.fromString(call.parameters[matchId])
-//        controller.deleteMatch(inputMatchId)
-//        call.response.status(HttpStatusCode.NoContent)
-//    }
-//
-//    // all matches that needs at least one player
-//    get("/match") {
-//        call.respond(HttpStatusCode.OK, controller.getAllAvailableMatches())
-//    }
-//}

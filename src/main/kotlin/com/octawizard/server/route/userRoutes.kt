@@ -19,7 +19,7 @@ fun Routing.userRoutes(controller: Controller) {
     authenticate {
         get("/user/{$emailParam}") {
             val emailString = call.parameters[emailParam]
-                    ?: throw BadRequestException("$emailParam must be present in path")
+                ?: throw BadRequestException("$emailParam must be present in path")
             val u = controller.getUser(emailString) ?: throw NotFoundException("User $emailString not found")
             call.respond(HttpStatusCode.OK, u)
         }
@@ -35,7 +35,7 @@ fun Routing.userRoutes(controller: Controller) {
                 val email = Email(call.parameters[emailParam]!!) // checked in auth
                 val updated = call.receive<UserUpdateInput>().toUser(email)
                 val updatedUser = controller.updateUser(updated)
-                        ?: throw NotFoundException("User ${email.value} not found")
+                    ?: throw NotFoundException("User ${email.value} not found")
                 call.respond(HttpStatusCode.OK, updatedUser)
             }
 

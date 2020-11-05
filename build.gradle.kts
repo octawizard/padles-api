@@ -27,6 +27,11 @@ dependencies {
     testImplementation("org.testcontainers:testcontainers:1.14.3")
     testImplementation("org.testcontainers:junit-jupiter:1.14.3")
     testImplementation("io.mockk:mockk:1.10.2")
+
+    testImplementation("org.litote.kmongo:kmongo-core-tests:4.1.3")
+    testImplementation("org.litote.kmongo:kmongo-shared-tests:4.1.3")
+    testImplementation("org.litote.kmongo:kmongo-flapdoodle:4.1.3")
+
     testRuntimeOnly("com.h2database:h2:1.4.200")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.0")
 
@@ -59,6 +64,15 @@ dependencies {
 
     // redis
     implementation("org.redisson:redisson:3.13.5")
+
+    // kmongo
+//    implementation("org.litote.kmongo:kmongo:4.1.3")
+    implementation("org.litote.kmongo:kmongo-id:4.1.3")
+    implementation("org.litote.kmongo:kmongo-native:4.1.3")
+
+//    implementation("org.litote.kmongo:kmongo-async:4.1.3")
+//    implementation("org.litote.kmongo:kmongo-coroutine:4.1.3")
+
 
 }
 

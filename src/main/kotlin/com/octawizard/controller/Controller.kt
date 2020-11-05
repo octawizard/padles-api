@@ -1,9 +1,17 @@
 package com.octawizard.controller
 
 import com.octawizard.domain.model.Email
-import com.octawizard.domain.model.Match
+import com.octawizard.domain.model.MatchResult
+import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.User
-import com.octawizard.domain.usecase.match.*
+import com.octawizard.domain.usecase.reservation.CancelReservation
+import com.octawizard.domain.usecase.reservation.CreateReservation
+import com.octawizard.domain.usecase.reservation.GetNearestAvailableReservations
+import com.octawizard.domain.usecase.reservation.GetReservation
+import com.octawizard.domain.usecase.reservation.JoinMatch
+import com.octawizard.domain.usecase.reservation.LeaveMatch
+import com.octawizard.domain.usecase.reservation.UpdateMatchResult
 import com.octawizard.domain.usecase.user.CreateUser
 import com.octawizard.domain.usecase.user.DeleteUser
 import com.octawizard.domain.usecase.user.GetUser
@@ -14,19 +22,25 @@ import io.ktor.features.*
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import java.math.BigDecimal
+import java.time.LocalDateTime
 import java.util.*
 
 class Controller(
-        private val createUser: CreateUser,
-        private val createMatch: CreateMatch,
-        private val deleteMatch: DeleteMatch,
-        private val findAvailableMatches: FindAvailableMatches,
-        private val getMatch: GetMatch,
-        private val getUser: GetUser,
-        private val joinMatch: JoinMatch,
-        private val leaveMatch: LeaveMatch,
-        private val updateUser: UpdateUser,
-        private val deleteUser: DeleteUser
+    // User
+    private val createUser: CreateUser,
+    private val updateUser: UpdateUser,
+    private val deleteUser: DeleteUser,
+    private val getUser: GetUser,
+    // Reservation
+    private val createReservation: CreateReservation,
+    private val cancelReservation: CancelReservation,
+    private val getReservation: GetReservation,
+    private val getNearestAvailableReservations: GetNearestAvailableReservations,
+    // Reservation Match
+    private val updateMatchResult: UpdateMatchResult,
+    private val joinMatch: JoinMatch,
+    private val leaveMatch: LeaveMatch
 ) {
 
     suspend fun createUser(user: User): User = async { createUser.invoke(user) }
@@ -42,32 +56,53 @@ class Controller(
         }
     }
 
-    suspend fun createMatch(player1: Email, player2: Email?, player3: Email?, player4: Email?): Match {
-        return async { createMatch.invoke(player1, player2, player3, player4) }
+    suspend fun deleteUser(email: Email) {
+        return async { deleteUser.invoke(email) }
     }
 
-    suspend fun getAllAvailableMatches(): List<Match> {
-        return async { findAvailableMatches() }
+    suspend fun getReservation(reservationId: UUID): Reservation? {
+        return async { getReservation.invoke(reservationId) }
     }
 
-    suspend fun getMatch(inputMatchId: UUID): Match? {
-        return async { getMatch.invoke(inputMatchId) }
-    }
-
-    suspend fun patchMatch(input: PatchMatchInput, matchId: UUID): Match? {
-        val user = getUser(input.value) ?: throw NotFoundException("user ${input.value} not found")
-        return when (input.op) {
-            OpType.remove -> async { leaveMatch(user, matchId) }
-            OpType.replace -> async { joinMatch(user, matchId) }
+    suspend fun createReservation(
+        reservedBy: Email,
+        clubId: UUID,
+        fieldId: UUID,
+        startTime: LocalDateTime,
+        endTime: LocalDateTime,
+        price: BigDecimal,
+        matchEmailPlayer2: Email?,
+        matchEmailPlayer3: Email?,
+        matchEmailPlayer4: Email?
+    ): Reservation {
+        return async {
+            createReservation.invoke(
+                reservedBy, clubId, fieldId, startTime, endTime, price, matchEmailPlayer2,
+                matchEmailPlayer3, matchEmailPlayer4
+            )
         }
     }
 
-    suspend fun deleteMatch(matchId: UUID) {
-        return async { deleteMatch.invoke(matchId) }
+    suspend fun cancelReservation(reservation: Reservation): Reservation {
+        return async { cancelReservation.invoke(reservation.id) }
     }
 
-    suspend fun deleteUser(email: Email) {
-        return async { deleteUser.invoke(email) }
+    suspend fun updateReservationMatchResult(reservation: Reservation, matchResult: MatchResult): Reservation {
+        return async { updateMatchResult.invoke(reservation, matchResult) }
+    }
+
+    suspend fun getNearestAvailableReservations(
+        longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit
+    ): List<Reservation> {
+        return async { getNearestAvailableReservations.invoke(longitude, latitude, radius, radiusUnit) }
+    }
+
+    suspend fun patchReservationMatch(input: PatchMatchInput, reservation: Reservation): Reservation {
+        val user = getUser(input.value) ?: throw NotFoundException("user ${input.value} not found")
+        return when (input.op) {
+            OpType.remove -> async { leaveMatch(user, reservation) }
+            OpType.replace -> async { joinMatch(user, reservation) }
+        }
     }
 }
 

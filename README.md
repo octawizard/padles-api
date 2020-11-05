@@ -13,25 +13,34 @@ Small REST API project using
 
 * Run the main function in `com.octawizard.server.server.kt`
 
+* API will be reachable at `http://localhost:1111`
+
 ## Use cases
-* create a user (done)
-* get a user (done)
-* update a user (done)
-* delete a user (done)
+* Users
+-[x] create a user
+-[x] get a user
+-[x] update a user
+-[x] delete a user
 
-* make a reservation
-* join a reservation
-* leave a reservation
-* pay a reservation
-* add result of the reserved match
+* Reservations
+-[x] make a reservation
+-[x] update a reservation (only by reservation owner)
+    *[x] cancel a reservation
+    *[ ] pay a reservation
 
-* search for available fields (close to user, filters, ...)
-* search for incomplete reservation (missing players)
+-[x] add/update result of the reserved match
+-[x] patch a reservation match (authorized players)
+    * join a reservation
+    * leave a reservation
 
-* register a club
-* update a club
-* get a club
-* add/update field availability
+-[x] search for incomplete reservation (missing players)
+
+* Club
+-[ ] register a club
+-[ ] update a club
+-[ ] get a club
+-[ ] add/update field availability
+-[ ] search for available fields (close to user, filters, ...)
 
 * get all matches of a user
 * get all reservation of a user
