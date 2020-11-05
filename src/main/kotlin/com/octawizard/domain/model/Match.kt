@@ -2,9 +2,11 @@ package com.octawizard.domain.model
 
 import java.io.Serializable
 
+const val MATCH_MAX_NUMBER_OF_PLAYERS = 4
+
 data class Match(val players: List<User>, val result: MatchResult? = null): Serializable {
     init {
-        check(players.isNotEmpty() && players.size <= 4) {
+        check(players.isNotEmpty() && players.size <= MATCH_MAX_NUMBER_OF_PLAYERS) {
             "players should contain at least one player and less than four"
         }
     }

@@ -14,7 +14,7 @@ class CancelReservation(private val reservationRepository: ReservationRepository
 
     operator fun invoke(reservationId: UUID): Reservation {
         val reservation = reservationRepository.getReservation(reservationId)
-                ?: throw NotFoundException("reservation$reservationId not found")
+            ?: throw NotFoundException("reservation$reservationId not found")
         val now = LocalDateTime.now()
         if (now > reservation.startTime) {
             throw BadRequestException("cannot cancel a reservation for a match that should be already started")
@@ -26,12 +26,11 @@ class CancelReservation(private val reservationRepository: ReservationRepository
                 canceledReservation
             }
             ReservationStatus.Confirmed -> {
-                val canceledReservation = if (reservation.paymentStatus == PaymentStatus.Payed) {
+                if (reservation.paymentStatus == PaymentStatus.Payed) {
                     reservation.copy(status = ReservationStatus.Canceled, paymentStatus = PaymentStatus.ToBeRefunded)
                 } else {
                     reservation.copy(status = ReservationStatus.Canceled)
                 }
-                canceledReservation
             }
             ReservationStatus.Canceled -> throw BadRequestException("reservation $reservationId is already canceled")
         }

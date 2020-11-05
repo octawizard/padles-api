@@ -1,8 +1,8 @@
 package com.octawizard.domain.usecase
 
-import com.octawizard.domain.usecase.match.*
 import com.octawizard.domain.usecase.reservation.CancelReservation
 import com.octawizard.domain.usecase.reservation.CreateReservation
+import com.octawizard.domain.usecase.reservation.GetNearestAvailableReservations
 import com.octawizard.domain.usecase.reservation.GetReservation
 import com.octawizard.domain.usecase.reservation.JoinMatch
 import com.octawizard.domain.usecase.reservation.LeaveMatch
@@ -25,9 +25,10 @@ val useCaseModule = DI.Module("useCase") {
     bind<DeleteUser>() with provider { DeleteUser(instance()) }
 
     // reservation
-    bind<CreateReservation>() with provider { CreateReservation(instance(), instance()) }
+    bind<CreateReservation>() with provider { CreateReservation(instance(), instance(), instance()) }
     bind<CancelReservation>() with provider { CancelReservation(instance()) }
     bind<GetReservation>() with provider { GetReservation(instance()) }
+    bind<GetNearestAvailableReservations>() with provider { GetNearestAvailableReservations(instance()) }
 
     // reservation match
     bind<UpdateMatchResult>() with provider { UpdateMatchResult(instance()) }
