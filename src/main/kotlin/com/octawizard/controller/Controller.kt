@@ -10,11 +10,7 @@ import com.octawizard.domain.model.MatchResult
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.User
-import com.octawizard.domain.usecase.club.CreateClub
-import com.octawizard.domain.usecase.club.GetClub
-import com.octawizard.domain.usecase.club.GetNearestClubs
-import com.octawizard.domain.usecase.club.UpdateClubAddress
-import com.octawizard.domain.usecase.club.UpdateClubName
+import com.octawizard.domain.usecase.club.*
 import com.octawizard.domain.usecase.reservation.CancelReservation
 import com.octawizard.domain.usecase.reservation.CreateReservation
 import com.octawizard.domain.usecase.reservation.GetNearestAvailableReservations
@@ -58,6 +54,7 @@ class Controller(
     private val getNearestClubs: GetNearestClubs,
     private val updateClubName: UpdateClubName,
     private val updateClubAddress: UpdateClubAddress,
+    private val updateClubContacts: UpdateClubContacts,
 ) {
 
     suspend fun createUser(user: User): User = async { createUser.invoke(user) }
@@ -163,6 +160,10 @@ class Controller(
 
     suspend fun updateClubAddress(club: Club, address: String, location: GeoLocation): Club {
         return async { updateClubAddress.invoke(club, address, location) }
+    }
+
+    suspend fun updateClubContacts(club: Club, contacts: Contacts): Club {
+        return async { updateClubContacts.invoke(club, contacts) }
     }
 }
 

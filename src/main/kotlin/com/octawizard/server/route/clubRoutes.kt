@@ -1,7 +1,7 @@
 package com.octawizard.server.route
 
 import com.octawizard.controller.Controller
-import com.octawizard.domain.model.Club
+import com.octawizard.domain.model.Contacts
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.server.input.CreateClubInput
 import com.octawizard.server.input.UpdateClubAddressNameInput
@@ -130,13 +130,15 @@ fun Routing.clubRoutes(controller: Controller) {
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-//        put<ClubContactsRoute> { route ->
-//            val input = call.receive<UpdateClubContactsInput>()
-//            //todo check if authorized
-//            val club = controller.updateClubContacts(route.clubId, input.contacts)
-//            call.respond(HttpStatusCode.OK, club)
-//        }
-//
+        put<ClubContactsRoute> { route ->
+            val input = call.receive<UpdateClubContactsInput>()
+            //todo check if authorized
+            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val contacts = Contacts(input.phone, input.email)
+            val updatedClub = controller.updateClubContacts(club, contacts)
+            call.respond(HttpStatusCode.OK, updatedClub)
+        }
+
 //        put<ClubAvgPriceRoute> { route ->
 //            val input = call.receive<UpdateClubAvgPriceInput>()
 //            //todo check if authorized
