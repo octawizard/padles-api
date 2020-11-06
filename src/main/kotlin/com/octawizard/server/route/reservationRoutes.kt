@@ -6,7 +6,7 @@ import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
 import com.octawizard.server.AuthorizationException
 import com.octawizard.server.input.PatchMatchInput
-import com.octawizard.server.input.ReservationInput
+import com.octawizard.server.input.CreateReservationInput
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -41,7 +41,7 @@ fun Routing.reservationRoutes(controller: Controller) {
             val longitude = call.request.queryParameters["lon"]?.toDoubleOrNull()
             val latitude = call.request.queryParameters["lat"]?.toDoubleOrNull()
             val radius = call.request.queryParameters["rad"]?.toDoubleOrNull()
-            val radiusUnit = call.request.queryParameters["rad"]?.let { RadiusUnit.valueOf(it) }
+            val radiusUnit = call.request.queryParameters["radUnit"]?.let { RadiusUnit.valueOf(it) }
                 ?: RadiusUnit.Kilometers
 
             checkNotNull(longitude)
@@ -57,7 +57,7 @@ fun Routing.reservationRoutes(controller: Controller) {
 
         // create a reservation
         post("/reservation") {
-            val input = call.receive<ReservationInput>()
+            val input = call.receive<CreateReservationInput>()
             val reservation = controller.createReservation(
                 input.reservedBy, input.clubId, input.fieldId, input.startTime, input.endTime, input.price,
                 input.matchEmailPlayer2, input.matchEmailPlayer3, input.matchEmailPlayer4

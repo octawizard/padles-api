@@ -1,6 +1,7 @@
 package com.octawizard.repository.reservation
 
 import com.octawizard.domain.model.ClubReservationInfo
+import com.octawizard.domain.model.GeoLocation
 import com.octawizard.domain.model.Match
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
@@ -17,7 +18,7 @@ interface ReservationRepository {
         startTime: LocalDateTime,
         endTime: LocalDateTime,
         price: BigDecimal,
-        match: Match
+        match: Match,
     ): Reservation
 
     fun getReservation(reservationId: UUID): Reservation?
@@ -28,6 +29,9 @@ interface ReservationRepository {
         longitude: Double,
         latitude: Double,
         radius: Double,
-        radiusUnit: RadiusUnit
+        radiusUnit: RadiusUnit,
     ): List<Reservation>
+
+    fun updateClubName(clubId: UUID, name: String)
+    fun updateClubAddress(clubId: UUID, location: GeoLocation)
 }

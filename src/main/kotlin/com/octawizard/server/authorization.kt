@@ -11,7 +11,7 @@ import io.ktor.util.*
 import io.ktor.util.pipeline.*
 import mu.KotlinLogging
 
-data class AuthorizationException(override val message: String): RuntimeException(message)
+data class AuthorizationException(override val message: String) : RuntimeException(message)
 
 class UserEmailBasedAuthorization {
     private val logger = KotlinLogging.logger { }
@@ -22,7 +22,7 @@ class UserEmailBasedAuthorization {
 
         pipeline.intercept(AuthorizationPhase) {
             val principal =
-                    call.authentication.principal<JWTPrincipal>() ?: throw AuthorizationException("Missing principal")
+                call.authentication.principal<JWTPrincipal>() ?: throw AuthorizationException("Missing principal")
 
             val tokenUserId = Email(principal.payload.subject)
             val userIdFromPath = (call.parameters[pathParam] ?: throw BadRequestException("user id must be in path"))
@@ -30,8 +30,8 @@ class UserEmailBasedAuthorization {
 
             if (userId != tokenUserId) {
                 val message =
-                        "Authorization failed for ${call.request.path()}. User $tokenUserId can't perform updates on " +
-                                "user $userId"
+                    "Authorization failed for ${call.request.path()}. User $tokenUserId can't perform updates on " +
+                            "user $userId"
                 logger.warn { message }
                 throw AuthorizationException(message)
             }
@@ -59,7 +59,8 @@ class AuthorizedRouteSelector(private val entity: String) : RouteSelector(RouteS
     override fun toString(): String = "(authorize by ${entity})"
 }
 
-fun Route.authorizeWithUserEmailInPath(pathParameter: String, build: Route.() -> Unit) = authorizedRoute(pathParameter, build)
+fun Route.authorizeWithUserEmailInPath(pathParameter: String, build: Route.() -> Unit) =
+    authorizedRoute(pathParameter, build)
 
 private fun Route.authorizedRoute(pathParameter: String, build: Route.() -> Unit): Route {
     val authorizedRoute = createChild(AuthorizedRouteSelector(pathParameter))

@@ -11,7 +11,7 @@ data class ClubReservationInfoDTO(
     val id: UUID,
     val name: String,
     val field: Field,
-    val location: Point
+    val location: Point,
 ) {
     fun toClubReservationInfo(): ClubReservationInfo {
         return ClubReservationInfo(

@@ -1,10 +1,20 @@
 package com.octawizard.controller
 
+import com.octawizard.domain.model.Availability
+import com.octawizard.domain.model.Club
+import com.octawizard.domain.model.Contacts
 import com.octawizard.domain.model.Email
+import com.octawizard.domain.model.Field
+import com.octawizard.domain.model.GeoLocation
 import com.octawizard.domain.model.MatchResult
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.User
+import com.octawizard.domain.usecase.club.CreateClub
+import com.octawizard.domain.usecase.club.GetClub
+import com.octawizard.domain.usecase.club.GetNearestClubs
+import com.octawizard.domain.usecase.club.UpdateClubAddress
+import com.octawizard.domain.usecase.club.UpdateClubName
 import com.octawizard.domain.usecase.reservation.CancelReservation
 import com.octawizard.domain.usecase.reservation.CreateReservation
 import com.octawizard.domain.usecase.reservation.GetNearestAvailableReservations
@@ -23,6 +33,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.math.BigDecimal
+import java.time.LocalDate
 import java.time.LocalDateTime
 import java.util.*
 
@@ -40,7 +51,13 @@ class Controller(
     // Reservation Match
     private val updateMatchResult: UpdateMatchResult,
     private val joinMatch: JoinMatch,
-    private val leaveMatch: LeaveMatch
+    private val leaveMatch: LeaveMatch,
+    // Club
+    private val getClub: GetClub,
+    private val createClub: CreateClub,
+    private val getNearestClubs: GetNearestClubs,
+    private val updateClubName: UpdateClubName,
+    private val updateClubAddress: UpdateClubAddress,
 ) {
 
     suspend fun createUser(user: User): User = async { createUser.invoke(user) }
@@ -73,7 +90,7 @@ class Controller(
         price: BigDecimal,
         matchEmailPlayer2: Email?,
         matchEmailPlayer3: Email?,
-        matchEmailPlayer4: Email?
+        matchEmailPlayer4: Email?,
     ): Reservation {
         return async {
             createReservation.invoke(
@@ -92,7 +109,7 @@ class Controller(
     }
 
     suspend fun getNearestAvailableReservations(
-        longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit
+        longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit,
     ): List<Reservation> {
         return async { getNearestAvailableReservations.invoke(longitude, latitude, radius, radiusUnit) }
     }
@@ -103,6 +120,49 @@ class Controller(
             OpType.remove -> async { leaveMatch(user, reservation) }
             OpType.replace -> async { joinMatch(user, reservation) }
         }
+    }
+
+    suspend fun getClub(clubId: UUID): Club? {
+        return async { getClub.invoke(clubId) }
+    }
+
+    suspend fun createClub(
+        name: String,
+        address: String,
+        geoLocation: GeoLocation,
+        avgPrice: BigDecimal,
+        contacts: Contacts,
+        fields: List<Field>?,
+        availability: Availability?,
+    ): Club {
+        return async { createClub.invoke(name, address, geoLocation, avgPrice, contacts, fields, availability) }
+    }
+
+    suspend fun getNearestClubs(
+        longitude: Double,
+        latitude: Double,
+        radius: Double,
+        radiusUnit: RadiusUnit,
+    ): List<Club> {
+        return async { getNearestClubs.invoke(longitude, latitude, radius, radiusUnit) }
+    }
+
+    suspend fun getAvailableNearestClubs(
+        longitude: Double,
+        latitude: Double,
+        radius: Double,
+        radiusUnit: RadiusUnit,
+        day: LocalDate,
+    ): List<Club> {
+        return async { getNearestClubs.invoke(longitude, latitude, radius, radiusUnit, day) }
+    }
+
+    suspend fun updateClubName(club: Club, name: String): Club {
+        return async { updateClubName.invoke(club, name) }
+    }
+
+    suspend fun updateClubAddress(club: Club, address: String, location: GeoLocation): Club {
+        return async { updateClubAddress.invoke(club, address, location) }
     }
 }
 

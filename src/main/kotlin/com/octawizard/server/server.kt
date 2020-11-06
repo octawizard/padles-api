@@ -4,6 +4,7 @@ import com.octawizard.controller.Controller
 import com.octawizard.domain.usecase.useCaseModule
 import com.octawizard.repository.repositoryConfigurationModule
 import com.octawizard.repository.repositoryModule
+import com.octawizard.server.route.clubRoutes
 import com.octawizard.server.route.reservationRoutes
 import com.octawizard.server.route.userRoutes
 import io.ktor.application.*
@@ -43,6 +44,11 @@ fun main() {
                 instance(),
                 instance(),
                 instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
+                instance(),
             )
         }
     }
@@ -68,8 +74,8 @@ fun main() {
         routing {
             with(controller) {
                 userRoutes(this)
-                reservationRoutes(controller)
-//            clubRoutes(controller) TODO
+                reservationRoutes(this)
+                clubRoutes(this)
             }
         }
     }.start(wait = true)

@@ -1,12 +1,14 @@
 package com.octawizard.repository
 
-//import com.octawizard.repository.match.CacheMatchRepository
 import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.mongodb.client.model.Indexes
 import com.octawizard.domain.model.User
+import com.octawizard.repository.club.ClubRepository
+import com.octawizard.repository.club.DocumentClubRepository
+import com.octawizard.repository.club.model.ClubDTO
 import com.octawizard.repository.reservation.DocumentReservationRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.reservation.model.ReservationDTO
@@ -17,6 +19,7 @@ import com.octawizard.repository.user.Users
 import com.zaxxer.hikari.HikariConfig
 import com.zaxxer.hikari.HikariDataSource
 import org.bson.UuidRepresentation
+import org.bson.conversions.Bson
 import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
@@ -65,16 +68,24 @@ val repositoryModule = DI.Module("repository") {
     }
     bind<ReservationRepository>() with singleton {
         val reservations = instance<MongoDatabase>().getCollection<ReservationDTO>("reservations")
-        reservations.ensureIndexes()
+        reservations.ensureIndexes(
+            Indexes.ascending("matches.players.email.value"),
+            Indexes.geo2dsphere("clubReservationInfo.location"),
+        )
         DocumentReservationRepository(reservations)
+    }
+    bind<ClubRepository>() with singleton {
+        val clubs = instance<MongoDatabase>().getCollection<ClubDTO>("clubs")
+        clubs.ensureIndexes(
+            Indexes.ascending("name"),
+            Indexes.geo2dsphere("geoLocation"),
+        )
+        DocumentClubRepository(clubs)
     }
 }
 
-fun MongoCollection<ReservationDTO>.ensureIndexes() {
-    // index on match players
-    ensureIndex(Indexes.ascending("matches.players.email.value"))
-    // geo spatial index
-    ensureIndex(Indexes.geo2dsphere("clubReservationInfo.location"))
+fun <T> MongoCollection<T>.ensureIndexes(vararg indexes: Bson) {
+    indexes.forEach { ensureIndex(it) }
 }
 
 class DatabaseProvider(private val dataSource: DataSource) {

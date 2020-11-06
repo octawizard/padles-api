@@ -36,11 +36,12 @@ Small REST API project using
 -[x] search for incomplete reservation (missing players)
 
 * Club
--[ ] register a club
--[ ] update a club
--[ ] get a club
+-[x] register a club
+-[x] update a club
+-[x] get a club
 -[ ] add/update field availability
--[ ] search for available fields (close to user, filters, ...)
+-[x] search for available fields (close to user, filters, ...)
+-[x] search for near clubs (close to user, filters, ...)
 
 * get all matches of a user
 * get all reservation of a user

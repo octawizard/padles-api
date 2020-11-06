@@ -1,5 +1,10 @@
 package com.octawizard.domain.usecase
 
+import com.octawizard.domain.usecase.club.CreateClub
+import com.octawizard.domain.usecase.club.GetClub
+import com.octawizard.domain.usecase.club.GetNearestClubs
+import com.octawizard.domain.usecase.club.UpdateClubAddress
+import com.octawizard.domain.usecase.club.UpdateClubName
 import com.octawizard.domain.usecase.reservation.CancelReservation
 import com.octawizard.domain.usecase.reservation.CreateReservation
 import com.octawizard.domain.usecase.reservation.GetNearestAvailableReservations
@@ -35,4 +40,10 @@ val useCaseModule = DI.Module("useCase") {
     bind<JoinMatch>() with provider { JoinMatch(instance()) }
     bind<LeaveMatch>() with provider { LeaveMatch(instance()) }
 
+    // club
+    bind<GetClub>() with provider { GetClub(instance()) }
+    bind<CreateClub>() with provider { CreateClub(instance()) }
+    bind<UpdateClubName>() with provider { UpdateClubName(instance(), instance()) }
+    bind<UpdateClubAddress>() with provider { UpdateClubAddress(instance(), instance()) }
+    bind<GetNearestClubs>() with provider { GetNearestClubs(instance()) }
 }
