@@ -139,12 +139,13 @@ fun Routing.clubRoutes(controller: Controller) {
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-//        put<ClubAvgPriceRoute> { route ->
-//            val input = call.receive<UpdateClubAvgPriceInput>()
-//            //todo check if authorized
-//            val club = controller.updateClubAvgPrice(route.clubId, input.avgPrice)
-//            call.respond(HttpStatusCode.OK, club)
-//        }
+        put<ClubAvgPriceRoute> { route ->
+            val input = call.receive<UpdateClubAvgPriceInput>()
+            //todo check if authorized
+            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val updatedClub = controller.updateClubAvgPrice(club, input.avgPrice)
+            call.respond(HttpStatusCode.OK, updatedClub)
+        }
 //        //fields
 //        put<ClubFieldsRoute> { route ->
 //            val input = call.receive<UpdateClubFieldsInput>()

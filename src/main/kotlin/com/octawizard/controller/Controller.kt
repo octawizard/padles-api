@@ -55,6 +55,7 @@ class Controller(
     private val updateClubName: UpdateClubName,
     private val updateClubAddress: UpdateClubAddress,
     private val updateClubContacts: UpdateClubContacts,
+    private val updateClubAvgPrice: UpdateClubAvgPrice,
 ) {
 
     suspend fun createUser(user: User): User = async { createUser.invoke(user) }
@@ -164,6 +165,10 @@ class Controller(
 
     suspend fun updateClubContacts(club: Club, contacts: Contacts): Club {
         return async { updateClubContacts.invoke(club, contacts) }
+    }
+
+    suspend fun updateClubAvgPrice(club: Club, avgPrice: BigDecimal): Club {
+        return async { updateClubAvgPrice.invoke(club, avgPrice) }
     }
 }
 
