@@ -39,4 +39,5 @@ val useCaseModule = DI.Module("useCase") {
     bind<GetNearestClubs>() with provider { GetNearestClubs(instance()) }
     bind<UpdateClubField>() with provider { UpdateClubField(instance(), instance()) }
     bind<AddFieldToClub>() with provider { AddFieldToClub(instance()) }
+    bind<UpdateClubAvailability>() with provider { UpdateClubAvailability(instance()) }
 }

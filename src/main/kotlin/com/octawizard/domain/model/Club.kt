@@ -14,7 +14,24 @@ data class Club(
     val availability: Availability,
     val avgPrice: BigDecimal,
     val contacts: Contacts,
-)
+) {
+    init {
+        check(
+            availability.byDate.values
+                .asSequence()
+                .flatten()
+                .map { it.field.id }
+                .distinct()
+                .all { hasField(it) }
+        ) {
+            "only club fields can be available, please review available fields"
+        }
+    }
+
+    private fun hasField(fieldId: UUID): Boolean {
+        return fields.any { it.id == fieldId }
+    }
+}
 
 data class Availability(val byDate: Map<LocalDate, List<FieldAvailability>>) : Serializable
 

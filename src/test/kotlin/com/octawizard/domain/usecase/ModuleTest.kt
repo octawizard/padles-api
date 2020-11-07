@@ -51,6 +51,7 @@ class ModuleTest {
         assertNotNull(kodein.direct.instance<GetClub>())
         assertNotNull(kodein.direct.instance<GetNearestClubs>())
         assertNotNull(kodein.direct.instance<UpdateClubAddress>())
+        assertNotNull(kodein.direct.instance<UpdateClubAvailability>())
         assertNotNull(kodein.direct.instance<UpdateClubAvgPrice>())
         assertNotNull(kodein.direct.instance<UpdateClubContacts>())
         assertNotNull(kodein.direct.instance<UpdateClubField>())

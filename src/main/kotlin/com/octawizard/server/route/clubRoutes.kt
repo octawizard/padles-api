@@ -168,13 +168,14 @@ fun Routing.clubRoutes(controller: Controller) {
             )
             call.respond(HttpStatusCode.OK, updatedClub)
         }
-//
-//        //availability
-//        put<ClubAvailabilityRoute> { route ->
-//            val input = call.receive<UpdateClubAvailabilityInput>()
-//            //todo check if authorized
-//            val club = controller.updateClubAvailability(route.clubId, input.availability)
-//            call.respond(HttpStatusCode.OK, club)
-//        }
+
+        //availability
+        put<ClubAvailabilityRoute> { route ->
+            val input = call.receive<UpdateClubAvailabilityInput>()
+            //todo check if authorized
+            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val updatedClub = controller.updateClubAvailability(club, input.availability)
+            call.respond(HttpStatusCode.OK, updatedClub)
+        }
     }
 }

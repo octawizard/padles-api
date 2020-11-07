@@ -1,6 +1,7 @@
 package com.octawizard.controller
 
 import com.octawizard.domain.model.*
+import com.octawizard.domain.usecase.club.UpdateClubAvailability
 import com.octawizard.domain.usecase.club.*
 import com.octawizard.domain.usecase.reservation.CancelReservation
 import com.octawizard.domain.usecase.reservation.CreateReservation
@@ -49,6 +50,7 @@ class Controller(
     private val updateClubAvgPrice: UpdateClubAvgPrice,
     private val addFieldToClub: AddFieldToClub,
     private val updateClubField: UpdateClubField,
+    private val updateClubAvailability: UpdateClubAvailability,
 ) {
 
     suspend fun createUser(user: User): User = async { createUser.invoke(user) }
@@ -183,6 +185,10 @@ class Controller(
         wallsMaterial: WallsMaterial,
     ): Club {
         return async { updateClubField.invoke(club, fieldId, name, indoor, hasSand, wallsMaterial) }
+    }
+
+    suspend fun updateClubAvailability(club: Club, availability: Availability): Club {
+        return async { updateClubAvailability.invoke(club, availability) }
     }
 }
 

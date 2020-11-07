@@ -1,15 +1,10 @@
 package com.octawizard.domain.usecase.reservation
 
-import com.octawizard.domain.model.Club
-import com.octawizard.domain.model.ClubReservationInfo
-import com.octawizard.domain.model.Email
-import com.octawizard.domain.model.Field
-import com.octawizard.domain.model.Match
-import com.octawizard.domain.model.Reservation
-import com.octawizard.domain.model.User
+import com.octawizard.domain.model.*
 import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.user.UserRepository
+import com.octawizard.server.route.entityNotFound
 import io.ktor.features.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
@@ -43,11 +38,24 @@ class CreateReservation(
 
         val match = Match(listOfNotNull(reservationOwner, player2, player3, player4))
 
+        val preReservedAvailability: FieldAvailability? = club.availability.byDate[startTime.toLocalDate()]
+            ?.find { it.timeSlot.startDateTime == startTime && it.timeSlot.endDateTime == endTime && it.field.id == fieldId }
+            ?: entityNotFound<FieldAvailability>("field=$fieldId from=$startTime to=$endTime")
+        val updatedAvailability = Availability(
+            club.availability.byDate.filterNot { (day, fieldsAv) ->
+                day == startTime.toLocalDate() && fieldsAv.contains(preReservedAvailability)
+            }
+        )
+        clubRepository.updateClubAvailability(clubId, updatedAvailability)
+
         val clubReservationInfo = ClubReservationInfo(club.id, club.name, field, club.geoLocation)
 
         return reservationRepository.createReservation(
             reservationOwner, clubReservationInfo, startTime, endTime, price, match
         )
+
+        //todo in case of error we need to restore the availability for the club. Maybe instead of removing it we can
+        // have a boolean inReservation=true to mark them not available. Would be easy to restore it in case
     }
 
     private fun userNotFound(email: Email): User {
