@@ -1,25 +1,15 @@
 package com.octawizard.repository.club
 
 import com.mongodb.client.MongoCollection
+import com.mongodb.client.model.Updates
 import com.mongodb.client.model.geojson.Point
 import com.mongodb.client.model.geojson.Position
-import com.octawizard.domain.model.Availability
-import com.octawizard.domain.model.Club
-import com.octawizard.domain.model.Contacts
-import com.octawizard.domain.model.Field
-import com.octawizard.domain.model.GeoLocation
-import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.domain.model.*
 import com.octawizard.repository.club.model.ClubDTO
 import com.octawizard.repository.reservation.and
 import com.octawizard.repository.reservation.filterGeoWithinSphere
 import com.octawizard.server.route.entityNotFound
-import org.litote.kmongo.exists
-import org.litote.kmongo.findOneById
-import org.litote.kmongo.keyProjection
-import org.litote.kmongo.save
-import org.litote.kmongo.set
-import org.litote.kmongo.setTo
-import org.litote.kmongo.updateOneById
+import org.litote.kmongo.*
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
@@ -76,8 +66,36 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
         updateClubById(clubId, ClubDTO::avgPrice setTo avgPrice)
     }
 
-    override fun updateClubFields(clubId: UUID, fields: List<Field>) {
-        updateClubById(clubId, ClubDTO::fields setTo fields)
+    override fun updateClubField(
+        clubId: UUID,
+        fieldId: UUID,
+        name: String,
+        indoor: Boolean,
+        hasSand: Boolean,
+        wallsMaterial: WallsMaterial
+    ) {
+        val result = clubs.updateOne(
+            (ClubDTO::id eq clubId) and ((ClubDTO::fields / Field::id) eq fieldId),
+            ClubDTO::fields.colProperty.posOp / Field::name setTo name,
+            ClubDTO::fields.colProperty.posOp / Field::isIndoor setTo indoor,
+            ClubDTO::fields.colProperty.posOp / Field::wallsMaterial setTo wallsMaterial,
+            ClubDTO::fields.colProperty.posOp / Field::hasSand setTo hasSand,
+        )
+        if (result.modifiedCount == 1L) {
+            entityNotFound<Club>(clubId)
+        }
+    }
+
+    override fun addFieldToClub(
+        clubId: UUID,
+        name: String,
+        indoor: Boolean,
+        hasSand: Boolean,
+        wallsMaterial: WallsMaterial
+    ): Field {
+        val field = Field(UUID.randomUUID(), name, indoor, wallsMaterial, hasSand)
+        updateClubById(clubId, ClubDTO::fields addToSet field)
+        return field
     }
 
     override fun updateClubAvailability(clubId: UUID, availability: Availability) {

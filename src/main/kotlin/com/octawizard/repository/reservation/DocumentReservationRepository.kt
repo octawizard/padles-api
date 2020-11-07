@@ -3,15 +3,7 @@ package com.octawizard.repository.reservation
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.geojson.Point
 import com.mongodb.client.model.geojson.Position
-import com.octawizard.domain.model.ClubReservationInfo
-import com.octawizard.domain.model.GeoLocation
-import com.octawizard.domain.model.MATCH_MAX_NUMBER_OF_PLAYERS
-import com.octawizard.domain.model.Match
-import com.octawizard.domain.model.PaymentStatus
-import com.octawizard.domain.model.RadiusUnit
-import com.octawizard.domain.model.Reservation
-import com.octawizard.domain.model.ReservationStatus
-import com.octawizard.domain.model.User
+import com.octawizard.domain.model.*
 import com.octawizard.repository.reservation.model.ClubReservationInfoDTO
 import com.octawizard.repository.reservation.model.MatchDTO
 import com.octawizard.repository.reservation.model.ReservationDTO
@@ -108,6 +100,13 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
         reservations.updateMany(
             (ReservationDTO::clubReservationInfo / ClubReservationInfoDTO::id) eq clubId,
             (ReservationDTO::clubReservationInfo / ClubReservationInfoDTO::location) setTo point
+        )
+    }
+
+    override fun updateClubField(updatedField: Field) {
+        reservations.updateMany(
+            (ReservationDTO::clubReservationInfo / ClubReservationInfoDTO::field / Field::id) eq updatedField.id,
+            (ReservationDTO::clubReservationInfo / ClubReservationInfoDTO::field) setTo updatedField
         )
     }
 }

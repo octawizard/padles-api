@@ -23,7 +23,16 @@ interface ClubRepository {
     fun updateClubAddress(clubId: UUID, address: String, geoLocation: GeoLocation) //side effects on reservations
     fun updateClubContacts(clubId: UUID, contacts: Contacts)
     fun updateClubAvgPrice(clubId: UUID, avgPrice: BigDecimal)
-    fun updateClubFields(clubId: UUID, fields: List<Field>) //side effects on reservations (?)
+    fun updateClubField(
+        clubId: UUID,
+        fieldId: UUID,
+        name: String,
+        indoor: Boolean,
+        hasSand: Boolean,
+        wallsMaterial: WallsMaterial
+    ) //side effects on reservations (?)
+    fun addFieldToClub(clubId: UUID, name: String, indoor: Boolean, hasSand: Boolean, wallsMaterial: WallsMaterial): Field
+
     fun updateClubAvailability(clubId: UUID, availability: Availability)
 
     fun getNearestClubsAvailableForReservation(
@@ -32,7 +41,7 @@ interface ClubRepository {
         longitude: Double,
         radius: Double,
         radiusUnit: RadiusUnit
-    ) : List<Club>
+    ): List<Club>
 
     fun getNearestClubs(latitude: Double, longitude: Double, radius: Double, radiusUnit: RadiusUnit): List<Club>
 

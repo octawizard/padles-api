@@ -1,15 +1,6 @@
 package com.octawizard.controller
 
-import com.octawizard.domain.model.Availability
-import com.octawizard.domain.model.Club
-import com.octawizard.domain.model.Contacts
-import com.octawizard.domain.model.Email
-import com.octawizard.domain.model.Field
-import com.octawizard.domain.model.GeoLocation
-import com.octawizard.domain.model.MatchResult
-import com.octawizard.domain.model.RadiusUnit
-import com.octawizard.domain.model.Reservation
-import com.octawizard.domain.model.User
+import com.octawizard.domain.model.*
 import com.octawizard.domain.usecase.club.*
 import com.octawizard.domain.usecase.reservation.CancelReservation
 import com.octawizard.domain.usecase.reservation.CreateReservation
@@ -56,6 +47,8 @@ class Controller(
     private val updateClubAddress: UpdateClubAddress,
     private val updateClubContacts: UpdateClubContacts,
     private val updateClubAvgPrice: UpdateClubAvgPrice,
+    private val addFieldToClub: AddFieldToClub,
+    private val updateClubField: UpdateClubField,
 ) {
 
     suspend fun createUser(user: User): User = async { createUser.invoke(user) }
@@ -169,6 +162,27 @@ class Controller(
 
     suspend fun updateClubAvgPrice(club: Club, avgPrice: BigDecimal): Club {
         return async { updateClubAvgPrice.invoke(club, avgPrice) }
+    }
+
+    suspend fun addToClubFields(
+        club: Club,
+        name: String,
+        indoor: Boolean,
+        hasSand: Boolean,
+        wallsMaterial: WallsMaterial,
+    ): Club {
+        return async { addFieldToClub(club, name, indoor, hasSand, wallsMaterial) }
+    }
+
+    suspend fun updateClubField(
+        club: Club,
+        fieldId: UUID,
+        name: String,
+        indoor: Boolean,
+        hasSand: Boolean,
+        wallsMaterial: WallsMaterial,
+    ): Club {
+        return async { updateClubField.invoke(club, fieldId, name, indoor, hasSand, wallsMaterial) }
     }
 }
 

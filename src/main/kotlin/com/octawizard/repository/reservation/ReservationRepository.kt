@@ -1,11 +1,6 @@
 package com.octawizard.repository.reservation
 
-import com.octawizard.domain.model.ClubReservationInfo
-import com.octawizard.domain.model.GeoLocation
-import com.octawizard.domain.model.Match
-import com.octawizard.domain.model.RadiusUnit
-import com.octawizard.domain.model.Reservation
-import com.octawizard.domain.model.User
+import com.octawizard.domain.model.*
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
@@ -34,4 +29,5 @@ interface ReservationRepository {
 
     fun updateClubName(clubId: UUID, name: String)
     fun updateClubAddress(clubId: UUID, location: GeoLocation)
+    fun updateClubField(updatedField: Field)
 }

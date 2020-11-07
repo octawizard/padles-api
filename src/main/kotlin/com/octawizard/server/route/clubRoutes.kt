@@ -3,11 +3,7 @@ package com.octawizard.server.route
 import com.octawizard.controller.Controller
 import com.octawizard.domain.model.Contacts
 import com.octawizard.domain.model.RadiusUnit
-import com.octawizard.server.input.CreateClubInput
-import com.octawizard.server.input.UpdateClubAddressNameInput
-import com.octawizard.server.input.UpdateClubAvgPriceInput
-import com.octawizard.server.input.UpdateClubContactsInput
-import com.octawizard.server.input.UpdateClubNameInput
+import com.octawizard.server.input.*
 import com.octawizard.server.route.QueryParams.DAY
 import com.octawizard.server.route.QueryParams.LATITUDE
 import com.octawizard.server.route.QueryParams.LONGITUDE
@@ -15,7 +11,6 @@ import com.octawizard.server.route.QueryParams.RADIUS
 import com.octawizard.server.route.QueryParams.RADIUS_UNIT
 import io.ktor.application.*
 import io.ktor.auth.*
-import io.ktor.features.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.request.*
@@ -39,7 +34,7 @@ data class ClubContactsRoute(val clubId: UUID)
 @Location("/club/clubId/avgPrice")
 data class ClubAvgPriceRoute(val clubId: UUID)
 
-@Location("/club/clubId/fields")
+@Location("/club/clubId/field")
 data class ClubFieldsRoute(val clubId: UUID)
 
 @Location("/club/clubId/field/fieldId")
@@ -146,20 +141,33 @@ fun Routing.clubRoutes(controller: Controller) {
             val updatedClub = controller.updateClubAvgPrice(club, input.avgPrice)
             call.respond(HttpStatusCode.OK, updatedClub)
         }
-//        //fields
-//        put<ClubFieldsRoute> { route ->
-//            val input = call.receive<UpdateClubFieldsInput>()
-//            //todo check if authorized
-//            val club = controller.updateClubFields(route.clubId, input.fields)
-//            call.respond(HttpStatusCode.OK, club)
-//        }
-//
-//        put<ClubFieldRoute> { route ->
-//            val input = call.receive<UpdateClubFieldInput>()
-//            //todo check if authorized
-//            val club = controller.updateClubField(route.clubId, route.fieldId, input.field)
-//            call.respond(HttpStatusCode.OK, club)
-//        }
+
+        //fields (only add new field)
+        post<ClubFieldsRoute> { route ->
+            val input = call.receive<AddClubFieldInput>()
+            //todo check if authorized
+            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val updatedClub = controller.addToClubFields(
+                club, input.name, input.isIndoor, input.hasSand, input.wallsMaterial
+            )
+            call.respond(HttpStatusCode.OK, updatedClub)
+        }
+
+        put<ClubFieldRoute> { route ->
+            val input = call.receive<UpdateClubFieldInput>()
+            //todo check if authorized
+            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+
+            val updatedClub = controller.updateClubField(
+                club,
+                route.fieldId,
+                input.name,
+                input.isIndoor,
+                input.hasSand,
+                input.wallsMaterial
+            )
+            call.respond(HttpStatusCode.OK, updatedClub)
+        }
 //
 //        //availability
 //        put<ClubAvailabilityRoute> { route ->

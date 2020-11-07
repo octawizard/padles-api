@@ -1,13 +1,7 @@
 package com.octawizard.domain.usecase
 
 import com.octawizard.domain.usecase.club.*
-import com.octawizard.domain.usecase.reservation.CancelReservation
-import com.octawizard.domain.usecase.reservation.CreateReservation
-import com.octawizard.domain.usecase.reservation.GetNearestAvailableReservations
-import com.octawizard.domain.usecase.reservation.GetReservation
-import com.octawizard.domain.usecase.reservation.JoinMatch
-import com.octawizard.domain.usecase.reservation.LeaveMatch
-import com.octawizard.domain.usecase.reservation.UpdateMatchResult
+import com.octawizard.domain.usecase.reservation.*
 import com.octawizard.domain.usecase.user.CreateUser
 import com.octawizard.domain.usecase.user.DeleteUser
 import com.octawizard.domain.usecase.user.GetUser
@@ -43,4 +37,6 @@ val useCaseModule = DI.Module("useCase") {
     bind<UpdateClubAddress>() with provider { UpdateClubAddress(instance(), instance()) }
     bind<UpdateClubContacts>() with provider { UpdateClubContacts(instance()) }
     bind<GetNearestClubs>() with provider { GetNearestClubs(instance()) }
+    bind<UpdateClubField>() with provider { UpdateClubField(instance(), instance()) }
+    bind<AddFieldToClub>() with provider { AddFieldToClub(instance()) }
 }
