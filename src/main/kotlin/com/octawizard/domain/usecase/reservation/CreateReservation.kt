@@ -22,7 +22,6 @@ class CreateReservation(
         fieldId: UUID,
         startTime: LocalDateTime,
         endTime: LocalDateTime,
-        price: BigDecimal,
         matchEmailPlayer2: Email?,
         matchEmailPlayer3: Email?,
         matchEmailPlayer4: Email?
@@ -38,7 +37,7 @@ class CreateReservation(
 
         val match = Match(listOfNotNull(reservationOwner, player2, player3, player4))
 
-        val preReservedAvailability: FieldAvailability? = club.availability.byDate[startTime.toLocalDate()]
+        val preReservedAvailability = club.availability.byDate[startTime.toLocalDate()]
             ?.find { it.timeSlot.startDateTime == startTime && it.timeSlot.endDateTime == endTime && it.field.id == fieldId }
             ?: entityNotFound<FieldAvailability>("field=$fieldId from=$startTime to=$endTime")
         val updatedAvailability = Availability(
@@ -51,7 +50,7 @@ class CreateReservation(
         val clubReservationInfo = ClubReservationInfo(club.id, club.name, field, club.geoLocation)
 
         return reservationRepository.createReservation(
-            reservationOwner, clubReservationInfo, startTime, endTime, price, match
+            reservationOwner, clubReservationInfo, startTime, endTime, preReservedAvailability.price, match
         )
 
         //todo in case of error we need to restore the availability for the club. Maybe instead of removing it we can

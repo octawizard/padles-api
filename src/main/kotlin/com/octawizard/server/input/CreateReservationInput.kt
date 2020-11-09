@@ -10,7 +10,6 @@ data class CreateReservationInput(
     val fieldId: UUID,
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
-    val price: BigDecimal,
     val matchEmailPlayer2: Email?,
     val matchEmailPlayer3: Email?,
     val matchEmailPlayer4: Email?,

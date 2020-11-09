@@ -80,15 +80,13 @@ class Controller(
         fieldId: UUID,
         startTime: LocalDateTime,
         endTime: LocalDateTime,
-        price: BigDecimal,
         matchEmailPlayer2: Email?,
         matchEmailPlayer3: Email?,
         matchEmailPlayer4: Email?,
     ): Reservation {
         return async {
             createReservation.invoke(
-                reservedBy, clubId, fieldId, startTime, endTime, price, matchEmailPlayer2,
-                matchEmailPlayer3, matchEmailPlayer4
+                reservedBy, clubId, fieldId, startTime, endTime, matchEmailPlayer2, matchEmailPlayer3, matchEmailPlayer4
             )
         }
     }

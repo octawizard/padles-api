@@ -59,7 +59,7 @@ fun Routing.reservationRoutes(controller: Controller) {
         post("/reservation") {
             val input = call.receive<CreateReservationInput>()
             val reservation = controller.createReservation(
-                input.reservedBy, input.clubId, input.fieldId, input.startTime, input.endTime, input.price,
+                input.reservedBy, input.clubId, input.fieldId, input.startTime, input.endTime,
                 input.matchEmailPlayer2, input.matchEmailPlayer3, input.matchEmailPlayer4
             )
             call.respond(HttpStatusCode.Created, reservation)
