@@ -1,7 +1,6 @@
 package com.octawizard.server.input
 
 import com.octawizard.domain.model.Email
-import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
 
