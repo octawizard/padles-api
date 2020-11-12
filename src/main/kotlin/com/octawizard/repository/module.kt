@@ -77,7 +77,7 @@ val repositoryModule = DI.Module("repository") {
     bind<MongoDatabase>() with eagerSingleton {
         instance<MongoClient>().getDatabase(instance<MongoRepositoryConfiguration>().database)
     }
-    bind<DocumentSessionProvider>() with eagerSingleton { DocumentSessionProvider(instance()) }
+    bind<MongoSessionProvider>() with eagerSingleton { MongoSessionProvider(instance()) }
     bind<MongoCollection<ReservationDTO>>(tag = reservationsCollection) with singleton {
         val config = instance<MongoRepositoryConfiguration>()
         val reservations =

@@ -15,7 +15,7 @@ import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.ReservationStatus
 import com.octawizard.domain.model.TimeSlot
 import com.octawizard.domain.model.User
-import com.octawizard.repository.DocumentSessionProvider
+import com.octawizard.repository.MongoSessionProvider
 import com.octawizard.repository.club.model.ClubDTO
 import com.octawizard.repository.reservation.model.ReservationDTO
 import com.octawizard.repository.reservation.model.toClubReservationInfoDTO
@@ -38,7 +38,7 @@ import kotlin.reflect.KProperty1
 class DocumentTransactionRepository(
     private val clubs: MongoCollection<ClubDTO>,
     private val reservations: MongoCollection<ReservationDTO>,
-    private val sessionProvider: DocumentSessionProvider,
+    private val sessionProvider: MongoSessionProvider,
 ) : TransactionRepository {
     private val logger = KotlinLogging.logger { }
 
