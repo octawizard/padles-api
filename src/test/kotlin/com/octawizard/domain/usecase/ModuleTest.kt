@@ -41,6 +41,8 @@ class ModuleTest {
         assertNotNull(kodein.direct.instance<CreateReservation>())
         assertNotNull(kodein.direct.instance<GetNearestAvailableReservations>())
         assertNotNull(kodein.direct.instance<GetReservation>())
+
+        // reservation match
         assertNotNull(kodein.direct.instance<JoinMatch>())
         assertNotNull(kodein.direct.instance<LeaveMatch>())
         assertNotNull(kodein.direct.instance<UpdateMatchResult>())
