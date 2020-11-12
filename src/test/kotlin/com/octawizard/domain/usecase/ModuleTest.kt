@@ -8,6 +8,7 @@ import com.octawizard.domain.usecase.user.GetUser
 import com.octawizard.domain.usecase.user.UpdateUser
 import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
+import com.octawizard.repository.transaction.TransactionRepository
 import com.octawizard.repository.user.UserRepository
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertNotNull
@@ -20,6 +21,7 @@ class ModuleTest {
     private val fakeRepoModule = DI.Module("repository") {
         bind<ClubRepository>() with singleton { mockk(relaxed = true) }
         bind<ReservationRepository>() with singleton { mockk(relaxed = true) }
+        bind<TransactionRepository>() with singleton { mockk(relaxed = true) }
         bind<UserRepository>() with singleton { mockk(relaxed = true) }
     }
 

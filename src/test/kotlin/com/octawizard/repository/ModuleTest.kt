@@ -39,6 +39,14 @@ class ModuleTest {
                 withExposedPorts(6379)
             }
         }
+
+        @get:ClassRule
+        @JvmStatic
+        val mongo: GenericContainer<Nothing> = object : GenericContainer<Nothing>("mongo") {
+            init {
+                withExposedPorts(27017)
+            }
+        }
     }
 
     init {

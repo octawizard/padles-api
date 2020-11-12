@@ -37,7 +37,7 @@ class ConfigModuleTest {
         assertEquals(1234, instance.port)
         assertEquals(Duration.ofSeconds(1), instance.timeout)
         assertEquals(Duration.ofHours(1), instance.userCacheTtl)
-        assertEquals(Duration.ofHours(2), instance.userCacheName)
+        assertEquals("users", instance.userCacheName)
     }
 
     @Test
