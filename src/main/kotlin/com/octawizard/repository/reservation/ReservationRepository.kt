@@ -1,20 +1,18 @@
 package com.octawizard.repository.reservation
 
 import com.octawizard.domain.model.*
-import java.math.BigDecimal
-import java.time.LocalDateTime
 import java.util.*
 
 interface ReservationRepository {
 
-    fun createReservation(
-        reservationOwner: User,
-        clubReservationInfo: ClubReservationInfo,
-        startTime: LocalDateTime,
-        endTime: LocalDateTime,
-        price: BigDecimal,
-        match: Match,
-    ): Reservation
+//    fun createReservation(
+//        reservationOwner: User,
+//        clubReservationInfo: ClubReservationInfo,
+//        startTime: LocalDateTime,
+//        endTime: LocalDateTime,
+//        price: BigDecimal,
+//        match: Match,
+//    ): Reservation
 
     fun getReservation(reservationId: UUID): Reservation?
     fun updateReservation(reservation: Reservation)

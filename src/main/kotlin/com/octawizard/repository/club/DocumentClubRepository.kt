@@ -1,7 +1,6 @@
 package com.octawizard.repository.club
 
 import com.mongodb.client.MongoCollection
-import com.mongodb.client.model.Updates
 import com.mongodb.client.model.geojson.Point
 import com.mongodb.client.model.geojson.Position
 import com.octawizard.domain.model.*

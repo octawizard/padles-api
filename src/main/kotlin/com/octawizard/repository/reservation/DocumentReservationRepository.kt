@@ -18,13 +18,9 @@ import org.litote.kmongo.eq
 import org.litote.kmongo.findOneById
 import org.litote.kmongo.id.StringId
 import org.litote.kmongo.lt
-import org.litote.kmongo.save
 import org.litote.kmongo.setTo
 import org.litote.kmongo.updateOneById
 import org.litote.kmongo.updateMany
-import org.litote.kmongo.find
-import java.math.BigDecimal
-import java.time.LocalDateTime
 import java.util.*
 
 class DocumentReservationRepository(private val reservations: MongoCollection<ReservationDTO>) : ReservationRepository {
@@ -32,28 +28,28 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
     private val filterReservationWithMissingPlayers: Bson =
         ReservationDTO::match / MatchDTO::playersCount lt MATCH_MAX_NUMBER_OF_PLAYERS
 
-    override fun createReservation(
-        reservationOwner: User,
-        clubReservationInfo: ClubReservationInfo,
-        startTime: LocalDateTime,
-        endTime: LocalDateTime,
-        price: BigDecimal,
-        match: Match
-    ): Reservation {
-        val reservation = ReservationDTO(
-            UUID.randomUUID(),
-            match.toMatchDTO(),
-            clubReservationInfo.toClubReservationInfoDTO(),
-            startTime,
-            endTime,
-            reservationOwner,
-            price,
-            ReservationStatus.Pending,
-            PaymentStatus.PendingPayment
-        )
-        reservations.save(reservation)
-        return reservation.toReservation()
-    }
+//    override fun createReservation(
+//        reservationOwner: User,
+//        clubReservationInfo: ClubReservationInfo,
+//        startTime: LocalDateTime,
+//        endTime: LocalDateTime,
+//        price: BigDecimal,
+//        match: Match
+//    ): Reservation {
+//        val reservation = ReservationDTO(
+//            UUID.randomUUID(),
+//            match.toMatchDTO(),
+//            clubReservationInfo.toClubReservationInfoDTO(),
+//            startTime,
+//            endTime,
+//            reservationOwner,
+//            price,
+//            ReservationStatus.Pending,
+//            PaymentStatus.PendingPayment
+//        )
+//        reservations.save(reservation)
+//        return reservation.toReservation()
+//    }
 
     override fun getReservation(reservationId: UUID): Reservation? {
         return reservations.findOneById(reservationId)?.toReservation()
