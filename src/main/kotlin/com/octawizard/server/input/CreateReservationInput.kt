@@ -5,7 +5,8 @@ import java.time.LocalDateTime
 import java.util.*
 
 data class CreateReservationInput(
-    val reservedBy: Email, val clubId: UUID,
+    val reservedBy: Email,
+    val clubId: UUID,
     val fieldId: UUID,
     val startTime: LocalDateTime,
     val endTime: LocalDateTime,
