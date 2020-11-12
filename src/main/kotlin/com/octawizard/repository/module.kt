@@ -92,12 +92,12 @@ val repositoryModule = DI.Module("repository") {
     }
     bind<TransactionRepository>() with singleton {
         DocumentTransactionRepository(
-            instance("reservationsCollection"),
             instance("clubsCollection"),
+            instance("reservationsCollection"),
             instance(),
         )
     }
-    bind<ClubRepository>() with singleton { DocumentClubRepository(instance("clubsReservations")) }
+    bind<ClubRepository>() with singleton { DocumentClubRepository(instance("clubsCollection")) }
 }
 
 fun <T> MongoCollection<T>.ensureIndexes(vararg indexes: Bson) {
