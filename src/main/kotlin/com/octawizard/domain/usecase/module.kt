@@ -11,7 +11,6 @@ import org.kodein.di.bind
 import org.kodein.di.instance
 import org.kodein.di.provider
 
-
 val useCaseModule = DI.Module("useCase") {
     // user
     bind<CreateUser>() with provider { CreateUser(instance()) }

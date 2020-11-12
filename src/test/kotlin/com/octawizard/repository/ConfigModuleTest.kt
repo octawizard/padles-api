@@ -16,7 +16,7 @@ class ConfigModuleTest {
         val kodein = DI {
             import(repositoryConfigurationModule)
         }
-        val instance = kodein.direct.instance<RepositoryConfiguration>()
+        val instance = kodein.direct.instance<DatabaseConfiguration>()
         assertNotNull(instance)
         assertEquals("test", instance.protocol)
         assertEquals("127.0.0.1", instance.host)

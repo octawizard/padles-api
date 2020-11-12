@@ -5,6 +5,8 @@ import org.kodein.di.bind
 import org.kodein.di.singleton
 
 val repositoryConfigurationModule = DI.Module("repositoryConfig") {
-    bind<RepositoryConfiguration>() with singleton { RepositoryConfigurationFactory.build() }
+    bind<DatabaseConfiguration>() with singleton { DatabaseConfigurationFactory.build() }
+    bind<RedisRepositoryConfiguration>() with singleton { RedisRepositoryConfigurationFactory.build() }
+    bind<MongoRepositoryConfiguration>() with singleton { MongoRepositoryConfigurationFactory.build() }
 }
 
