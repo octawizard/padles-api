@@ -32,9 +32,9 @@ class CreateReservation(
         val field = club.fields.find { it.id == fieldId } ?: fieldNotFound(fieldId)
         val fieldPrice = getFieldPrice(club, field, startTime, endTime)
 
-        val player2 = matchEmailPlayer2?.let { userRepository.getUser(reservedBy) }
-        val player3 = matchEmailPlayer3?.let { userRepository.getUser(reservedBy) }
-        val player4 = matchEmailPlayer4?.let { userRepository.getUser(reservedBy) }
+        val player2 = matchEmailPlayer2?.let { userRepository.getUser(matchEmailPlayer2) }
+        val player3 = matchEmailPlayer3?.let { userRepository.getUser(matchEmailPlayer3) }
+        val player4 = matchEmailPlayer4?.let { userRepository.getUser(matchEmailPlayer4) }
 
         val match = Match(listOfNotNull(reservationOwner, player2, player3, player4))
 
