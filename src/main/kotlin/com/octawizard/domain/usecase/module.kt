@@ -20,7 +20,7 @@ val useCaseModule = DI.Module("useCase") {
 
     // reservation
     bind<CreateReservation>() with provider { CreateReservation(instance(), instance(), instance()) }
-    bind<CancelReservation>() with provider { CancelReservation(instance()) }
+    bind<CancelReservation>() with provider { CancelReservation(instance(), instance()) }
     bind<GetReservation>() with provider { GetReservation(instance()) }
     bind<GetNearestAvailableReservations>() with provider { GetNearestAvailableReservations(instance()) }
 

@@ -1,38 +1,55 @@
 package com.octawizard.domain.usecase.reservation
 
-import com.octawizard.domain.model.Email
+import com.octawizard.domain.model.FieldAvailability
 import com.octawizard.domain.model.PaymentStatus
 import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.ReservationStatus
+import com.octawizard.domain.model.TimeSlot
+import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
+import com.octawizard.repository.retry
 import io.ktor.features.*
-import java.math.BigDecimal
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.*
 
-class CancelReservation(private val reservationRepository: ReservationRepository) {
+class CancelReservation(
+    private val reservationRepository: ReservationRepository,
+    private val clubRepository: ClubRepository,
+) {
 
     operator fun invoke(reservationId: UUID): Reservation {
         val reservation = reservationRepository.getReservation(reservationId)
             ?: throw NotFoundException("reservation$reservationId not found")
-        val now = LocalDateTime.now()
-        if (now > reservation.startTime) {
+        if (reservation.startTime.isBefore(LocalDateTime.now())) {
             throw BadRequestException("cannot cancel a reservation for a match that should be already started")
         }
-        return when (reservation.status) {
-            ReservationStatus.Pending -> {
-                val canceledReservation = reservation.copy(status = ReservationStatus.Canceled)
-                reservationRepository.updateReservation(canceledReservation)
-                canceledReservation
-            }
-            ReservationStatus.Confirmed -> {
-                if (reservation.paymentStatus == PaymentStatus.Payed) {
-                    reservation.copy(status = ReservationStatus.Canceled, paymentStatus = PaymentStatus.ToBeRefunded)
-                } else {
-                    reservation.copy(status = ReservationStatus.Canceled)
+        return kotlin.runCatching {
+            val canceledReservation: Reservation = when (reservation.status) {
+                ReservationStatus.Pending -> reservation.copy(status = ReservationStatus.Canceled)
+                ReservationStatus.Confirmed -> {
+                    if (reservation.paymentStatus == PaymentStatus.Payed) {
+                        reservation.copy(
+                            status = ReservationStatus.Canceled, paymentStatus = PaymentStatus.ToBeRefunded
+                        )
+                    } else {
+                        reservation.copy(status = ReservationStatus.Canceled)
+                    }
                 }
+                ReservationStatus.Canceled -> throw BadRequestException("reservation $reservationId is already canceled")
             }
-            ReservationStatus.Canceled -> throw BadRequestException("reservation $reservationId is already canceled")
-        }
+            reservationRepository.updateReservation(canceledReservation)
+            canceledReservation
+        }.onSuccess {
+            GlobalScope.launch {
+                val fieldAvailability = FieldAvailability(
+                    TimeSlot(reservation.startTime, reservation.endTime),
+                    reservation.clubReservationInfo.field,
+                    reservation.price
+                )
+                retry { clubRepository.addClubAvailability(reservation.clubReservationInfo.clubId, fieldAvailability) }
+            }
+        }.getOrThrow()
     }
 }

@@ -34,6 +34,7 @@ interface ClubRepository {
     fun addFieldToClub(clubId: UUID, name: String, indoor: Boolean, hasSand: Boolean, wallsMaterial: WallsMaterial): Field
 
     fun updateClubAvailability(clubId: UUID, availability: Availability)
+    fun addClubAvailability(clubId: UUID, fieldAvailability: FieldAvailability)
 
     fun getNearestClubsAvailableForReservation(
         day: LocalDate,
@@ -44,5 +45,4 @@ interface ClubRepository {
     ): List<Club>
 
     fun getNearestClubs(latitude: Double, longitude: Double, radius: Double, radiusUnit: RadiusUnit): List<Club>
-
 }

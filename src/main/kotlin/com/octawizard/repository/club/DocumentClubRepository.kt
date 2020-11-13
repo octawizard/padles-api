@@ -71,7 +71,7 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
         name: String,
         indoor: Boolean,
         hasSand: Boolean,
-        wallsMaterial: WallsMaterial
+        wallsMaterial: WallsMaterial,
     ) {
         val result = clubs.updateOne(
             (ClubDTO::id eq clubId) and ((ClubDTO::fields / Field::id) eq fieldId),
@@ -90,7 +90,7 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
         name: String,
         indoor: Boolean,
         hasSand: Boolean,
-        wallsMaterial: WallsMaterial
+        wallsMaterial: WallsMaterial,
     ): Field {
         val field = Field(UUID.randomUUID(), name, indoor, wallsMaterial, hasSand)
         updateClubById(clubId, ClubDTO::fields addToSet field)
@@ -99,6 +99,14 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
 
     override fun updateClubAvailability(clubId: UUID, availability: Availability) {
         updateClubById(clubId, ClubDTO::availability setTo availability)
+    }
+
+    override fun addClubAvailability(clubId: UUID, fieldAvailability: FieldAvailability) {
+        val date = fieldAvailability.timeSlot.startDateTime.toLocalDate()
+        updateClubById(
+            clubId,
+            (ClubDTO::availability / Availability::byDate).keyProjection(date) addToSet fieldAvailability
+        )
     }
 
     override fun getNearestClubsAvailableForReservation(
