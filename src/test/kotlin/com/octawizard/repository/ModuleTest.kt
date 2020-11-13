@@ -1,10 +1,10 @@
 package com.octawizard.repository
-
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
 import com.octawizard.domain.model.User
 import com.octawizard.repository.Tags.clubsCollection
+import com.octawizard.repository.Tags.database
 import com.octawizard.repository.Tags.reservationsCollection
 import com.octawizard.repository.Tags.userCache
 import com.octawizard.repository.club.ClubRepository
@@ -18,7 +18,11 @@ import org.junit.jupiter.api.AfterAll
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.kodein.di.*
+import org.kodein.di.DI
+import org.kodein.di.bind
+import org.kodein.di.direct
+import org.kodein.di.instance
+import org.kodein.di.singleton
 import org.redisson.api.RedissonClient
 import org.testcontainers.containers.GenericContainer
 import java.time.Duration
@@ -32,6 +36,10 @@ class ModuleTest {
     private val mongoConfig: MongoRepositoryConfiguration
 
     companion object {
+        val db = "test-db"
+        val dbUser= "test_user"
+        val dbPassword = "test_password"
+
         @get:ClassRule
         @JvmStatic
         val redis: GenericContainer<Nothing> = object : GenericContainer<Nothing>("redis:6.0.8-alpine") {
@@ -47,25 +55,40 @@ class ModuleTest {
                 withExposedPorts(27017)
             }
         }
+
+        @get:ClassRule
+        @JvmStatic
+        val postgres: GenericContainer<Nothing> = object : GenericContainer<Nothing>("postgres:13.0-alpine") {
+            init {
+                withExposedPorts(5432)
+                withEnv("POSTGRES_DB", db)
+                withEnv("POSTGRES_PASSWORD", dbPassword)
+                withEnv("POSTGRES_USER", dbUser)
+            }
+        }
     }
 
     init {
         redis.start()
         val host = redis.host
         val port = redis.firstMappedPort
-        databaseConfig = DatabaseConfiguration(
-            "jdbc:postgresql://localhost:5432/padles",
-            "org.postgresql.Driver",
-            "test_user",
-            "test_password",
-            4
-        )
         redisConfig = RedisRepositoryConfiguration(
             "redis", host, port, Duration.ofMillis(500), Duration.ofSeconds(1), "users"
         )
+
+        postgres.start()
+        databaseConfig = DatabaseConfiguration(
+            "jdbc:postgresql://localhost:${postgres.firstMappedPort}/$db",
+            "org.postgresql.Driver",
+            dbUser,
+            dbPassword,
+            4
+        )
+
+        mongo.start()
         mongoConfig = MongoRepositoryConfiguration(
             "localhost",
-            27017,
+            mongo.firstMappedPort,
             "test",
             "clubs",
             "reservations",
@@ -88,7 +111,7 @@ class ModuleTest {
 
         assertNotNull(kodein.direct.instance<RedisCache<String, User>>(tag = userCache))
         assertNotNull(kodein.direct.instance<RedissonClient>())
-        assertNotNull(kodein.direct.instance<UserRepository>(tag = "db"))
+        assertNotNull(kodein.direct.instance<UserRepository>(tag = database))
         assertNotNull(kodein.direct.instance<UserRepository>())
         assertNotNull(kodein.direct.instance<DatabaseProvider>())
         assertNotNull(kodein.direct.instance<DataSource>())
