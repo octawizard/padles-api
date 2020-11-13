@@ -24,8 +24,8 @@ val exposedVersion = "0.24.1"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
-    testImplementation("org.testcontainers:testcontainers:1.14.3")
-    testImplementation("org.testcontainers:junit-jupiter:1.14.3")
+    testImplementation("org.testcontainers:testcontainers:1.15.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.15.0")
     testImplementation("io.mockk:mockk:1.10.2")
 
     testImplementation("org.litote.kmongo:kmongo-core-tests:4.1.3")
