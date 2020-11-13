@@ -18,14 +18,18 @@ import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.transaction.TransactionRepository
 import com.octawizard.repository.user.UserRepository
+import io.ktor.features.*
+import io.mockk.Called
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
@@ -131,5 +135,83 @@ class CreateReservationTest {
             userRepository.getUser(email3)
             userRepository.getUser(email4)
         }
+    }
+
+    @Test
+    fun `CreateReservation throws exception creating a reservation when reservation owner does not exist`() {
+        every { userRepository.getUser(email1) } returns null
+
+        assertThrows(NotFoundException::class.java) { createReservation.invoke(
+            email1,
+            club.id,
+            fieldId,
+            startTime,
+            endTime,
+            email2,
+            email3,
+            email4,
+        ) }
+        verify(exactly = 1) { userRepository.getUser(email1) }
+        verify { listOf(transactionRepository, clubRepository) wasNot Called }
+    }
+
+    @Test
+    fun `CreateReservation throws exception creating a reservation when club does not exist`() {
+        every { userRepository.getUser(email1) } returns user1
+        every { clubRepository.getClub(club.id) } returns null
+
+        assertThrows(NotFoundException::class.java) { createReservation.invoke(
+            email1,
+            club.id,
+            fieldId,
+            startTime,
+            endTime,
+            email2,
+            email3,
+            email4,
+        ) }
+        verify(exactly = 1) { userRepository.getUser(email1) }
+        verify(exactly = 1) { clubRepository.getClub(club.id) }
+        verify { transactionRepository wasNot Called }
+    }
+
+    @Test
+    fun `CreateReservation throws exception creating a reservation when field does not exist in the club`() {
+        every { userRepository.getUser(email1) } returns user1
+        every { clubRepository.getClub(club.id) } returns club.copy(fields = emptyList())
+
+        assertThrows(NotFoundException::class.java) { createReservation.invoke(
+            email1,
+            club.id,
+            fieldId,
+            startTime,
+            endTime,
+            email2,
+            email3,
+            email4,
+        ) }
+        verify(exactly = 1) { userRepository.getUser(email1) }
+        verify(exactly = 1) { clubRepository.getClub(club.id) }
+        verify { transactionRepository wasNot Called }
+    }
+
+    @Test
+    fun `CreateReservation throws exception creating a reservation when field isn't available in the given timeslot`() {
+        every { userRepository.getUser(email1) } returns user1
+        every { clubRepository.getClub(club.id) } returns club
+
+        assertThrows(IllegalArgumentException::class.java) { createReservation.invoke(
+            email1,
+            club.id,
+            fieldId,
+            startTime,
+            endTime,
+            email2,
+            email3,
+            email4,
+        ) }
+        verify(exactly = 1) { userRepository.getUser(email1) }
+        verify(exactly = 1) { clubRepository.getClub(club.id) }
+        verify { transactionRepository wasNot Called }
     }
 }
