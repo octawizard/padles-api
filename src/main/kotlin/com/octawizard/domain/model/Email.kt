@@ -29,7 +29,6 @@ class Email(val value: String): Serializable {
         return "Email(value='$value')"
     }
 
-
 }
 
 private const val Prefix = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}"

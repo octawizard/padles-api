@@ -3,6 +3,7 @@ package com.octawizard.domain.model
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertThrows
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -29,5 +30,10 @@ class EmailTest {
     @Test
     fun `Email should not be equals to another object`() {
         assertFalse(Email("test@test.com").equals(1))
+    }
+
+    @Test
+    fun `Email should be equals if value is the same`() {
+        assertTrue(Email("test@test.com").equals(Email("test@test.com")))
     }
 }
