@@ -33,7 +33,18 @@ data class Club(
     }
 }
 
-data class Availability(val byDate: Map<LocalDate, List<FieldAvailability>>) : Serializable
+data class Availability(val byDate: Map<LocalDate, List<FieldAvailability>>) : Serializable {
+    init {
+        check(byDate.entries.all { (date, availableFields) -> dateMatchesTimeSlot(availableFields, date) }) {
+            "field availability timeslot is not matching the availability date"
+        }
+    }
+
+    private fun dateMatchesTimeSlot(
+        availableFields: List<FieldAvailability>,
+        date: LocalDate,
+    ) = availableFields.all { date == it.timeSlot.startDateTime.toLocalDate() }
+}
 
 val EmptyAvailability = Availability(emptyMap())
 
