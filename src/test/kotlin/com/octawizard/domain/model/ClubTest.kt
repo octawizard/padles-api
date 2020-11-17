@@ -14,7 +14,7 @@ class ClubTest {
 
     @Test
     fun `Club should throw exception when creating it if availability include fields that are not owned by the club`() {
-        val clubField = Field(UUID.randomUUID(), "club field", true, WallsMaterial.Glass)
+        val clubField = Field(UUID.randomUUID(), "club field", false, WallsMaterial.Bricks)
         val anotherField = Field(UUID.randomUUID(), "not club field", true, WallsMaterial.Glass)
         val wrongFieldAvailability = listOf(
             FieldAvailability(TimeSlot(LocalDateTime.now(), LocalDateTime.now()), anotherField, BigDecimal.TEN)
