@@ -21,6 +21,7 @@ repositories {
 
 val ktorVersion = "1.4.1"
 val exposedVersion = "0.24.1"
+val kmongoVersion = "4.2.0"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
@@ -28,9 +29,9 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.15.0")
     testImplementation("io.mockk:mockk:1.10.2")
 
-    testImplementation("org.litote.kmongo:kmongo-core-tests:4.1.3")
-    testImplementation("org.litote.kmongo:kmongo-shared-tests:4.1.3")
-    testImplementation("org.litote.kmongo:kmongo-flapdoodle:4.1.3")
+//    testImplementation("org.litote.kmongo:kmongo-core-tests:4.2.0")
+//    testImplementation("org.litote.kmongo:kmongo-shared-tests:4.2.0")
+    testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
 
     testRuntimeOnly("com.h2database:h2:1.4.200")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.0")
@@ -67,8 +68,8 @@ dependencies {
 
     // kmongo
 //    implementation("org.litote.kmongo:kmongo:4.1.3")
-    implementation("org.litote.kmongo:kmongo-id:4.1.3")
-    implementation("org.litote.kmongo:kmongo-native:4.1.3")
+    implementation("org.litote.kmongo:kmongo-id:$kmongoVersion")
+    implementation("org.litote.kmongo:kmongo-native:$kmongoVersion")
 
 //    implementation("org.litote.kmongo:kmongo-async:4.1.3")
 //    implementation("org.litote.kmongo:kmongo-coroutine:4.1.3")

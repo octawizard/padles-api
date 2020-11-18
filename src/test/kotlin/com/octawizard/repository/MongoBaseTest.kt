@@ -21,14 +21,12 @@ import org.junit.Rule
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import org.litote.kmongo.KFlapdoodleRule
-import org.litote.kmongo.KMongoRootTest
 import org.litote.kmongo.service.MongoClientProvider
 import org.litote.kmongo.util.KMongoUtil
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KClass
 
-abstract class MongoBaseTestWithUUIDRepr<T: Any>() : KMongoRootTest() {
+abstract class MongoBaseTestWithUUIDRepr<T : Any>() {
 
     @Suppress("LeakingThis")
     @Rule
@@ -61,7 +59,7 @@ internal object StandaloneEmbeddedMongo {
         .net(Net(port, Network.localhostIsIPv6()))
         .build()
 
-    val mongodProcess: MongodProcess by lazy {
+    private val mongodProcess: MongodProcess by lazy {
         createInstance()
     }
 
@@ -89,27 +87,24 @@ internal object EmbeddedMongoLog {
 class MongoFlapdoodleRule<T : Any>(
     val defaultDocumentClass: KClass<T>,
     val generateRandomCollectionName: Boolean = false,
-    val dbName: String = "test"
+    val dbName: String = "test",
 ) : TestRule {
 
     companion object {
-
-        inline fun <reified T : Any> rule(generateRandomCollectionName: Boolean = false): KFlapdoodleRule<T> =
-            KFlapdoodleRule(T::class, generateRandomCollectionName)
-
+        inline fun <reified T : Any> rule(generateRandomCollectionName: Boolean = false): MongoFlapdoodleRule<T> =
+            MongoFlapdoodleRule(T::class, generateRandomCollectionName)
     }
 
-    val mongoClient: MongoClient  by lazy {
-        MongoClientProvider.createMongoClient<MongoClient>(
+    private fun default(host: String, command: BsonDocument) = MongoClientProvider
+        .createMongoClient<MongoClient>(ConnectionString("mongodb://$host/?uuidRepresentation=STANDARD"))
+        .getDatabase("admin")
+        .runCommand(command)
+
+    val mongoClient: MongoClient by lazy {
+        MongoClientProvider.createMongoClient(
             StandaloneEmbeddedMongo.connectionString { host, command, callback ->
                 try {
-                    callback(
-                        MongoClientProvider
-                            .createMongoClient<MongoClient>(ConnectionString("mongodb://$host"))
-                            .getDatabase("admin")
-                            .runCommand(command),
-                        null
-                    )
+                    callback(default(host, command), null)
                 } catch (e: Exception) {
                     callback(null, e)
                 }

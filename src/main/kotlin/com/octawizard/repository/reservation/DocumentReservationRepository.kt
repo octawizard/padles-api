@@ -28,29 +28,6 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
     private val filterReservationWithMissingPlayers: Bson =
         ReservationDTO::match / MatchDTO::playersCount lt MATCH_MAX_NUMBER_OF_PLAYERS
 
-//    override fun createReservation(
-//        reservationOwner: User,
-//        clubReservationInfo: ClubReservationInfo,
-//        startTime: LocalDateTime,
-//        endTime: LocalDateTime,
-//        price: BigDecimal,
-//        match: Match
-//    ): Reservation {
-//        val reservation = ReservationDTO(
-//            UUID.randomUUID(),
-//            match.toMatchDTO(),
-//            clubReservationInfo.toClubReservationInfoDTO(),
-//            startTime,
-//            endTime,
-//            reservationOwner,
-//            price,
-//            ReservationStatus.Pending,
-//            PaymentStatus.PendingPayment
-//        )
-//        reservations.save(reservation)
-//        return reservation.toReservation()
-//    }
-
     override fun getReservation(reservationId: UUID): Reservation? {
         return reservations.findOneById(reservationId)?.toReservation()
     }

@@ -22,32 +22,6 @@
 //import kotlin.reflect.KClass
 //import kotlin.test.assertEquals
 //
-///**
-// *
-// */
-//
-//class MyBaseTest<T: Any>() {
-//    @Suppress("LeakingThis")
-//    @Rule
-//    @JvmField
-//    val rule = KFlapdoodleRule(getDefaultCollectionClass())
-//
-//    val col by lazy { rule.col }
-//
-//    val database by lazy { rule.database }
-//
-//    val mongoClient by lazy { rule.mongoClient }
-//
-//    inline fun <reified T : Any> getCollection(): MongoCollection<T> = rule.getCollection()
-//
-//    inline fun <reified T : Any> dropCollection() = rule.dropCollection<T>()
-//
-//    @Suppress("UNCHECKED_CAST")
-//    fun getDefaultCollectionClass(): KClass<T> =
-//            ((this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>).kotlin
-//
-//}
-//
 //class GeometryTest : KMongoBaseTest<ClubReservationInfoDTO>() {
 //
 //    @Category(NativeMappingCategory::class)
