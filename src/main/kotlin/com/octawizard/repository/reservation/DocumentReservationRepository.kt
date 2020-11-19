@@ -7,8 +7,6 @@ import com.octawizard.domain.model.*
 import com.octawizard.repository.reservation.model.ClubReservationInfoDTO
 import com.octawizard.repository.reservation.model.MatchDTO
 import com.octawizard.repository.reservation.model.ReservationDTO
-import com.octawizard.repository.reservation.model.toClubReservationInfoDTO
-import com.octawizard.repository.reservation.model.toMatchDTO
 import com.octawizard.repository.reservation.model.toReservation
 import com.octawizard.repository.reservation.model.toReservationDTO
 import io.ktor.features.*
@@ -16,11 +14,13 @@ import org.bson.conversions.Bson
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOneById
+import org.litote.kmongo.gt
 import org.litote.kmongo.id.StringId
 import org.litote.kmongo.lt
 import org.litote.kmongo.setTo
 import org.litote.kmongo.updateOneById
 import org.litote.kmongo.updateMany
+import java.time.LocalDateTime
 import java.util.*
 
 class DocumentReservationRepository(private val reservations: MongoCollection<ReservationDTO>) : ReservationRepository {
@@ -32,10 +32,9 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
         return reservations.findOneById(reservationId)?.toReservation()
     }
 
-    //todo check how to perform partial updates on the document and in case create several update methods
     override fun updateReservation(reservation: Reservation) {
         val result = reservations.updateOneById(
-            StringId<UUID>(reservation.id.toString()),
+            StringId<UUID>(reservation.id.toString()), //todo check if I can pass directly uuid
             reservation.toReservationDTO()
         )
         if (result.modifiedCount != 1L) {
@@ -53,11 +52,12 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
         longitude: Double,
         latitude: Double,
         radius: Double,
-        radiusUnit: RadiusUnit
+        radiusUnit: RadiusUnit,
     ): List<Reservation> {
         val field = ReservationDTO::clubReservationInfo / ClubReservationInfoDTO::location
         val filter = filterGeoWithinSphere(field, longitude, latitude, radius, radiusUnit) and
-                filterReservationWithMissingPlayers
+                filterReservationWithMissingPlayers and
+                (ReservationDTO::startTime gt LocalDateTime.now())
         return reservations.find(filter).map { it.toReservation() }.toList()
     }
 

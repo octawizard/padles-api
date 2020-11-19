@@ -1,6 +1,7 @@
 package com.octawizard.repository
 
 import com.mongodb.ConnectionString
+import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
@@ -16,11 +17,14 @@ import de.flapdoodle.embed.process.config.io.ProcessOutput
 import de.flapdoodle.embed.process.runtime.Network
 import org.bson.BsonDocument
 import org.bson.Document
+import org.bson.UuidRepresentation
 import org.bson.types.ObjectId
 import org.junit.Rule
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
+import org.kodein.di.instance
+import org.litote.kmongo.KMongo
 import org.litote.kmongo.service.MongoClientProvider
 import org.litote.kmongo.util.KMongoUtil
 import java.lang.reflect.ParameterizedType
@@ -59,18 +63,12 @@ internal object StandaloneEmbeddedMongo {
         .net(Net(port, Network.localhostIsIPv6()))
         .build()
 
-    private val mongodProcess: MongodProcess by lazy {
-        createInstance()
-    }
+    private val mongodProcess: MongodProcess by lazy { createInstance() }
 
-    fun connectionString(commandExecutor: (String, BsonDocument, (Document?, Throwable?) -> Unit) -> Unit): ConnectionString =
-        ConnectionString(
-            "mongodb://${mongodProcess.host}/?uuidRepresentation=STANDARD"
-        )
+    fun connectionString(): ConnectionString = ConnectionString("mongodb://${mongodProcess.host}")
 
-    private fun createInstance(): MongodProcess {
-        return MongodStarter.getInstance(EmbeddedMongoLog.embeddedConfig).prepare(config).start()
-    }
+    private fun createInstance(): MongodProcess =
+        MongodStarter.getInstance(EmbeddedMongoLog.embeddedConfig).prepare(config).start()
 }
 
 internal object EmbeddedMongoLog {
@@ -101,15 +99,11 @@ class MongoFlapdoodleRule<T : Any>(
         .runCommand(command)
 
     val mongoClient: MongoClient by lazy {
-        MongoClientProvider.createMongoClient(
-            StandaloneEmbeddedMongo.connectionString { host, command, callback ->
-                try {
-                    callback(default(host, command), null)
-                } catch (e: Exception) {
-                    callback(null, e)
-                }
-            }
-        )
+        val settings = MongoClientSettings.builder()
+            .uuidRepresentation(UuidRepresentation.STANDARD)
+            .applyConnectionString(StandaloneEmbeddedMongo.connectionString())
+            .build()
+        KMongo.createClient(settings)
     }
 
     val database: MongoDatabase by lazy {

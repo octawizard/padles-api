@@ -67,13 +67,8 @@ dependencies {
     implementation("org.redisson:redisson:3.13.5")
 
     // kmongo
-//    implementation("org.litote.kmongo:kmongo:4.1.3")
     implementation("org.litote.kmongo:kmongo-id:$kmongoVersion")
     implementation("org.litote.kmongo:kmongo-native:$kmongoVersion")
-
-//    implementation("org.litote.kmongo:kmongo-async:4.1.3")
-//    implementation("org.litote.kmongo:kmongo-coroutine:4.1.3")
-
 
 }
 
