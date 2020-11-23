@@ -117,7 +117,9 @@ class DocumentReservationRepositoryTest : MongoBaseTestWithUUIDRepr<ReservationD
         val expectedReservation = currentReservation.copy(paymentStatus = PaymentStatus.Payed)
         col.save(currentReservation.toReservationDTO())
 
-        assertEquals(expectedReservation, repository.updateReservation(expectedReservation))
+        repository.updateReservation(expectedReservation)
+
+        assertEquals(expectedReservation, repository.getReservation(expectedReservation.id))
     }
 
     @Test

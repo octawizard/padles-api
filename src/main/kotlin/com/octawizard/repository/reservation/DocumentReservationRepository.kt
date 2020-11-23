@@ -33,10 +33,7 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
     }
 
     override fun updateReservation(reservation: Reservation) {
-        val result = reservations.updateOneById(
-            StringId<UUID>(reservation.id.toString()), //todo check if I can pass directly uuid
-            reservation.toReservationDTO()
-        )
+        val result = reservations.updateOneById(reservation.id, reservation.toReservationDTO())
         if (result.modifiedCount != 1L) {
             throw NotFoundException("reservation ${reservation.id} not found")
         }
