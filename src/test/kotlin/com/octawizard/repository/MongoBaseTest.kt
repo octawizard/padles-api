@@ -16,14 +16,12 @@ import de.flapdoodle.embed.mongo.distribution.Version
 import de.flapdoodle.embed.process.config.io.ProcessOutput
 import de.flapdoodle.embed.process.runtime.Network
 import org.bson.BsonDocument
-import org.bson.Document
 import org.bson.UuidRepresentation
 import org.bson.types.ObjectId
 import org.junit.Rule
 import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import org.kodein.di.instance
 import org.litote.kmongo.KMongo
 import org.litote.kmongo.service.MongoClientProvider
 import org.litote.kmongo.util.KMongoUtil
