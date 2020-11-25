@@ -15,7 +15,7 @@ interface ClubRepository {
         geoLocation: GeoLocation,
         avgPrice: BigDecimal,
         contacts: Contacts,
-        fields: List<Field>,
+        fields: Set<Field>,
         availability: Availability,
     ): Club
 

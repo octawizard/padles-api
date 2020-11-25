@@ -123,7 +123,7 @@ class Controller(
         geoLocation: GeoLocation,
         avgPrice: BigDecimal,
         contacts: Contacts,
-        fields: List<Field>?,
+        fields: Set<Field>?,
         availability: Availability?,
     ): Club {
         return async { createClub.invoke(name, address, geoLocation, avgPrice, contacts, fields, availability) }

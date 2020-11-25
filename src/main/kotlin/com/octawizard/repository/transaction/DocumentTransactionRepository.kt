@@ -16,6 +16,7 @@ import com.octawizard.domain.model.ReservationStatus
 import com.octawizard.domain.model.TimeSlot
 import com.octawizard.domain.model.User
 import com.octawizard.repository.MongoSessionProvider
+import com.octawizard.repository.club.model.AvailabilityDTO
 import com.octawizard.repository.club.model.ClubDTO
 import com.octawizard.repository.reservation.model.ReservationDTO
 import com.octawizard.repository.reservation.model.toClubReservationInfoDTO
@@ -62,10 +63,10 @@ class DocumentTransactionRepository(
         val txnBody: TransactionBody<Reservation> = TransactionBody {
 
             val availableFieldTimeSlotProperty: KProperty1<out Any?, TimeSlot?> =
-                (ClubDTO::availability / Availability::byDate)
+                (ClubDTO::availability / AvailabilityDTO::byDate)
                     .keyProjection(startTime.toLocalDate()) / FieldAvailability::timeSlot
             val availableFieldIdProperty: KProperty1<out Any?, UUID?> =
-                (ClubDTO::availability / Availability::byDate)
+                (ClubDTO::availability / AvailabilityDTO::byDate)
                     .keyProjection(startTime.toLocalDate()) / FieldAvailability::field / Field::id
 
             val updateResult = clubs.updateOneById(

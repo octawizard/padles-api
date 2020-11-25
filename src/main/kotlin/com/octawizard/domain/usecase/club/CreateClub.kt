@@ -17,7 +17,7 @@ class CreateClub(private val clubRepository: ClubRepository) {
         geoLocation: GeoLocation,
         avgPrice: BigDecimal,
         contacts: Contacts,
-        fields: List<Field>?,
+        fields: Set<Field>?,
         availability: Availability?,
     ): Club {
         return clubRepository.createClub(
@@ -26,7 +26,7 @@ class CreateClub(private val clubRepository: ClubRepository) {
             geoLocation,
             avgPrice,
             contacts,
-            fields ?: emptyList(),
+            fields ?: emptySet(),
             availability ?: EmptyAvailability
         )
     }

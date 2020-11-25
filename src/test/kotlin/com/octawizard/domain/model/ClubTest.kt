@@ -25,7 +25,7 @@ class ClubTest {
                 "test club",
                 "club address",
                 mockk(),
-                listOf(clubField),
+                setOf(clubField),
                 Availability(mapOf(LocalDate.now() to wrongFieldAvailability)),
                 BigDecimal.TEN,
                 mockk()

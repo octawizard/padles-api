@@ -31,7 +31,7 @@ class UpdateClubField(
             } else {
                 it
             }
-        }
+        }.toSet()
         val updatedClub = club.copy(fields = updatedFields)
         GlobalScope.launch { retry { reservationRepository.updateClubField(updatedField) } }
         return updatedClub

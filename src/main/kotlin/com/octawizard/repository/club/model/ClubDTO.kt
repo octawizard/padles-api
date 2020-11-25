@@ -11,8 +11,8 @@ data class ClubDTO(
     val name: String,
     val address: String,
     val geoLocation: Point,
-    val fields: List<Field>,
-    val availability: Availability,
+    val fields: Set<Field>,
+    val availability: AvailabilityDTO,
     val avgPrice: BigDecimal,
     val contacts: Contacts,
 ) {
@@ -24,7 +24,7 @@ data class ClubDTO(
             address,
             GeoLocation(geoLocation.position.values[0], geoLocation.position.values[1]),
             fields,
-            availability,
+            availability.toAvailability(),
             avgPrice,
             contacts,
         )
@@ -38,7 +38,7 @@ fun Club.toClubDTO(): ClubDTO =
         address,
         Point(Position(geoLocation.longitude, geoLocation.latitude)),
         fields,
-        availability,
+        availability.toAvailabilityDTO(),
         avgPrice,
         contacts,
     )

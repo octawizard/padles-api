@@ -12,6 +12,6 @@ data class CreateClubInput(
     val geoLocation: GeoLocation,
     val avgPrice: BigDecimal,
     val contacts: Contacts,
-    val fields: List<Field>?,
+    val fields: Set<Field>?,
     val availability: Availability?,
 )

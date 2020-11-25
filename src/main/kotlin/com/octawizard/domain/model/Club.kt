@@ -10,7 +10,7 @@ data class Club(
     val name: String,
     val address: String,
     val geoLocation: GeoLocation,
-    val fields: List<Field>,
+    val fields: Set<Field>,
     val availability: Availability,
     val avgPrice: BigDecimal,
     val contacts: Contacts,

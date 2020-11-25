@@ -57,7 +57,7 @@ class CreateReservationTest {
         "my club",
         "address",
         geoLocation,
-        listOf(field),
+        setOf(field),
         availability,
         BigDecimal.TEN,
         Contacts("", Email("club@gmail.com"))
@@ -178,7 +178,7 @@ class CreateReservationTest {
     @Test
     fun `CreateReservation throws exception creating a reservation when field does not exist in the club`() {
         every { userRepository.getUser(email1) } returns user1
-        every { clubRepository.getClub(club.id) } returns club.copy(fields = emptyList())
+        every { clubRepository.getClub(club.id) } returns club.copy(fields = emptySet())
 
         assertThrows(NotFoundException::class.java) { createReservation.invoke(
             email1,
