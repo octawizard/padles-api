@@ -52,19 +52,19 @@ dependencies {
     implementation("org.jetbrains.exposed", "exposed-java-time", exposedVersion)
 
     // driver and connection pool
-    implementation("org.postgresql:postgresql:42.2.16")
+    implementation("org.postgresql:postgresql:42.2.18")
     implementation("com.zaxxer:HikariCP:3.4.5")
 
     // configuration
-    implementation("com.typesafe:config:1.4.0")
+    implementation("com.typesafe:config:1.4.1")
 
     // logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.3")
-    implementation("org.apache.logging.log4j:log4j-core:2.13.3")
+    implementation("org.apache.logging.log4j:log4j-core:2.14.0")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
 
     // redis
-    implementation("org.redisson:redisson:3.13.5")
+    implementation("org.redisson:redisson:3.14.0")
 
     // kmongo
     implementation("org.litote.kmongo:kmongo-id:$kmongoVersion")
