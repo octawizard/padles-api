@@ -19,9 +19,9 @@ repositories {
     }
 }
 
-val ktorVersion = "1.4.1"
-val exposedVersion = "0.24.1"
-val kmongoVersion = "4.2.1"
+val ktorVersion = "1.4.2"
+val exposedVersion = "0.28.1"
+val kmongoVersion = "4.2.2"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
@@ -45,7 +45,7 @@ dependencies {
     // Dependency Injection
     implementation("org.kodein.di:kodein-di-jvm:7.1.0")
 
-    //dao
+    // orm
     implementation("org.jetbrains.exposed", "exposed-core", exposedVersion)
     implementation("org.jetbrains.exposed", "exposed-dao", exposedVersion)
     implementation("org.jetbrains.exposed", "exposed-jdbc", exposedVersion)
