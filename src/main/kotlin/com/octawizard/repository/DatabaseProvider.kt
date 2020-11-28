@@ -6,7 +6,7 @@ import org.jetbrains.exposed.sql.SchemaUtils
 import org.jetbrains.exposed.sql.transactions.transaction
 import javax.sql.DataSource
 
-class DatabaseProvider(private val dataSource: DataSource) {
+class DatabaseProvider(dataSource: DataSource) {
 
     init {
         Database.connect(dataSource)
