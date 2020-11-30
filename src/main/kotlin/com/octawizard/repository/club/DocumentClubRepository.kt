@@ -3,7 +3,14 @@ package com.octawizard.repository.club
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.geojson.Point
 import com.mongodb.client.model.geojson.Position
-import com.octawizard.domain.model.*
+import com.octawizard.domain.model.Availability
+import com.octawizard.domain.model.Club
+import com.octawizard.domain.model.Contacts
+import com.octawizard.domain.model.Field
+import com.octawizard.domain.model.FieldAvailability
+import com.octawizard.domain.model.GeoLocation
+import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.club.model.AvailabilityDTO
 import com.octawizard.repository.club.model.ClubDTO
 import com.octawizard.repository.club.model.DateFormatter
@@ -12,8 +19,20 @@ import com.octawizard.repository.reservation.and
 import com.octawizard.repository.reservation.filterGeoWithinSphere
 import com.octawizard.server.route.entityNotFound
 import org.bson.conversions.Bson
-import org.litote.kmongo.*
-import java.lang.IllegalArgumentException
+import org.litote.kmongo.SetTo
+import org.litote.kmongo.addToSet
+import org.litote.kmongo.and
+import org.litote.kmongo.colProperty
+import org.litote.kmongo.div
+import org.litote.kmongo.eq
+import org.litote.kmongo.exists
+import org.litote.kmongo.findOneById
+import org.litote.kmongo.keyProjection
+import org.litote.kmongo.ne
+import org.litote.kmongo.save
+import org.litote.kmongo.set
+import org.litote.kmongo.setTo
+import org.litote.kmongo.updateOne
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
@@ -129,9 +148,11 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
         radiusUnit: RadiusUnit,
     ): List<Club> {
         val dayString = day.format(DateFormatter)
-        val filterByAvailabilityDay = (ClubDTO::availability / AvailabilityDTO::byDate)
-            .keyProjection(dayString)
-            .exists()
+        val availabilityByDayProperty = (ClubDTO::availability / AvailabilityDTO::byDate).keyProjection(dayString)
+        val filterByAvailabilityDay = and(
+            availabilityByDayProperty.exists(),
+            availabilityByDayProperty.ne(emptyList())
+        )
         val filterByGeoSphere = filterGeoWithinSphere(
             ClubDTO::geoLocation,
             longitude,

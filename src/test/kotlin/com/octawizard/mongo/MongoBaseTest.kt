@@ -1,21 +1,12 @@
 package com.octawizard.repository
 
-import com.mongodb.ConnectionString
 import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
-import de.flapdoodle.embed.mongo.Command
+import com.octawizard.mongo.ReplicaSetEmbeddedMongo
+import com.octawizard.mongo.StandaloneEmbeddedMongo
 import de.flapdoodle.embed.mongo.MongodProcess
-import de.flapdoodle.embed.mongo.MongodStarter
-import de.flapdoodle.embed.mongo.config.IMongodConfig
-import de.flapdoodle.embed.mongo.config.MongodConfigBuilder
-import de.flapdoodle.embed.mongo.config.Net
-import de.flapdoodle.embed.mongo.config.RuntimeConfigBuilder
-import de.flapdoodle.embed.mongo.distribution.Version
-import de.flapdoodle.embed.process.config.io.ProcessOutput
-import de.flapdoodle.embed.process.runtime.Network
-import org.bson.BsonDocument
 import org.bson.UuidRepresentation
 import org.bson.types.ObjectId
 import org.junit.Rule
@@ -23,17 +14,16 @@ import org.junit.rules.TestRule
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
 import org.litote.kmongo.KMongo
-import org.litote.kmongo.service.MongoClientProvider
 import org.litote.kmongo.util.KMongoUtil
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KClass
 
-abstract class MongoBaseTestWithUUIDRepr<T : Any>() {
+abstract class MongoBaseTestWithUUIDRepr<T : Any>(standalone: Boolean = true) {
 
     @Suppress("LeakingThis")
     @Rule
     @JvmField
-    val rule = MongoFlapdoodleRule(getDefaultCollectionClass())
+    val rule = MongoFlapdoodleRule(getDefaultCollectionClass(), standalone = standalone)
 
     val col by lazy { rule.col }
 
@@ -53,37 +43,11 @@ abstract class MongoBaseTestWithUUIDRepr<T : Any>() {
 
 internal val MongodProcess.host get() = "127.0.0.1:${config.net().port}"
 
-internal object StandaloneEmbeddedMongo {
-
-    var port = Network.getFreeServerPort()
-    var config: IMongodConfig = MongodConfigBuilder()
-        .version(Version.Main.PRODUCTION)
-        .net(Net(port, Network.localhostIsIPv6()))
-        .build()
-
-    private val mongodProcess: MongodProcess by lazy { createInstance() }
-
-    fun connectionString(): ConnectionString = ConnectionString("mongodb://${mongodProcess.host}")
-
-    private fun createInstance(): MongodProcess =
-        MongodStarter.getInstance(EmbeddedMongoLog.embeddedConfig).prepare(config).start()
-}
-
-internal object EmbeddedMongoLog {
-
-    val embeddedConfig = RuntimeConfigBuilder()
-        .defaults(Command.MongoD)
-        .processOutput(
-            if (System.getProperty("kmongo.flapdoddle.log") == "true") ProcessOutput.getDefaultInstance("mongod")
-            else ProcessOutput.getDefaultInstanceSilent()
-        )
-        .build();
-}
-
 class MongoFlapdoodleRule<T : Any>(
     val defaultDocumentClass: KClass<T>,
     val generateRandomCollectionName: Boolean = false,
     val dbName: String = "test",
+    val standalone: Boolean = true,
 ) : TestRule {
 
     companion object {
@@ -91,15 +55,16 @@ class MongoFlapdoodleRule<T : Any>(
             MongoFlapdoodleRule(T::class, generateRandomCollectionName)
     }
 
-    private fun default(host: String, command: BsonDocument) = MongoClientProvider
-        .createMongoClient<MongoClient>(ConnectionString("mongodb://$host/?uuidRepresentation=STANDARD"))
-        .getDatabase("admin")
-        .runCommand(command)
+    private val connectionString = if (!standalone) {
+        ReplicaSetEmbeddedMongo.connectionString()
+    } else {
+        StandaloneEmbeddedMongo.connectionString()
+    }
 
     val mongoClient: MongoClient by lazy {
         val settings = MongoClientSettings.builder()
             .uuidRepresentation(UuidRepresentation.STANDARD)
-            .applyConnectionString(StandaloneEmbeddedMongo.connectionString())
+            .applyConnectionString(connectionString)
             .build()
         KMongo.createClient(settings)
     }
