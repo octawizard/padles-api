@@ -69,7 +69,7 @@ class DocumentClubRepositoryTest : MongoBaseTestWithUUIDRepr<ClubDTO>() {
 
     @Test
     fun `DocumentClubRepository should create a club and returns it`() {
-        val now = LocalDateTime.now()
+        val now = LocalDateTime.now().withHour(10)
         val fieldAvailability = FieldAvailability(TimeSlot(now.plusHours(1), now.plusHours(2)), field, BigDecimal.TEN)
         val club = getClub(UUID.randomUUID())
             .copy(availability = Availability(mapOf(now.toLocalDate() to listOf(fieldAvailability))))
