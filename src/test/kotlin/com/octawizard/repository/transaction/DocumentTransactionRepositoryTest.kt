@@ -23,6 +23,7 @@ import com.octawizard.repository.club.model.toClubDTO
 import com.octawizard.repository.reservation.model.ReservationDTO
 import com.octawizard.repository.reservation.model.toReservationDTO
 import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -84,9 +85,9 @@ class DocumentTransactionRepositoryTest : MongoBaseTestWithUUIDRepr<ReservationD
         )
 
     @Test
-    fun `DocumentTransactionRepository should create a reservation and update the club availability`() {
+    fun `DocumentTransactionRepository should create a reservation and update the club availability to be empty`() {
         val today = LocalDate.now()
-        val startDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS)
+        val startDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS).withHour(10)
         val endDateTime = startDateTime.plusHours(1)
         val timeSlot = TimeSlot(startDateTime, endDateTime)
         val fieldAvailability = FieldAvailability(timeSlot, field, BigDecimal.ONE)
@@ -119,69 +120,68 @@ class DocumentTransactionRepositoryTest : MongoBaseTestWithUUIDRepr<ReservationD
         assertTrue(clubs.findOneById(clubAvailable.id)!!.availability.byDate.isEmpty())
     }
 
-    //todo add case for multiple entries to be deleted (null or empty)
+    @Test
+    fun `DocumentTransactionRepository should create a reservation and update the club availability for that slot`() {
+        val today = LocalDate.now()
+        val startDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS).withHour(10)
+        val endDateTime = startDateTime.plusHours(1)
+        val timeSlot = TimeSlot(startDateTime, endDateTime)
+        val anotherTimeSlot = TimeSlot(startDateTime.plusHours(2), endDateTime.plusHours(2))
+        val fieldAvailabilityToBook = FieldAvailability(timeSlot, field, BigDecimal.ONE)
+        val fieldAvailability = FieldAvailability(anotherTimeSlot, field, BigDecimal.ONE)
+        val availability = Availability(mapOf(today to listOf(fieldAvailabilityToBook, fieldAvailability)))
+
+        val clubAvailable = getClub(UUID.randomUUID()).copy(availability = availability)
+        clubs.save(clubAvailable.toClubDTO())
+        val user = User(Email("user@test.com"), "user")
+        val match = Match(listOf(user))
+        val price = BigDecimal.TEN
+        val clubReservationInfo =
+            ClubReservationInfo(clubAvailable.id, clubAvailable.name, field, clubAvailable.geoLocation)
+        val createdReservation = repository.createReservation(
+            user,
+            clubReservationInfo,
+            startDateTime,
+            endDateTime,
+            price,
+            match
+        )
+
+        assertEquals(match, createdReservation.match)
+        assertEquals(clubReservationInfo, createdReservation.clubReservationInfo)
+        assertEquals(startDateTime, createdReservation.startTime)
+        assertEquals(endDateTime, createdReservation.endTime)
+        assertEquals(user, createdReservation.reservedBy)
+        assertEquals(price, createdReservation.price)
+        assertEquals(ReservationStatus.Pending, createdReservation.status)
+        assertEquals(PaymentStatus.PendingPayment, createdReservation.paymentStatus)
+        val club = clubs.findOneById(clubAvailable.id)!!
+        assertEquals(1, club.availability.byDate.size)
+        assertEquals(1, club.availability.byDate.values.first().size)
+        assertEquals(fieldAvailability, club.availability.byDate.values.first().first())
+    }
 
     @Test
-    fun `DocumentTransactionRepository should not create a reservation and not update the club availability when an exception occurs`() {
+    fun `DocumentTransactionRepository should not create a reservation and not update the club availability when field is not available in that timeSlot`() {
+        val startDateTime = LocalDateTime.now().truncatedTo(ChronoUnit.MILLIS).withHour(10)
+        val endDateTime = startDateTime.plusHours(1)
+        val clubAvailable = getClub(UUID.randomUUID())
+        clubs.save(clubAvailable.toClubDTO())
+        val user = User(Email("user@test.com"), "user")
+        val match = Match(listOf(user))
+        val price = BigDecimal.TEN
+        val clubReservationInfo =
+            ClubReservationInfo(clubAvailable.id, clubAvailable.name, field, clubAvailable.geoLocation)
 
+        assertThrows(IllegalArgumentException::class.java) {
+            repository.createReservation(
+                user,
+                clubReservationInfo,
+                startDateTime,
+                endDateTime,
+                price,
+                match
+            )
+        }
     }
 }
-
-
-//data class Test2(val id: UUID, val myList: List<Inner>)
-//data class Inner(val k: String)
-//
-//class MyTest : MongoBaseTestWithUUIDRepr<Test2>() {
-//
-//    @Test
-//    fun test() {
-//        val inner = Inner("k")
-//        val obj = Test2(UUID.randomUUID(), listOf(inner))
-//        col.save(obj)
-//
-//        val updateOne = col.updateOne(
-//            Test2::id eq obj.id,
-//            pullByFilter(Test2::myList, Inner::k eq "k")
-//        )
-//
-//        Test2::myList.colProperty.allPosOp
-//        assertEquals(1, updateOne.matchedCount)
-//        assertEquals(1, updateOne.modifiedCount)
-//    }
-//
-//}
-//
-//data class Test3(val id: UUID, val myMap: Map<String, List<Inner>>)
-//class MyTest2 : MongoBaseTestWithUUIDRepr<Test3>() {
-//
-//    @Test
-//    fun test() {
-//        val inner = Inner("k")
-//        val obj = Test3(UUID.randomUUID(), mapOf("my-key" to listOf(inner)))
-//        col.save(obj)
-//
-//        val updateOne = col.updateOne(
-//            Test3::id eq obj.id,
-//            pullByFilter(Test3::myMap.keyProjection("my-key"), Inner::k eq "k")
-//        )
-//        assertEquals(1, updateOne.matchedCount)
-//        assertEquals(1, updateOne.modifiedCount)
-//
-//        val findOneById = col.findOneById(obj.id)!!
-//        assertEquals(emptyList<Inner>(), findOneById.myMap["my-key"])
-//
-//
-//        findOneById.myMap.forEach { (key, value) ->
-//            if (value.isEmpty()) {
-//                col.updateMany(
-//                    Test3::id eq obj.id,
-//                    and(
-//                        unset(Test3::myMap.keyProjection(key))
-//                    )
-//                )
-//            }
-//        }
-//        assertEquals(0, col.findOneById(obj.id)!!.myMap.size)
-//    }
-//
-//}
