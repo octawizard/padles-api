@@ -142,8 +142,8 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
 
     override fun getNearestClubsAvailableForReservation(
         day: LocalDate,
-        latitude: Double,
         longitude: Double,
+        latitude: Double,
         radius: Double,
         radiusUnit: RadiusUnit,
     ): List<Club> {
@@ -166,8 +166,8 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
     }
 
     override fun getNearestClubs(
-        latitude: Double,
         longitude: Double,
+        latitude: Double,
         radius: Double,
         radiusUnit: RadiusUnit,
     ): List<Club> {

@@ -14,7 +14,7 @@ class GetNearestClubs(private val clubRepository: ClubRepository) {
         radius: Double,
         radiusUnit: RadiusUnit,
     ): List<Club> {
-        return clubRepository.getNearestClubs(latitude, longitude, radius, radiusUnit)
+        return clubRepository.getNearestClubs(longitude, latitude, radius, radiusUnit)
     }
 
     operator fun invoke(
@@ -24,6 +24,6 @@ class GetNearestClubs(private val clubRepository: ClubRepository) {
         radiusUnit: RadiusUnit,
         day: LocalDate,
     ): List<Club> {
-        return clubRepository.getNearestClubsAvailableForReservation(day, latitude, longitude, radius, radiusUnit)
+        return clubRepository.getNearestClubsAvailableForReservation(day, longitude, latitude, radius, radiusUnit)
     }
 }

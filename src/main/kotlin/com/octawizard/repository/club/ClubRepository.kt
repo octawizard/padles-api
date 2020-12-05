@@ -38,11 +38,11 @@ interface ClubRepository {
 
     fun getNearestClubsAvailableForReservation(
         day: LocalDate,
-        latitude: Double,
         longitude: Double,
+        latitude: Double,
         radius: Double,
         radiusUnit: RadiusUnit
     ): List<Club>
 
-    fun getNearestClubs(latitude: Double, longitude: Double, radius: Double, radiusUnit: RadiusUnit): List<Club>
+    fun getNearestClubs(longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit): List<Club>
 }

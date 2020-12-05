@@ -310,7 +310,7 @@ class DocumentClubRepositoryTest : MongoBaseTestWithUUIDRepr<ClubDTO>() {
         )
 
         val nearestClubsAvailableForReservation =
-            repository.getNearestClubsAvailableForReservation(today, latitude, longitude, radius, radiusUnit)
+            repository.getNearestClubsAvailableForReservation(today, longitude, latitude, radius, radiusUnit)
         assertEquals(listOf(nearClubAvailable), nearestClubsAvailableForReservation)
     }
 
@@ -334,7 +334,7 @@ class DocumentClubRepositoryTest : MongoBaseTestWithUUIDRepr<ClubDTO>() {
         val farClub = getClub(UUID.randomUUID()).copy(geoLocation = farGeoLocation)
         col.insertMany(listOf(nearClub, farClub).map { it.toClubDTO() })
 
-        val nearestClubs = repository.getNearestClubs(latitude, longitude, radius, radiusUnit)
+        val nearestClubs = repository.getNearestClubs(longitude, latitude, radius, radiusUnit)
         assertEquals(listOf(nearClub), nearestClubs)
     }
 }
