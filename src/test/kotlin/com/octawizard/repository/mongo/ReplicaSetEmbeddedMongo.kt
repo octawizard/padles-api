@@ -1,4 +1,4 @@
-package com.octawizard.mongo
+package com.octawizard.repository.mongo
 
 import com.mongodb.ConnectionString
 import com.mongodb.client.MongoClient

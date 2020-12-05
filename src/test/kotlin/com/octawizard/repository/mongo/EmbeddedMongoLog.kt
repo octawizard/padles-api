@@ -1,4 +1,4 @@
-package com.octawizard.mongo
+package com.octawizard.repository.mongo
 
 import de.flapdoodle.embed.mongo.Command
 import de.flapdoodle.embed.mongo.config.RuntimeConfigBuilder

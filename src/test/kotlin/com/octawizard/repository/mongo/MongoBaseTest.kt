@@ -4,8 +4,8 @@ import com.mongodb.MongoClientSettings
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
-import com.octawizard.mongo.ReplicaSetEmbeddedMongo
-import com.octawizard.mongo.StandaloneEmbeddedMongo
+import com.octawizard.repository.mongo.ReplicaSetEmbeddedMongo
+import com.octawizard.repository.mongo.StandaloneEmbeddedMongo
 import de.flapdoodle.embed.mongo.MongodProcess
 import org.bson.UuidRepresentation
 import org.bson.types.ObjectId
