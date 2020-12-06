@@ -19,11 +19,10 @@ Mainly is based on the following frameworks/libraries:
 
 ## Use cases
 * Users
-
--[x] create a user
--[x] get a user
--[x] update a user
--[x] delete a user
+- \[x] create a user
+- \[x] get a user
+- \[x] update a user
+- \[x] delete a user
 
 * Reservations
 -[x] make a reservation
