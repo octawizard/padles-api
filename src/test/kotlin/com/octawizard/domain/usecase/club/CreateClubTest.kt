@@ -14,7 +14,6 @@ import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 import java.math.BigDecimal
-import java.util.*
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CreateClubTest {
