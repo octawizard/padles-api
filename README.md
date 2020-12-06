@@ -25,25 +25,25 @@ Mainly is based on the following frameworks/libraries:
 - \[x] delete a user
 
 * Reservations
--[x] make a reservation
--[x] update a reservation (only by reservation owner)
-    *[x] cancel a reservation
-    *[] pay a reservation
+- \[x] make a reservation
+- \[x] update a reservation (only by reservation owner)
+    - \[x] cancel a reservation
+    - \[] pay a reservation
 
--[x] add/update result of the reserved match
--[x] patch a reservation match (authorized players)
+- \[x] add/update result of the reserved match
+- \[x] patch a reservation match (authorized players)
     * join a reservation
     * leave a reservation
 
--[x] search for incomplete reservation (missing players)
+- \[x] search for incomplete reservation (missing players)
 
 * Club
--[x] register a club
--[x] update a club
--[x] get a club
--[x] add/update field availability
--[x] search for available fields (close to user, filters, ...)
--[x] search for near clubs (close to user, filters, ...)
+- \[x] register a club
+- \[x] update a club
+- \[x] get a club
+- \[x] add/update field availability
+- \[x] search for available fields (close to user, filters, ...)
+- \[x] search for near clubs (close to user, filters, ...)
 
 #### TODO 
 * get all matches of a user
