@@ -28,7 +28,7 @@ Mainly is based on the following frameworks/libraries:
 - \[x] make a reservation
 - \[x] update a reservation (only by reservation owner)
     - \[x] cancel a reservation
-    - \[] pay a reservation
+    - \[ ] pay a reservation
 
 - \[x] add/update result of the reserved match
 - \[x] patch a reservation match (authorized players)
