@@ -21,16 +21,13 @@ repositories {
 
 val ktorVersion = "1.4.2"
 val exposedVersion = "0.28.1"
-val kmongoVersion = "4.2.2"
+val kmongoVersion = "4.2.3"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.testcontainers:testcontainers:1.15.0")
     testImplementation("org.testcontainers:junit-jupiter:1.15.0")
     testImplementation("io.mockk:mockk:1.10.2")
-
-//    testImplementation("org.litote.kmongo:kmongo-core-tests:4.2.0")
-//    testImplementation("org.litote.kmongo:kmongo-shared-tests:4.2.0")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
 
     testRuntimeOnly("com.h2database:h2:1.4.200")
