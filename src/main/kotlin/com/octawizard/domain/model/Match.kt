@@ -1,24 +1,17 @@
 package com.octawizard.domain.model
 
 import java.io.Serializable
-import java.time.LocalDateTime
-import java.util.*
 
-data class Match(
-    val id: UUID,
-    val player1: User,
-    val player2: User?,
-    val player3: User?,
-    val player4: User?,
-    val createdAt: LocalDateTime,
-    val status: MatchStatus,
-//    val reservation: Reservation?
-    val reservationId: UUID?
-): Serializable
+const val MATCH_MAX_NUMBER_OF_PLAYERS = 4
 
-enum class MatchStatus: Serializable {
-    Draft,  // missing reservation/players
-    Confirmed, // reservation confirmed && players == 4
-    Finished, // match has been played TODO maybe to be removed, match effective date will be inside reservation
-    Canceled    // match has been canceled whenever a reservation was present
+data class Match(val players: List<User>, val result: MatchResult? = null) : Serializable {
+    init {
+        check(players.isNotEmpty() && players.size <= MATCH_MAX_NUMBER_OF_PLAYERS) {
+            "players should contain at least one player and less than four"
+        }
+    }
 }
+
+data class MatchResult(val sets: List<MatchSet>) : Serializable
+
+data class MatchSet(val home: Int, val away: Int) : Serializable

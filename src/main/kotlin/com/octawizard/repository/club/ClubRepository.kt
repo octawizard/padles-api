@@ -1,0 +1,48 @@
+package com.octawizard.repository.club
+
+import com.octawizard.domain.model.*
+import java.math.BigDecimal
+import java.time.LocalDate
+import java.util.*
+
+interface ClubRepository {
+
+    fun getClub(id: UUID): Club?
+
+    fun createClub(
+        name: String,
+        address: String,
+        geoLocation: GeoLocation,
+        avgPrice: BigDecimal,
+        contacts: Contacts,
+        fields: Set<Field>,
+        availability: Availability,
+    ): Club
+
+    fun updateClubName(clubId: UUID, name: String) //side effects on reservations
+    fun updateClubAddress(clubId: UUID, address: String, geoLocation: GeoLocation) //side effects on reservations
+    fun updateClubContacts(clubId: UUID, contacts: Contacts)
+    fun updateClubAvgPrice(clubId: UUID, avgPrice: BigDecimal)
+    fun updateClubField(
+        clubId: UUID,
+        fieldId: UUID,
+        name: String,
+        indoor: Boolean,
+        hasSand: Boolean,
+        wallsMaterial: WallsMaterial
+    ) //side effects on reservations (?)
+    fun addFieldToClub(clubId: UUID, name: String, indoor: Boolean, hasSand: Boolean, wallsMaterial: WallsMaterial): Field
+
+    fun updateClubAvailability(clubId: UUID, availability: Availability)
+    fun addClubAvailability(clubId: UUID, fieldAvailability: FieldAvailability)
+
+    fun getNearestClubsAvailableForReservation(
+        day: LocalDate,
+        longitude: Double,
+        latitude: Double,
+        radius: Double,
+        radiusUnit: RadiusUnit
+    ): List<Club>
+
+    fun getNearestClubs(longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit): List<Club>
+}

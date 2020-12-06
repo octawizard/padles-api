@@ -20,6 +20,7 @@ class DatabaseUserRepository : UserRepository {
                 it[id] = EntityID(user.email.value, Users)
                 it[name] = user.name
                 it[gender] = user.gender
+                it[phone] = user.phone
                 it[createdAt] = user.createdAt
             }
         }
@@ -38,6 +39,7 @@ class DatabaseUserRepository : UserRepository {
                 it[id] = EntityID(user.email.value, Users)
                 it[name] = user.name
                 it[gender] = user.gender
+                it[phone] = user.phone
                 it[createdAt] = user.createdAt
             }
         }
@@ -46,11 +48,21 @@ class DatabaseUserRepository : UserRepository {
             else -> throw NotFoundException("user ${user.email} not found, cannot update")
         }
     }
+
+    override fun deleteUser(email: Email) {
+        val res = transaction {
+            Users.deleteWhere { Users.id eq email.value }
+        }
+        if (res == 0) {
+            throw NotFoundException("user ${email.value} not found")
+        }
+    }
 }
 
 object Users : StringIdTable("users", "email", 250) {
     val name: Column<String> = varchar("name", 50)
     val gender: Column<Gender> = enumerationByName("gender",15, Gender::class)
+    val phone: Column<String?> = varchar("phone", 16).nullable()
     val createdAt: Column<LocalDateTime> = datetime("created_at")
 }
 
@@ -59,7 +71,8 @@ class UsersEntity(id: EntityID<String>) : Entity<String>(id) {
 
     var name by Users.name
     var gender by Users.gender
+    var phone by Users.phone
     var createdAt by Users.createdAt
 
-    fun toUser(): User = User(Email(id.value), name, gender, createdAt)
+    fun toUser(): User = User(Email(id.value), name, gender, phone, createdAt)
 }

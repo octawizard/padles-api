@@ -1,13 +1,12 @@
 package com.octawizard.domain.model
 
 import java.io.Serializable
-import java.lang.IllegalArgumentException
 
 class Email(val value: String): Serializable {
 
     init {
-        if (!value.isValidEmail()) {
-            throw IllegalArgumentException("not a valid email: $value")
+        check(value.isValidEmail()) {
+            "not a valid email: $value"
         }
     }
 
@@ -30,11 +29,10 @@ class Email(val value: String): Serializable {
         return "Email(value='$value')"
     }
 
-
 }
 
-private val Prefix = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}"
-private val Suffix = "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+"
+private const val Prefix = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}"
+private const val Suffix = "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+"
 private val EmailRegex = "$Prefix@$Suffix".toRegex()
 
 fun String.isValidEmail(): Boolean {

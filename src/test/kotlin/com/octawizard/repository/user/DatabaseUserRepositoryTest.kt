@@ -51,7 +51,7 @@ class DatabaseUserRepositoryTest {
         transaction {
             UsersEntity.new(email.value) {
                 name = "Test User"
-                gender = Gender.other
+                gender = Gender.Other
                 createdAt = LocalDateTime.now()
             }
         }
@@ -64,8 +64,9 @@ class DatabaseUserRepositoryTest {
         val createdAt = LocalDateTime.now()
         val previousName = "Test User"
         val updatedName = "Test User Updated"
-        val gender = Gender.female
-        val user = User(email, updatedName, gender, createdAt)
+        val gender = Gender.Female
+        val phone = "phone"
+        val user = User(email, updatedName, gender, phone, createdAt)
         transaction {
             UsersEntity.new(email.value) {
                 name = previousName
@@ -82,11 +83,12 @@ class DatabaseUserRepositoryTest {
     }
 
     @Test
-    fun `DatabaseUserRepository returns exception when trying to updat not existing user`() {
+    fun `DatabaseUserRepository returns exception when trying to update not existing user`() {
         val email = Email("test@test.com")
         val createdAt = LocalDateTime.now()
         val updatedName = "Test User Updated"
-        val user = User(email, updatedName, Gender.female, createdAt)
+        val phone = "phone"
+        val user = User(email, updatedName, Gender.Female, phone, createdAt)
 
         assertThrows(NotFoundException::class.java) { repository.updateUser(user)  }
     }
