@@ -26,7 +26,7 @@ Small REST API project using
 -[x] make a reservation
 -[x] update a reservation (only by reservation owner)
     *[x] cancel a reservation
-    *[ ] pay a reservation
+    *[] pay a reservation
 
 -[x] add/update result of the reserved match
 -[x] patch a reservation match (authorized players)
@@ -39,10 +39,11 @@ Small REST API project using
 -[x] register a club
 -[x] update a club
 -[x] get a club
--[ ] add/update field availability
+-[x] add/update field availability
 -[x] search for available fields (close to user, filters, ...)
 -[x] search for near clubs (close to user, filters, ...)
 
+#### TODO 
 * get all matches of a user
 * get all reservation of a user
 
