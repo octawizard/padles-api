@@ -1,37 +1,55 @@
-## Welcome to GitHub Pages
+# Padles API
+This is a Kotlin project that exposes a REST API for Padel match reservations.
 
-You can use the [editor on GitHub](https://github.com/octawizard/padles-api/edit/master/docs/index.md) to maintain and preview the content for your website in Markdown files.
+Mainly is based on the following frameworks/libraries:
+* [Ktor](https://ktor.io/)
+* [Kodein](https://github.com/Kodein-Framework/Kodein-DI)
+* [Exposed](https://github.com/JetBrains/Exposed) (with Postgres driver)
+* [Redisson](https://github.com/redisson/redisson)
+* [KMongo](https://litote.org/kmongo/)
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+## How to run
+* Start the docker containers (Postgres and Redis):
+`docker-compose up`
 
-### Markdown
+* Run the main function in `com.octawizard.server.server.kt`
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+* API will be reachable at `http://localhost:1111`
 
-```markdown
-Syntax highlighted code block
+## Use cases
+* Users
+-[x] create a user
+-[x] get a user
+-[x] update a user
+-[x] delete a user
 
-# Header 1
-## Header 2
-### Header 3
+* Reservations
+-[x] make a reservation
+-[x] update a reservation (only by reservation owner)
+    *[x] cancel a reservation
+    *[] pay a reservation
 
-- Bulleted
-- List
+-[x] add/update result of the reserved match
+-[x] patch a reservation match (authorized players)
+    * join a reservation
+    * leave a reservation
 
-1. Numbered
-2. List
+-[x] search for incomplete reservation (missing players)
 
-**Bold** and _Italic_ and `Code` text
+* Club
+-[x] register a club
+-[x] update a club
+-[x] get a club
+-[x] add/update field availability
+-[x] search for available fields (close to user, filters, ...)
+-[x] search for near clubs (close to user, filters, ...)
 
-[Link](url) and ![Image](src)
-```
+#### TODO 
+* get all matches of a user
+* get all reservation of a user
 
-For more details see [GitHub Flavored Markdown](https://guides.github.com/features/mastering-markdown/).
+* review a user
+* review a club
 
-### Jekyll Themes
-
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/octawizard/padles-api/settings). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
-
-### Support or Contact
-
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://github.com/contact) and we’ll help you sort it out.
+* mark club as favourite
+* mark user as favourite
