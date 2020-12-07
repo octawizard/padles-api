@@ -68,7 +68,7 @@ class ReservationController(
         val userEmail = Email(input.value)
         return when (input.op) {
             OpType.remove -> async { leaveMatch(userEmail, reservation) }
-            OpType.replace -> async { joinMatch(userEmail, reservation) }
+            OpType.add -> async { joinMatch(userEmail, reservation) }
         }
     }
 }
