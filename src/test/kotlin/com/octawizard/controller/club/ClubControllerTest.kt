@@ -32,7 +32,7 @@ import java.util.*
 import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
-class ControllerClubTest {
+class ClubControllerTest {
     private val getClub: GetClub = mockk()
     private val createClub: CreateClub = mockk()
     private val getNearestClubs: GetNearestClubs = mockk()
