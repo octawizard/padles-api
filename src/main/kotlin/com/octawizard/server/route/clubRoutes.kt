@@ -1,9 +1,16 @@
 package com.octawizard.server.route
 
-import com.octawizard.controller.Controller
+import com.octawizard.controller.club.ClubController
 import com.octawizard.domain.model.Contacts
 import com.octawizard.domain.model.RadiusUnit
-import com.octawizard.server.input.*
+import com.octawizard.server.input.AddClubFieldInput
+import com.octawizard.server.input.CreateClubInput
+import com.octawizard.server.input.UpdateClubAddressNameInput
+import com.octawizard.server.input.UpdateClubAvailabilityInput
+import com.octawizard.server.input.UpdateClubAvgPriceInput
+import com.octawizard.server.input.UpdateClubContactsInput
+import com.octawizard.server.input.UpdateClubFieldInput
+import com.octawizard.server.input.UpdateClubNameInput
 import com.octawizard.server.route.QueryParams.DAY
 import com.octawizard.server.route.QueryParams.LATITUDE
 import com.octawizard.server.route.QueryParams.LONGITUDE
@@ -51,7 +58,7 @@ object QueryParams {
     const val DAY = "day"
 }
 
-fun Routing.clubRoutes(controller: Controller) {
+fun Routing.clubRoutes(controller: ClubController) {
     authenticate {
 
         // get club

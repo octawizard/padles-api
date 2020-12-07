@@ -7,6 +7,7 @@ import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.ReservationStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.reservation.ReservationRepository
+import com.octawizard.repository.user.UserRepository
 import io.ktor.features.*
 import io.mockk.Called
 import io.mockk.clearAllMocks
@@ -25,7 +26,8 @@ import java.util.*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class JoinMatchTest {
     private val reservationRepository = mockk<ReservationRepository>(relaxed = true)
-    private val joinMatch = JoinMatch(reservationRepository)
+    private val userRepository = mockk<UserRepository>(relaxed = true)
+    private val joinMatch = JoinMatch(reservationRepository, userRepository)
 
     @AfterEach
     fun `reset mocks`() {
@@ -49,8 +51,9 @@ class JoinMatchTest {
             PaymentStatus.PendingPayment,
         )
         val expectedReservation = reservation.copy(match = match)
+        every { userRepository.getUser(playerToAdd.email) } returns playerToAdd
 
-        val updatedReservation = joinMatch(playerToAdd, reservation)
+        val updatedReservation = joinMatch(playerToAdd.email, reservation)
         assertEquals(expectedReservation, updatedReservation)
 
         verify(exactly = 1) { reservationRepository.updateReservation(expectedReservation) }
@@ -73,9 +76,20 @@ class JoinMatchTest {
         val user = User(Email("test@test.com"), "")
         val match = Match(players = listOf(user))
         every { expectedReservation.match } returns match
+        every { userRepository.getUser(user.email) } returns user
 
-        val reservation = joinMatch(user, expectedReservation)
+        val reservation = joinMatch(user.email, expectedReservation)
         assertEquals(expectedReservation, reservation)
         verify { reservationRepository wasNot Called }
+    }
+
+    @Test
+    fun `JoinMatch throws exception when adding a player to a reservation match if player doesn't exist`() {
+        val email = Email("test@test.com")
+        every { userRepository.getUser(email) } returns null
+
+        assertThrows(NotFoundException::class.java) {
+            joinMatch(email, mockk())
+        }
     }
 }
