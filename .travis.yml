@@ -6,3 +6,4 @@ before_install:
   - pip install --user codecov
 after_success:
   - codecov --file build/reports/jacoco/test/jacocoTestReport.xml --disable search
+  - ./gradlew jacocoTestReport coveralls
