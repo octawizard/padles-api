@@ -62,6 +62,21 @@ class UserControllerTest {
     }
 
     @Test
+    fun `UserController should call UpdateUser to update a user when user is not found`() {
+        val user = User(Email("test@padles.com"), "user")
+        every { updateUser(any()) } returns user
+        every { getUser(any()) } returns null
+
+        assertEquals(null, runBlocking { controller.updateUser(user) })
+        verify {
+            getUser(user.email)
+        }
+        verify(inverse = true) {
+            updateUser(user)
+        }
+    }
+
+    @Test
     fun `UserController should call DeleteUser to delete a user`() {
         val email = Email("test@padles.com")
 
