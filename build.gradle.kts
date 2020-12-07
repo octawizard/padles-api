@@ -4,7 +4,6 @@ plugins {
     kotlin("jvm") version "1.4.10"
     application
     jacoco
-    id("com.github.kt3k.coveralls") version "2.8.4"
 }
 
 group = "com.octawizard"

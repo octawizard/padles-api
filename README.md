@@ -1,4 +1,4 @@
-# Padles API [![Build Status](https://travis-ci.org/octawizard/padles-api.svg?branch=master)](https://travis-ci.org/octawizard/padles-api) [![codecov](https://codecov.io/gh/octawizard/padles-api/branch/master/graph/badge.svg)](https://codecov.io/gh/octawizard/padles-api) [![Coverage Status](https://coveralls.io/repos/github/octawizard/padles-api/badge.svg?branch=master)](https://coveralls.io/github/octawizard/padles-api?branch=master)
+# Padles API [![Build Status](https://travis-ci.org/octawizard/padles-api.svg?branch=master)](https://travis-ci.org/octawizard/padles-api) [![codecov](https://codecov.io/gh/octawizard/padles-api/branch/master/graph/badge.svg)](https://codecov.io/gh/octawizard/padles-api)
 
 This is a Kotlin project that exposes a REST API for Padel match reservations.
 
