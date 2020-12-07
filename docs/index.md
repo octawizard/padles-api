@@ -9,41 +9,43 @@ Mainly is based on the following frameworks/libraries:
 * [KMongo](https://litote.org/kmongo/)
 
 ## How to run
-* Start the docker containers (Postgres and Redis):
-`docker-compose up`
+* Start the docker containers:
+```
+docker-compose up
+```
 
 * Run the main function in `com.octawizard.server.server.kt`
 
-* API will be reachable at `http://localhost:1111`
+* API will be reachable at [`http://localhost:1111`](http://localhost:1111). API Calls need to have a JWT Token as
+ auth http header.
 
-## Use cases
 ## Use cases
 * Users
-- \[x] create a user
-- \[x] get a user
-- \[x] update a user
-- \[x] delete a user
+    * create a user
+    * get a user
+    * update a user
+    * delete a user
 
 * Reservations
-- \[x] make a reservation
-- \[x] update a reservation (only by reservation owner)
-    - \[x] cancel a reservation
-    - \[ ] pay a reservation
+    * make a reservation
+    * update a reservation (only by reservation owner)
+        * cancel a reservation
+        * ~~pay a reservation~~
 
-- \[x] add/update result of the reserved match
-- \[x] patch a reservation match (authorized players)
-    * join a reservation
-    * leave a reservation
+    * add/update result of the reserved match
+    * patch a reservation match (authorized players)
+        * join a reservation
+        * leave a reservation
 
-- \[x] search for incomplete reservation (missing players)
+    * search for incomplete reservation (missing players)
 
 * Club
-- \[x] register a club
-- \[x] update a club
-- \[x] get a club
-- \[x] add/update field availability
-- \[x] search for available fields (close to user, filters, ...)
-- \[x] search for near clubs (close to user, filters, ...)
+    * register a club
+    * update a club
+    * get a club
+    * add/update field availability
+    * search for available fields (close to user, filters, ...)
+    * search for near clubs (close to user, filters, ...)
 
 #### TODO 
 * get all matches of a user
