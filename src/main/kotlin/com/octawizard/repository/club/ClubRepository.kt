@@ -29,9 +29,16 @@ interface ClubRepository {
         name: String,
         indoor: Boolean,
         hasSand: Boolean,
-        wallsMaterial: WallsMaterial
-    ) //side effects on reservations (?)
-    fun addFieldToClub(clubId: UUID, name: String, indoor: Boolean, hasSand: Boolean, wallsMaterial: WallsMaterial): Field
+        wallsMaterial: WallsMaterial,
+    )
+
+    fun addFieldToClub(
+        clubId: UUID,
+        name: String,
+        indoor: Boolean,
+        hasSand: Boolean,
+        wallsMaterial: WallsMaterial,
+    ): Field
 
     fun updateClubAvailability(clubId: UUID, availability: Availability)
     fun addClubAvailability(clubId: UUID, fieldAvailability: FieldAvailability)
@@ -41,7 +48,7 @@ interface ClubRepository {
         longitude: Double,
         latitude: Double,
         radius: Double,
-        radiusUnit: RadiusUnit
+        radiusUnit: RadiusUnit,
     ): List<Club>
 
     fun getNearestClubs(longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit): List<Club>

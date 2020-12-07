@@ -7,6 +7,8 @@ import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.ReservationStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.reservation.ReservationRepository
+import com.octawizard.repository.user.UserRepository
+import io.ktor.features.*
 import io.mockk.Called
 import io.mockk.clearAllMocks
 import io.mockk.every
@@ -24,7 +26,8 @@ import java.util.*
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class LeaveMatchTest {
     private val reservationRepository = mockk<ReservationRepository>(relaxed = true)
-    private val leaveMatch = LeaveMatch(reservationRepository)
+    private val userRepository = mockk<UserRepository>(relaxed = true)
+    private val leaveMatch = LeaveMatch(reservationRepository, userRepository)
 
     @AfterEach
     fun `reset mocks`() {
@@ -47,8 +50,9 @@ class LeaveMatchTest {
             PaymentStatus.PendingPayment,
         )
         val expectedReservation = reservation.copy(match = Match(players = listOf(user)))
+        every { userRepository.getUser(playerToRemove.email) } returns playerToRemove
 
-        val updatedReservation = leaveMatch(playerToRemove, reservation)
+        val updatedReservation = leaveMatch(playerToRemove.email, reservation)
         assertEquals(expectedReservation, updatedReservation)
 
         verify(exactly = 1) { reservationRepository.updateReservation(expectedReservation) }
@@ -61,9 +65,10 @@ class LeaveMatchTest {
         val match = Match(players = listOf(user))
         every { reservation.match } returns match
         every { reservation.reservedBy } returns user
+        every { userRepository.getUser(user.email) } returns user
 
         assertThrows(IllegalArgumentException::class.java) {
-            leaveMatch(user, reservation)
+            leaveMatch(user.email, reservation)
         }
     }
 
@@ -74,10 +79,21 @@ class LeaveMatchTest {
         val user = User(Email("test@test.com"), "")
         every { expectedReservation.match } returns Match(players = listOf(user))
         every { expectedReservation.reservedBy } returns user
+        every { userRepository.getUser(otherUser.email) } returns otherUser
 
-        val reservation = leaveMatch(otherUser, expectedReservation)
+        val reservation = leaveMatch(otherUser.email, expectedReservation)
 
         assertEquals(expectedReservation, reservation)
         verify { reservationRepository wasNot Called }
+    }
+
+    @Test
+    fun `LeaveMatch throws exception when removing a player to a reservation match if player doesn't exist`() {
+        val email = Email("test@test.com")
+        every { userRepository.getUser(email) } returns null
+
+        assertThrows(NotFoundException::class.java) {
+            leaveMatch(email, mockk())
+        }
     }
 }

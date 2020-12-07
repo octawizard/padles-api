@@ -1,6 +1,6 @@
 package com.octawizard.server.route
 
-import com.octawizard.controller.Controller
+import com.octawizard.controller.reservation.ReservationController
 import com.octawizard.domain.model.MatchResult
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
@@ -25,13 +25,13 @@ data class ReservationRoute(val reservationId: UUID)
 @Location("/reservation/reservationId/match")
 data class MatchRoute(val reservationId: UUID)
 
-fun Routing.reservationRoutes(controller: Controller) {
+fun Routing.reservationRoutes(reservationController: ReservationController) {
 
     authenticate {
 
         // get reservation
         get<ReservationRoute> { reservationRoute ->
-            val reservation = controller.getReservation(reservationRoute.reservationId)
+            val reservation = reservationController.getReservation(reservationRoute.reservationId)
                 ?: reservationNotFound(reservationRoute.reservationId)
             call.respond(HttpStatusCode.OK, reservation)
         }
@@ -48,7 +48,7 @@ fun Routing.reservationRoutes(controller: Controller) {
             checkNotNull(latitude)
             checkNotNull(radius)
 
-            val reservations = controller.getNearestAvailableReservations(
+            val reservations = reservationController.getNearestAvailableReservations(
                 longitude, latitude, radius, radiusUnit
             )
 
@@ -58,7 +58,7 @@ fun Routing.reservationRoutes(controller: Controller) {
         // create a reservation
         post("/reservation") {
             val input = call.receive<CreateReservationInput>()
-            val reservation = controller.createReservation(
+            val reservation = reservationController.createReservation(
                 input.reservedBy, input.clubId, input.fieldId, input.startTime, input.endTime,
                 input.matchEmailPlayer2, input.matchEmailPlayer3, input.matchEmailPlayer4
             )
@@ -67,10 +67,10 @@ fun Routing.reservationRoutes(controller: Controller) {
 
         // cancel reservation
         delete<ReservationRoute> { reservationRoute ->
-            val reservation: Reservation = controller.getReservation(reservationRoute.reservationId)
+            val reservation: Reservation = reservationController.getReservation(reservationRoute.reservationId)
                 ?: reservationNotFound(reservationRoute.reservationId)
             authorizeReservationOwnerOnly(reservation)
-            val canceledReservation = controller.cancelReservation(reservation)
+            val canceledReservation = reservationController.cancelReservation(reservation)
             call.respond(HttpStatusCode.OK, canceledReservation)
         }
 
@@ -85,21 +85,21 @@ fun Routing.reservationRoutes(controller: Controller) {
 
         // update match result
         put<MatchRoute> { matchRoute ->
-            val reservation = controller.getReservation(matchRoute.reservationId)
+            val reservation = reservationController.getReservation(matchRoute.reservationId)
                 ?: reservationNotFound(matchRoute.reservationId)
             authorizeReservationOwnerOnly(reservation)
             val matchResult = call.receive<MatchResult>()
-            val updatedReservation = controller.updateReservationMatchResult(reservation, matchResult)
+            val updatedReservation = reservationController.updateReservationMatchResult(reservation, matchResult)
             call.respond(HttpStatusCode.OK, updatedReservation)
         }
 
 
         // join or leave a match
         patch<MatchRoute> { matchRoute ->
-            val reservation = controller.getReservation(matchRoute.reservationId)
+            val reservation = reservationController.getReservation(matchRoute.reservationId)
                 ?: reservationNotFound(matchRoute.reservationId)
             val input = call.receive<PatchMatchInput>()
-            val updateMatch = controller.patchReservationMatch(input, reservation)
+            val updateMatch = reservationController.patchReservationMatch(input, reservation)
             call.respond(HttpStatusCode.OK, updateMatch)
         }
     }

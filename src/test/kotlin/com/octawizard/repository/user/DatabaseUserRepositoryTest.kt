@@ -41,6 +41,12 @@ class DatabaseUserRepositoryTest {
     }
 
     @Test
+    fun `DatabaseUserRepository creates and returns a user`() {
+        val user = User(Email("user@padles.com"), "tony")
+        assertEquals(user, repository.createUser(user))
+    }
+
+    @Test
     fun `DatabaseUserRepository returns a null user when user is not found`() {
         assertNull(repository.getUser(Email("test@test.com")))
     }
@@ -93,4 +99,18 @@ class DatabaseUserRepositoryTest {
         assertThrows(NotFoundException::class.java) { repository.updateUser(user)  }
     }
 
+    @Test
+    fun `DatabaseUserRepository should delete a user if exists`() {
+        val user = User(Email("user@padles.com"), "tony")
+        repository.createUser(user)
+
+        repository.deleteUser(user.email)
+
+        assertNull(repository.getUser(user.email))
+    }
+
+    @Test
+    fun `DatabaseUserRepository should throw an exception when deleting a user that doesn't exist`() {
+        assertThrows(NotFoundException::class.java) { repository.deleteUser(Email("test@test.com"))  }
+    }
 }

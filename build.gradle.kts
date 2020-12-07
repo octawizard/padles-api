@@ -5,6 +5,7 @@ plugins {
     application
     jacoco
 }
+
 group = "com.octawizard"
 version = "0.1-SNAPSHOT"
 

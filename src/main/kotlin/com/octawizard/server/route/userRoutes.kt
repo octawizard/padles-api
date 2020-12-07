@@ -1,6 +1,6 @@
 package com.octawizard.server.route
 
-import com.octawizard.controller.Controller
+import com.octawizard.controller.user.UserController
 import com.octawizard.domain.model.Email
 import com.octawizard.server.authorizeWithUserEmailInPath
 import com.octawizard.server.input.CreateUserInput
@@ -13,7 +13,7 @@ import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
 
-fun Routing.userRoutes(controller: Controller) {
+fun Routing.userRoutes(controller: UserController) {
     val emailParam = "email"
     authenticate {
         get("/user/{$emailParam}") {
