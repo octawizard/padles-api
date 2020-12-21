@@ -28,7 +28,7 @@ dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.testcontainers:testcontainers:1.15.0")
     testImplementation("org.testcontainers:junit-jupiter:1.15.0")
-    testImplementation("io.mockk:mockk:1.10.2")
+    testImplementation("io.mockk:mockk:1.10.3-jdk8")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
 
     testRuntimeOnly("com.h2database:h2:1.4.200")
