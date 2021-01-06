@@ -32,7 +32,7 @@ dependencies {
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
 
     testRuntimeOnly("com.h2database:h2:1.4.200")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.0.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
 
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-html-builder:$ktorVersion")
