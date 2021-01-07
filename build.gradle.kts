@@ -27,7 +27,7 @@ val kmongoVersion = "4.2.3"
 dependencies {
     testImplementation(kotlin("test-junit5"))
     testImplementation("org.testcontainers:testcontainers:1.15.0")
-    testImplementation("org.testcontainers:junit-jupiter:1.15.0")
+    testImplementation("org.testcontainers:junit-jupiter:1.15.1")
     testImplementation("io.mockk:mockk:1.10.4")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
 
