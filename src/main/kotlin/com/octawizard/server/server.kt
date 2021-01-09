@@ -27,7 +27,7 @@ import org.kodein.di.instance
 private val logger = KotlinLogging.logger {}
 
 fun main() {
-    logger.info { "Hello world" }
+    logger.info { "Starting padles-api" }
     val kodein = DI {
         import(controllerModule)
         import(useCaseModule)
