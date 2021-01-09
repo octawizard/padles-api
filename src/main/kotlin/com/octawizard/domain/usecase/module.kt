@@ -4,6 +4,7 @@ import com.octawizard.domain.usecase.club.AddFieldToClub
 import com.octawizard.domain.usecase.club.CreateClub
 import com.octawizard.domain.usecase.club.GetClub
 import com.octawizard.domain.usecase.club.GetNearestClubs
+import com.octawizard.domain.usecase.club.SearchClubsByName
 import com.octawizard.domain.usecase.club.UpdateClubAddress
 import com.octawizard.domain.usecase.club.UpdateClubAvailability
 import com.octawizard.domain.usecase.club.UpdateClubAvgPrice
@@ -55,4 +56,5 @@ val useCaseModule = DI.Module("useCase") {
     bind<UpdateClubField>() with provider { UpdateClubField(instance(), instance()) }
     bind<AddFieldToClub>() with provider { AddFieldToClub(instance()) }
     bind<UpdateClubAvailability>() with provider { UpdateClubAvailability(instance()) }
+    bind<SearchClubsByName>() with provider { SearchClubsByName(instance()) }
 }

@@ -52,4 +52,6 @@ interface ClubRepository {
     ): List<Club>
 
     fun getNearestClubs(longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit): List<Club>
+
+    fun searchClubsByName(name: String): List<Club>
 }

@@ -12,6 +12,7 @@ import com.octawizard.domain.usecase.club.AddFieldToClub
 import com.octawizard.domain.usecase.club.CreateClub
 import com.octawizard.domain.usecase.club.GetClub
 import com.octawizard.domain.usecase.club.GetNearestClubs
+import com.octawizard.domain.usecase.club.SearchClubsByName
 import com.octawizard.domain.usecase.club.UpdateClubAddress
 import com.octawizard.domain.usecase.club.UpdateClubAvailability
 import com.octawizard.domain.usecase.club.UpdateClubAvgPrice
@@ -43,6 +44,7 @@ class ClubControllerTest {
     private val addFieldToClub: AddFieldToClub = mockk()
     private val updateClubField: UpdateClubField = mockk()
     private val updateClubAvailability: UpdateClubAvailability = mockk()
+    private val searchClubsByName: SearchClubsByName = mockk()
     private val controller = ClubController(
         getClub,
         createClub,
@@ -54,6 +56,7 @@ class ClubControllerTest {
         addFieldToClub,
         updateClubField,
         updateClubAvailability,
+        searchClubsByName,
     )
 
     @AfterEach
@@ -188,5 +191,15 @@ class ClubControllerTest {
 
         assertEquals(club, runBlocking { controller.updateClubAvailability(club, EmptyAvailability) })
         verify { updateClubAvailability.invoke(club, EmptyAvailability) }
+    }
+
+    @Test
+    fun `ClubController should call SearchClubsByName to search clubs given a name`() {
+        val club = mockk<Club>()
+        every { searchClubsByName.invoke(any()) } returns listOf(club)
+
+        val name = "search"
+        assertEquals(listOf(club), runBlocking { controller.searchClubsByName(name) })
+        verify { searchClubsByName.invoke(name) }
     }
 }

@@ -22,7 +22,9 @@ import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
+import org.litote.kmongo.ensureIndex
 import org.litote.kmongo.save
+import org.litote.kmongo.textIndex
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -37,6 +39,7 @@ class DocumentClubRepositoryTest : MongoBaseTestWithUUIDRepr<ClubDTO>() {
     @BeforeEach
     fun beforeEach() {
         col.drop()
+        col.ensureIndex(ClubDTO::name.textIndex())
     }
 
     private fun getClub(id: UUID): Club =
@@ -336,5 +339,17 @@ class DocumentClubRepositoryTest : MongoBaseTestWithUUIDRepr<ClubDTO>() {
 
         val nearestClubs = repository.getNearestClubs(longitude, latitude, radius, radiusUnit)
         assertEquals(listOf(nearClub), nearestClubs)
+    }
+
+    @Test
+    fun `DocumentClubRepository should return club given a name search string`() {
+        val club1 = getClub(UUID.randomUUID()).copy(name = "padel club barcelona")
+        val club2 = getClub(UUID.randomUUID()).copy(name = "padel club")
+        val club3 = getClub(UUID.randomUUID()).copy(name = "padel")
+        val club4 = getClub(UUID.randomUUID()).copy(name = "another")
+        col.insertMany(listOf(club4, club3, club2, club1).map { it.toClubDTO() })
+
+        val searchedClubs = repository.searchClubsByName("Padel Club Barcelona")
+        assertEquals(listOf(club1, club2, club3), searchedClubs)
     }
 }

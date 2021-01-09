@@ -60,6 +60,7 @@ class ModuleTest {
         assertNotNull(kodein.direct.instance<UpdateClubContacts>())
         assertNotNull(kodein.direct.instance<UpdateClubField>())
         assertNotNull(kodein.direct.instance<UpdateClubName>())
+        assertNotNull(kodein.direct.instance<SearchClubsByName>())
     }
 
 }

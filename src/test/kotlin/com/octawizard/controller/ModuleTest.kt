@@ -7,6 +7,7 @@ import com.octawizard.domain.usecase.club.AddFieldToClub
 import com.octawizard.domain.usecase.club.CreateClub
 import com.octawizard.domain.usecase.club.GetClub
 import com.octawizard.domain.usecase.club.GetNearestClubs
+import com.octawizard.domain.usecase.club.SearchClubsByName
 import com.octawizard.domain.usecase.club.UpdateClubAddress
 import com.octawizard.domain.usecase.club.UpdateClubAvailability
 import com.octawizard.domain.usecase.club.UpdateClubAvgPrice
@@ -47,6 +48,7 @@ class ModuleTest {
         bind<UpdateClubContacts>() with singleton { mockk(relaxed = true) }
         bind<UpdateClubField>() with singleton { mockk(relaxed = true) }
         bind<UpdateClubName>() with singleton { mockk(relaxed = true) }
+        bind<SearchClubsByName>() with singleton { mockk(relaxed = true) }
 
         bind<CancelReservation>() with singleton { mockk(relaxed = true) }
         bind<CreateReservation>() with singleton { mockk(relaxed = true) }

@@ -39,6 +39,7 @@ import org.litote.kmongo.div
 import org.litote.kmongo.ensureIndex
 import org.litote.kmongo.geo2dsphere
 import org.litote.kmongo.getCollection
+import org.litote.kmongo.textIndex
 import org.redisson.api.RedissonClient
 import javax.sql.DataSource
 
@@ -98,6 +99,7 @@ val repositoryModule = DI.Module("repository") {
         clubs.ensureIndexes(
             ascendingIndex(ClubDTO::name),
             geo2dsphere(ClubDTO::geoLocation),
+            ClubDTO::name.textIndex(),
         )
         clubs
     }

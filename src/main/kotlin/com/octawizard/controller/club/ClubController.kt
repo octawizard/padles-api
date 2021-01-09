@@ -12,6 +12,7 @@ import com.octawizard.domain.usecase.club.AddFieldToClub
 import com.octawizard.domain.usecase.club.CreateClub
 import com.octawizard.domain.usecase.club.GetClub
 import com.octawizard.domain.usecase.club.GetNearestClubs
+import com.octawizard.domain.usecase.club.SearchClubsByName
 import com.octawizard.domain.usecase.club.UpdateClubAddress
 import com.octawizard.domain.usecase.club.UpdateClubAvailability
 import com.octawizard.domain.usecase.club.UpdateClubAvgPrice
@@ -33,6 +34,7 @@ class ClubController(
     private val addFieldToClub: AddFieldToClub,
     private val updateClubField: UpdateClubField,
     private val updateClubAvailability: UpdateClubAvailability,
+    private val searchClubsByName: SearchClubsByName,
 ) {
 
     suspend fun getClub(clubId: UUID): Club? {
@@ -109,5 +111,9 @@ class ClubController(
 
     suspend fun updateClubAvailability(club: Club, availability: Availability): Club {
         return async { updateClubAvailability.invoke(club, availability) }
+    }
+
+    suspend fun searchClubsByName(name: String): List<Club> {
+        return async { searchClubsByName.invoke(name) }
     }
 }

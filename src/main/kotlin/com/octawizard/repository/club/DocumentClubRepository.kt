@@ -1,6 +1,7 @@
 package com.octawizard.repository.club
 
 import com.mongodb.client.MongoCollection
+import com.mongodb.client.model.TextSearchOptions
 import com.mongodb.client.model.geojson.Point
 import com.mongodb.client.model.geojson.Position
 import com.octawizard.domain.model.Availability
@@ -32,6 +33,7 @@ import org.litote.kmongo.ne
 import org.litote.kmongo.save
 import org.litote.kmongo.set
 import org.litote.kmongo.setTo
+import org.litote.kmongo.text
 import org.litote.kmongo.updateOne
 import java.math.BigDecimal
 import java.time.LocalDate
@@ -179,6 +181,12 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
             radiusUnit
         )
         return clubs.find(filterByGeoSphere)
+            .map { it.toClub() }
+            .toList()
+    }
+
+    override fun searchClubsByName(name: String): List<Club> {
+        return clubs.find(text(name, TextSearchOptions().caseSensitive(false)))
             .map { it.toClub() }
             .toList()
     }
