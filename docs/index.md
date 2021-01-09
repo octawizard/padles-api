@@ -44,8 +44,9 @@ docker-compose up
     * update a club
     * get a club
     * add/update field availability
-    * search for available fields (close to user, filters, ...)
-    * search for near clubs (close to user, filters, ...)
+    * search for available fields (close to the user)
+    * search for near clubs (close to the user)
+    * search for clubs by name
 
 #### TODO 
 * get all matches of a user
