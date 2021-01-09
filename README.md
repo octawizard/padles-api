@@ -42,8 +42,9 @@ Mainly is based on the following frameworks/libraries:
 - \[x] update a club
 - \[x] get a club
 - \[x] add/update field availability
-- \[x] search for available fields (close to user, filters, ...)
-- \[x] search for near clubs (close to user, filters, ...)
+- \[x] search for available fields (close to the user)
+- \[x] search for near clubs (close to the user)
+- \[x] search for clubs by name
 
 #### TODO 
 * get all matches of a user
