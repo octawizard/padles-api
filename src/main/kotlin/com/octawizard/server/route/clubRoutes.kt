@@ -4,6 +4,7 @@ import com.octawizard.controller.club.ClubController
 import com.octawizard.domain.model.Contacts
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.server.input.AddClubFieldInput
+import com.octawizard.server.input.ClubSearchCriteria
 import com.octawizard.server.input.CreateClubInput
 import com.octawizard.server.input.UpdateClubAddressNameInput
 import com.octawizard.server.input.UpdateClubAvailabilityInput
@@ -23,6 +24,7 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.util.pipeline.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -82,36 +84,13 @@ fun Routing.clubRoutes(controller: ClubController) {
             call.respond(HttpStatusCode.Created, club)
         }
 
-        // search near clubs
-        get("/clubs") {
-            val longitude = call.getDoubleQueryParam(LONGITUDE)
-            val latitude = call.getDoubleQueryParam(LATITUDE)
-            val radius = call.getDoubleQueryParam(RADIUS)
-            val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
-
-            checkNotNull(longitude)
-            checkNotNull(latitude)
-            checkNotNull(radius)
-
-            val clubs = controller.getNearestClubs(longitude, latitude, radius, radiusUnit)
-            call.respond(HttpStatusCode.OK, clubs)
-        }
-
-        // search near clubs with availability for a specific day
-        get("/clubs") {
-            val longitude = call.getDoubleQueryParam(LONGITUDE)
-            val latitude = call.getDoubleQueryParam(LATITUDE)
-            val radius = call.getDoubleQueryParam(RADIUS)
-            val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
-            val day = call.getLocalDateQueryParam(DAY, DateTimeFormatter.ISO_LOCAL_DATE)
-
-            checkNotNull(longitude)
-            checkNotNull(latitude)
-            checkNotNull(radius)
-            checkNotNull(day)
-
-            val clubs = controller.getAvailableNearestClubs(longitude, latitude, radius, radiusUnit, day)
-            call.respond(HttpStatusCode.OK, clubs)
+        // search clubs by name, distance or distance + day availability
+        get("/clubs") { //clubs?criteria=ByName&name=padel-club
+            when (call.getEnumQueryParamOrDefault("criteria", ClubSearchCriteria.ByName)) {
+                ClubSearchCriteria.ByName -> searchClubsByName(controller)
+                ClubSearchCriteria.ByDistance -> searchClubsByDistance(controller)
+                ClubSearchCriteria.ByDistanceAndDayAvailability -> searchClubsByDistanceAndDayAvailability(controller)
+            }
         }
 
         // all updates for club
@@ -185,4 +164,48 @@ fun Routing.clubRoutes(controller: ClubController) {
             call.respond(HttpStatusCode.OK, updatedClub)
         }
     }
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistanceAndDayAvailability(
+    controller: ClubController,
+) {
+    val longitude = call.getDoubleQueryParam(LONGITUDE)
+    val latitude = call.getDoubleQueryParam(LATITUDE)
+    val radius = call.getDoubleQueryParam(RADIUS)
+    val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
+    val day = call.getLocalDateQueryParam(DAY, DateTimeFormatter.ISO_LOCAL_DATE)
+
+    checkNotNull(longitude)
+    checkNotNull(latitude)
+    checkNotNull(radius)
+    checkNotNull(day)
+
+    val clubs = controller.getAvailableNearestClubs(longitude, latitude, radius, radiusUnit, day)
+    call.respond(HttpStatusCode.OK, clubs)
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance(
+    controller: ClubController,
+) {
+    val longitude = call.getDoubleQueryParam(LONGITUDE)
+    val latitude = call.getDoubleQueryParam(LATITUDE)
+    val radius = call.getDoubleQueryParam(RADIUS)
+    val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
+
+    checkNotNull(longitude)
+    checkNotNull(latitude)
+    checkNotNull(radius)
+
+    val clubs = controller.getNearestClubs(longitude, latitude, radius, radiusUnit)
+    call.respond(HttpStatusCode.OK, clubs)
+}
+
+private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByName(
+    controller: ClubController,
+) {
+    val name = call.request.queryParameters["name"]
+    check(!name.isNullOrEmpty())
+
+    val clubs = controller.searchClubsByName(name)
+    call.respond(HttpStatusCode.OK, clubs)
 }

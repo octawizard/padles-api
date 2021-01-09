@@ -24,6 +24,7 @@ val controllerModule = DI.Module("controller") {
             instance(),
             instance(),
             instance(),
+            instance(),
         )
     }
     // reservation
