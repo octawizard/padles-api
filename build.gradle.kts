@@ -62,7 +62,7 @@ dependencies {
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
 
     // redis
-    implementation("org.redisson:redisson:3.14.0")
+    implementation("org.redisson:redisson:3.14.1")
 
     // kmongo
     implementation("org.litote.kmongo:kmongo-id:$kmongoVersion")
