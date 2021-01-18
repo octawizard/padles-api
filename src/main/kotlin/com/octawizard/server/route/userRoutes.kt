@@ -2,6 +2,7 @@ package com.octawizard.server.route
 
 import com.octawizard.controller.user.UserController
 import com.octawizard.domain.model.Email
+import com.octawizard.server.UserBasedAuthenticationConfig
 import com.octawizard.server.authorizeWithUserEmailInPath
 import com.octawizard.server.input.CreateUserInput
 import com.octawizard.server.input.UserUpdateInput
@@ -15,7 +16,7 @@ import io.ktor.routing.*
 
 fun Routing.userRoutes(controller: UserController) {
     val emailParam = "email"
-    authenticate {
+    authenticate(UserBasedAuthenticationConfig) {
         get("/user/{$emailParam}") {
             val emailString = call.parameters[emailParam]
                 ?: throw BadRequestException("$emailParam must be present in path")

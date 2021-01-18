@@ -30,6 +30,7 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter:1.15.1")
     testImplementation("io.mockk:mockk:1.10.4")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
+    testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
     testRuntimeOnly("com.h2database:h2:1.4.200")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
