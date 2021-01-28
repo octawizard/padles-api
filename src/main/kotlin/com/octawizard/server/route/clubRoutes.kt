@@ -13,9 +13,11 @@ import com.octawizard.server.input.UpdateClubAvgPriceInput
 import com.octawizard.server.input.UpdateClubContactsInput
 import com.octawizard.server.input.UpdateClubFieldInput
 import com.octawizard.server.input.UpdateClubNameInput
+import com.octawizard.server.route.QueryParams.CRITERIA
 import com.octawizard.server.route.QueryParams.DAY
 import com.octawizard.server.route.QueryParams.LATITUDE
 import com.octawizard.server.route.QueryParams.LONGITUDE
+import com.octawizard.server.route.QueryParams.NAME
 import com.octawizard.server.route.QueryParams.RADIUS
 import com.octawizard.server.route.QueryParams.RADIUS_UNIT
 import io.ktor.application.*
@@ -57,6 +59,8 @@ data class ClubRoute(private val clubIdString: String) {
 }
 
 object QueryParams {
+    const val CRITERIA = "criteria"
+    const val NAME = "name"
     const val LONGITUDE = "lon"
     const val LATITUDE = "lat"
     const val RADIUS = "rad"
@@ -75,7 +79,7 @@ fun Routing.clubRoutes(controller: ClubController) {
 
         // create club
         post("/club") {
-            val input = call.receive<CreateClubInput>()
+            val input = call.receive<CreateClubInput>().sanitize()
             val club = controller.createClub(
                 input.name,
                 input.address,
@@ -90,7 +94,7 @@ fun Routing.clubRoutes(controller: ClubController) {
 
         // search clubs by name, distance or distance + day availability
         get("/clubs") { //clubs?criteria=ByName&name=padel-club
-            when (call.getEnumQueryParamOrDefault("criteria", ClubSearchCriteria.ByName)) {
+            when (call.getEnumQueryParamOrDefault(CRITERIA, ClubSearchCriteria.ByName)) {
                 ClubSearchCriteria.ByName -> searchClubsByName(controller)
                 ClubSearchCriteria.ByDistance -> searchClubsByDistance(controller)
                 ClubSearchCriteria.ByDistanceAndDayAvailability -> searchClubsByDistanceAndDayAvailability(controller)
@@ -204,9 +208,9 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
     val radius = call.getDoubleQueryParam(RADIUS)
     val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
 
-    checkNotNull(longitude)
-    checkNotNull(latitude)
-    checkNotNull(radius)
+    checkNotNull(longitude) { "query param longitude cannot be null" }
+    checkNotNull(latitude) { "query param latitude cannot be null" }
+    checkNotNull(radius) { "query param radius cannot be null" }
 
     val clubs = controller.getNearestClubs(longitude, latitude, radius, radiusUnit)
     call.respond(HttpStatusCode.OK, clubs)
@@ -215,8 +219,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
 private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByName(
     controller: ClubController,
 ) {
-    val name = call.request.queryParameters["name"]
-    check(!name.isNullOrEmpty())
+    val name = call.request.queryParameters[NAME]
+    check(!name.isNullOrEmpty()) { "query param name cannot be null or empty" }
 
     val clubs = controller.searchClubsByName(name)
     call.respond(HttpStatusCode.OK, clubs)

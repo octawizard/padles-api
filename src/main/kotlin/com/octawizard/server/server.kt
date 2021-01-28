@@ -16,6 +16,7 @@ import io.ktor.features.*
 import io.ktor.gson.*
 import io.ktor.http.*
 import io.ktor.locations.*
+import io.ktor.response.*
 import io.ktor.routing.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
@@ -53,6 +54,9 @@ fun main() {
         install(StatusPages) {
             exception<AuthorizationException> {
                 call.response.status(HttpStatusCode.Forbidden)
+            }
+            exception<IllegalStateException> { cause ->
+                call.respond(HttpStatusCode.BadRequest, cause.localizedMessage)
             }
         }
         routing {
