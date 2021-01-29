@@ -191,10 +191,10 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
     val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
     val day = call.getLocalDateQueryParam(DAY, DateTimeFormatter.ISO_LOCAL_DATE)
 
-    checkNotNull(longitude)
-    checkNotNull(latitude)
-    checkNotNull(radius)
-    checkNotNull(day)
+    checkNotNull(longitude) { "query param longitude cannot be null" }
+    checkNotNull(latitude) { "query param latitude cannot be null" }
+    checkNotNull(radius) { "query param radius cannot be null" }
+    checkNotNull(day) { "query param day cannot be null" }
 
     val clubs = controller.getAvailableNearestClubs(longitude, latitude, radius, radiusUnit, day)
     call.respond(HttpStatusCode.OK, clubs)

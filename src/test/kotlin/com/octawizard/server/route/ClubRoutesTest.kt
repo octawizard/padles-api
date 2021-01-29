@@ -28,6 +28,8 @@ import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 fun Application.testableModule(clubController: ClubController) {
@@ -334,6 +336,138 @@ class ClubRoutesTest {
                         QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
                         QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
                         QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                    )
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                    assertEquals("query param radius cannot be null", response.content)
+                }
+            }
+        }
+
+        @Test
+        fun `Server should handle GET clubs - ByDistanceAndDayAvailability criteria`() {
+            val clubController = mockk<ClubController>(relaxed = true)
+            val club = getClub(UUID.randomUUID())
+            val clubs = listOf(club)
+            val radius = 1.0
+            val day = LocalDate.now()
+
+            // 200 - Ok
+            coEvery {
+                clubController.getAvailableNearestClubs(
+                    club.geoLocation.longitude,
+                    club.geoLocation.latitude,
+                    radius,
+                    RadiusUnit.Miles,
+                    day,
+                )
+            } returns clubs
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Get,
+                    "/clubs",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                        QueryParams.RADIUS_UNIT to RadiusUnit.Miles.name,
+                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                    )
+                )) {
+                    assertEquals(HttpStatusCode.OK, response.status())
+                    assertEquals(gson.toJson(clubs), response.content)
+                }
+            }
+
+            // 200 - radius unit null
+            coEvery {
+                clubController.getAvailableNearestClubs(
+                    club.geoLocation.longitude,
+                    club.geoLocation.latitude,
+                    radius,
+                    RadiusUnit.Kilometers,
+                    day,
+                )
+            } returns clubs
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Get,
+                    "/clubs",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                    )
+                )) {
+                    assertEquals(HttpStatusCode.OK, response.status())
+                    assertEquals(gson.toJson(clubs), response.content)
+                }
+            }
+
+            // 400 - bad request - longitude null
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Get,
+                    "/clubs",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                    )
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                    assertEquals("query param longitude cannot be null", response.content)
+                }
+            }
+
+            // 400 - bad request - latitude null
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Get,
+                    "/clubs",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                    )
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                    assertEquals("query param latitude cannot be null", response.content)
+                }
+            }
+
+            // 400 - bad request - day null
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Get,
+                    "/clubs",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                    )
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                    assertEquals("query param day cannot be null", response.content)
+                }
+            }
+
+            // 400 - bad request - radius null
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Get,
+                    "/clubs",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
                     )
                 )) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
