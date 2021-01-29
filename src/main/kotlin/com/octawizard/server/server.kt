@@ -21,6 +21,7 @@ import io.ktor.routing.*
 import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.kodein.di.DI
@@ -57,12 +58,7 @@ fun main() {
         }
         install(UserEmailBasedAuthorization)
         install(StatusPages) {
-            exception<AuthorizationException> {
-                call.response.status(HttpStatusCode.Forbidden)
-            }
-            exception<IllegalStateException> { cause ->
-                call.respond(HttpStatusCode.BadRequest, cause.localizedMessage)
-            }
+            exceptionHandler()
         }
         routing {
             userRoutes(userController)
@@ -70,5 +66,17 @@ fun main() {
             reservationRoutes(reservationController)
         }
     }.start(wait = true)
+}
+
+private fun StatusPages.Configuration.exceptionHandler() {
+    exception<AuthorizationException> {
+        call.response.status(HttpStatusCode.Forbidden)
+    }
+    exception<IllegalStateException> { cause ->
+        call.respond(HttpStatusCode.BadRequest, cause.localizedMessage)
+    }
+    exception<SerializationException> { cause ->
+        call.respond(HttpStatusCode.BadRequest, cause.localizedMessage)
+    }
 }
 
