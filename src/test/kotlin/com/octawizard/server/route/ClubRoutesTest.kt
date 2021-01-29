@@ -1,13 +1,16 @@
 package com.octawizard.server.route
 
-import com.google.gson.Gson
 import com.octawizard.controller.club.ClubController
+import com.octawizard.domain.model.Availability
 import com.octawizard.domain.model.Club
 import com.octawizard.domain.model.Contacts
 import com.octawizard.domain.model.Email
-import com.octawizard.domain.model.EmptyAvailability
+import com.octawizard.domain.model.Field
+import com.octawizard.domain.model.FieldAvailability
 import com.octawizard.domain.model.GeoLocation
 import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.domain.model.TimeSlot
+import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.server.AuthorizationException
 import com.octawizard.server.input.ClubSearchCriteria
 import com.octawizard.server.input.CreateClubInput
@@ -15,20 +18,22 @@ import com.octawizard.server.input.UpdateClubNameInput
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
-import io.ktor.gson.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.serialization.*
 import io.ktor.server.testing.*
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.serialization.encodeToString
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import java.math.BigDecimal
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -38,7 +43,7 @@ fun Application.testableModule(clubController: ClubController) {
 
 private fun Application.testableModuleWithDependencies(clubController: ClubController) {
     install(ContentNegotiation) {
-        gson { }
+        json(JsonSerde)
     }
     install(Authentication) {
         mockAuthConfig()
@@ -53,6 +58,9 @@ private fun Application.testableModuleWithDependencies(clubController: ClubContr
         exception<IllegalStateException> { cause ->
             call.respond(HttpStatusCode.BadRequest, cause.localizedMessage)
         }
+        exception<kotlinx.serialization.SerializationException> { cause ->
+            call.respond(HttpStatusCode.BadRequest, cause.localizedMessage)
+        }
     }
     routing {
         clubRoutes(clubController)
@@ -61,15 +69,20 @@ private fun Application.testableModuleWithDependencies(clubController: ClubContr
 
 class ClubRoutesTest {
 
-    private val gson = Gson()
+    private val field = Field(UUID.randomUUID(), "field", false, WallsMaterial.Bricks)
+    private val now = LocalDateTime.now()
+    private val timeslot = TimeSlot(now.plusHours(1), now.plusHours(2))
     private fun getClub(id: UUID): Club =
         Club(
             id,
             "club name",
             "club address",
             GeoLocation(1.1, 1.1),
-            emptySet(),
-            EmptyAvailability,
+            setOf(field),
+            Availability(mapOf(
+                LocalDate.now() to listOf(FieldAvailability(timeslot, field, BigDecimal.TEN)),
+                LocalDate.now().plusDays(1) to emptyList()
+            )),
             BigDecimal.TEN,
             Contacts("21451", Email("club@test.com")),
         )
@@ -98,7 +111,7 @@ class ClubRoutesTest {
             withTestApplication({ testableModule(clubController) }) {
                 with(handleRequestWithJWT(HttpMethod.Get, "/club/$clubId", UUID.randomUUID().toString())) {
                     assertEquals(HttpStatusCode.OK, response.status())
-                    assertEquals(gson.toJson(club), response.content)
+                    assertEquals(JsonSerde.encodeToString(club), response.content)
                 }
             }
 
@@ -158,15 +171,19 @@ class ClubRoutesTest {
 
             // 201 - Created
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Post, "/club", "anonymous", input)) {
+                with(handleRequestWithJWT(HttpMethod.Post, "/club", "anonymous", body = JsonSerde.encodeToString(input))) {
                     assertEquals(HttpStatusCode.Created, response.status())
-                    assertEquals(gson.toJson(club), response.content)
+                    assertEquals(JsonSerde.encodeToString(club), response.content)
                 }
             }
 
             // 400 - bad input
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Post, "/club", "anonymous", UpdateClubNameInput("wrong"))) {
+                with(handleRequestWithJWT(HttpMethod.Post,
+                    "/club",
+                    "anonymous",
+                    body = JsonSerde.encodeToString(UpdateClubNameInput("wrong"))
+                )) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -203,7 +220,7 @@ class ClubRoutesTest {
                     )
                 )) {
                     assertEquals(HttpStatusCode.OK, response.status())
-                    assertEquals(gson.toJson(clubs), response.content)
+                    assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
             }
 
@@ -266,7 +283,7 @@ class ClubRoutesTest {
                     )
                 )) {
                     assertEquals(HttpStatusCode.OK, response.status())
-                    assertEquals(gson.toJson(clubs), response.content)
+                    assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
             }
 
@@ -291,7 +308,7 @@ class ClubRoutesTest {
                     )
                 )) {
                     assertEquals(HttpStatusCode.OK, response.status())
-                    assertEquals(gson.toJson(clubs), response.content)
+                    assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
             }
 
@@ -376,7 +393,7 @@ class ClubRoutesTest {
                     )
                 )) {
                     assertEquals(HttpStatusCode.OK, response.status())
-                    assertEquals(gson.toJson(clubs), response.content)
+                    assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
             }
 
@@ -403,7 +420,7 @@ class ClubRoutesTest {
                     )
                 )) {
                     assertEquals(HttpStatusCode.OK, response.status())
-                    assertEquals(gson.toJson(clubs), response.content)
+                    assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
             }
 
@@ -483,6 +500,25 @@ class ClubRoutesTest {
                     assertEquals(HttpStatusCode.Unauthorized, response.status())
                 }
             }
+        }
+    }
+
+    @Nested
+    inner class UpdateClubNameRoute {
+
+        @Test
+        fun `Server should handle PUT club - update name`() {
+
+        }
+
+        @Test
+        fun `Server should handle PUT club - update name - unauthorized`() {
+
+        }
+
+        @Test
+        fun `Server should handle PUT club - update name - unauthenticated`() {
+
         }
     }
 

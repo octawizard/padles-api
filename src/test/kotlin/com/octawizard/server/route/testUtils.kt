@@ -1,27 +1,29 @@
 package com.octawizard.server.route
 
-import com.google.gson.Gson
+import com.octawizard.server.serialization.contextualSerializers
 import io.ktor.http.*
-import io.ktor.request.*
 import io.ktor.server.testing.*
+import kotlinx.serialization.json.Json
 
-val gson = Gson()
+val JsonSerde = Json {
+    serializersModule = contextualSerializers
+    allowStructuredMapKeys = true
+}
 
 fun TestApplicationEngine.handleRequestWithJWT(
     method: HttpMethod,
     url: String,
     id: String,
-    body: Any? = null,
-    queryParams: Map<String, String> = emptyMap()
+    queryParams: Map<String, String> = emptyMap(),
+    body: String? = null,
 ): TestApplicationCall =
     handleRequest {
         this.uri = url + queryParams.toQueryParamString()
         this.method = method
         addHeader(HttpHeaders.Authorization, "Bearer ${MockAuthConfig.generateToken(id)}")
         addHeader(HttpHeaders.ContentType, ContentType.Application.Json.toString())
-        body?.let { this.setBody(gson.toJson(it)) }
+        body?.let { this.setBody(body) }
     }
-
 
 fun Map<String, String>.toQueryParamString(): String {
     if (this.isEmpty()) {

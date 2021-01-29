@@ -1,11 +1,12 @@
 package com.octawizard.domain.model
 
+import kotlinx.serialization.Contextual
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
 
 data class Reservation(
-        val id: UUID,
+        @Contextual val id: UUID,
         val match: Match,
         val clubReservationInfo: ClubReservationInfo,
         val startTime: LocalDateTime,
@@ -25,4 +26,4 @@ enum class PaymentStatus {
     PendingPayment, Payed, Refunded, ToBeRefunded
 }
 
-data class ClubReservationInfo(val clubId: UUID, val name: String, val field: Field, val clubLocation: GeoLocation)
+data class ClubReservationInfo(@Contextual val clubId: UUID, val name: String, val field: Field, val clubLocation: GeoLocation)

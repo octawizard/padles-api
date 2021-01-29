@@ -79,7 +79,7 @@ fun Routing.clubRoutes(controller: ClubController) {
 
         // create club
         post("/club") {
-            val input = call.receive<CreateClubInput>().sanitize()
+            val input = call.receive<CreateClubInput>()
             val club = controller.createClub(
                 input.name,
                 input.address,

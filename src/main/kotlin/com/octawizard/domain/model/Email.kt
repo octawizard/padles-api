@@ -1,8 +1,9 @@
 package com.octawizard.domain.model
 
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
-class Email(val value: String): Serializable {
+@Serializable
+class Email(val value: String) {
 
     init {
         check(value.isValidEmail()) {

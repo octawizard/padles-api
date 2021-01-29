@@ -1,5 +1,6 @@
 package com.octawizard.domain.model
 
-import java.io.Serializable
+import kotlinx.serialization.Serializable
 
-data class GeoLocation(val longitude: Double, val latitude: Double): Serializable
+@Serializable
+data class GeoLocation(val longitude: Double, val latitude: Double)

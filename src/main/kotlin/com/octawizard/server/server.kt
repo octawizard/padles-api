@@ -10,16 +10,18 @@ import com.octawizard.repository.repositoryModule
 import com.octawizard.server.route.clubRoutes
 import com.octawizard.server.route.reservationRoutes
 import com.octawizard.server.route.userRoutes
+import com.octawizard.server.serialization.contextualSerializers
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
-import io.ktor.gson.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.serialization.*
 import io.ktor.server.engine.*
 import io.ktor.server.netty.*
+import kotlinx.serialization.json.Json
 import mu.KotlinLogging
 import org.kodein.di.DI
 import org.kodein.di.direct
@@ -42,7 +44,10 @@ fun main() {
 
     embeddedServer(Netty, port = 1111, host = "127.0.0.1") {
         install(ContentNegotiation) {
-            gson { }
+            json(Json {
+                serializersModule = contextualSerializers
+                allowStructuredMapKeys = true
+            })
         }
         install(DefaultHeaders)
         install(CallLogging)
@@ -66,3 +71,4 @@ fun main() {
         }
     }.start(wait = true)
 }
+

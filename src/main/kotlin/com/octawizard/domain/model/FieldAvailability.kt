@@ -1,9 +1,12 @@
 package com.octawizard.domain.model
 
-import java.io.Serializable
+import kotlinx.serialization.Contextual
+import kotlinx.serialization.Serializable
 import java.math.BigDecimal
 import java.time.LocalDateTime
 
-data class FieldAvailability(val timeSlot: TimeSlot, val field: Field, val price: BigDecimal) : Serializable
+@Serializable
+data class FieldAvailability(val timeSlot: TimeSlot, val field: Field, @Contextual val price: BigDecimal)
 
-data class TimeSlot(val startDateTime: LocalDateTime, val endDateTime: LocalDateTime): Serializable
+@Serializable
+data class TimeSlot(@Contextual val startDateTime: LocalDateTime, @Contextual val endDateTime: LocalDateTime)
