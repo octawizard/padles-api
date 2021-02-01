@@ -23,13 +23,13 @@ repositories {
 
 val ktorVersion = "1.5.0"
 val exposedVersion = "0.28.1"
-val kmongoVersion = "4.2.3"
+val kmongoVersion = "4.2.4"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
-    testImplementation("org.testcontainers:testcontainers:1.15.0")
+    testImplementation("org.testcontainers:testcontainers:1.15.1")
     testImplementation("org.testcontainers:junit-jupiter:1.15.1")
-    testImplementation("io.mockk:mockk:1.10.4")
+    testImplementation("io.mockk:mockk:1.10.5")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
@@ -54,7 +54,7 @@ dependencies {
 
     // driver and connection pool
     implementation("org.postgresql:postgresql:42.2.18")
-    implementation("com.zaxxer:HikariCP:3.4.5")
+    implementation("com.zaxxer:HikariCP:4.0.1")
 
     // configuration
     implementation("com.typesafe:config:1.4.1")
@@ -65,7 +65,7 @@ dependencies {
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
 
     // redis
-    implementation("org.redisson:redisson:3.14.0")
+    implementation("org.redisson:redisson:3.14.1")
 
     // kmongo
     implementation("org.litote.kmongo:kmongo-id:$kmongoVersion")
