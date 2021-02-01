@@ -45,14 +45,16 @@ data class ClubRoute(private val clubIdString: String) {
     @Location("/contacts")
     data class Contacts(val parent: ClubRoute)
 
-    @Location("/avgPrice")
+    @Location("/avg_price")
     data class AvgPrice(val parent: ClubRoute)
 
     @Location("/fields")
     data class Fields(val parent: ClubRoute)
 
-    @Location("/field/{fieldId}")
-    data class Field(val parent: ClubRoute, val fieldId: UUID)
+    @Location("/field/{fieldIdString}")
+    data class Field(val parent: ClubRoute, private val fieldIdString: String) {
+        val fieldId: UUID = UUID.fromString(fieldIdString)
+    }
 
     @Location("/availability")
     data class Availability(val parent: ClubRoute)
@@ -136,7 +138,7 @@ fun Routing.clubRoutes(controller: ClubController) {
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-        //fields (only add new field)
+        // add a new field to the list
         post<ClubRoute.Fields> { route ->
             authorize(route.parent.clubId)
             val input = call.receive<AddClubFieldInput>()
@@ -147,6 +149,7 @@ fun Routing.clubRoutes(controller: ClubController) {
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
+        // update one field
         put<ClubRoute.Field> { route ->
             authorize(route.parent.clubId)
             val input = call.receive<UpdateClubFieldInput>()
