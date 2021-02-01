@@ -3,22 +3,26 @@ package com.octawizard.server.route
 import com.octawizard.controller.club.ClubController
 import com.octawizard.domain.model.Contacts
 import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.server.AuthorizationException
 import com.octawizard.server.input.AddClubFieldInput
 import com.octawizard.server.input.ClubSearchCriteria
 import com.octawizard.server.input.CreateClubInput
-import com.octawizard.server.input.UpdateClubAddressNameInput
+import com.octawizard.server.input.UpdateClubAddressInput
 import com.octawizard.server.input.UpdateClubAvailabilityInput
 import com.octawizard.server.input.UpdateClubAvgPriceInput
 import com.octawizard.server.input.UpdateClubContactsInput
 import com.octawizard.server.input.UpdateClubFieldInput
 import com.octawizard.server.input.UpdateClubNameInput
+import com.octawizard.server.route.QueryParams.CRITERIA
 import com.octawizard.server.route.QueryParams.DAY
 import com.octawizard.server.route.QueryParams.LATITUDE
 import com.octawizard.server.route.QueryParams.LONGITUDE
+import com.octawizard.server.route.QueryParams.NAME
 import com.octawizard.server.route.QueryParams.RADIUS
 import com.octawizard.server.route.QueryParams.RADIUS_UNIT
 import io.ktor.application.*
 import io.ktor.auth.*
+import io.ktor.auth.jwt.*
 import io.ktor.http.*
 import io.ktor.locations.*
 import io.ktor.request.*
@@ -28,31 +32,37 @@ import io.ktor.util.pipeline.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-@Location("/club/clubId")
-data class ClubIdRoute(val clubId: UUID)
+@Location("/club/{clubIdString}")
+data class ClubRoute(private val clubIdString: String) {
+    val clubId: UUID = UUID.fromString(clubIdString)
 
-@Location("/club/clubId/name")
-data class ClubNameRoute(val clubId: UUID)
+    @Location("/name")
+    data class Name(val parent: ClubRoute)
 
-@Location("/club/clubId/address")
-data class ClubAddressRoute(val clubId: UUID)
+    @Location("/address")
+    data class Address(val parent: ClubRoute)
 
-@Location("/club/clubId/contacts")
-data class ClubContactsRoute(val clubId: UUID)
+    @Location("/contacts")
+    data class Contacts(val parent: ClubRoute)
 
-@Location("/club/clubId/avgPrice")
-data class ClubAvgPriceRoute(val clubId: UUID)
+    @Location("/avg_price")
+    data class AvgPrice(val parent: ClubRoute)
 
-@Location("/club/clubId/field")
-data class ClubFieldsRoute(val clubId: UUID)
+    @Location("/fields")
+    data class Fields(val parent: ClubRoute)
 
-@Location("/club/clubId/field/fieldId")
-data class ClubFieldRoute(val clubId: UUID, val fieldId: UUID)
+    @Location("/field/{fieldIdString}")
+    data class Field(val parent: ClubRoute, private val fieldIdString: String) {
+        val fieldId: UUID = UUID.fromString(fieldIdString)
+    }
 
-@Location("/club/clubId/availability")
-data class ClubAvailabilityRoute(val clubId: UUID)
+    @Location("/availability")
+    data class Availability(val parent: ClubRoute)
+}
 
 object QueryParams {
+    const val CRITERIA = "criteria"
+    const val NAME = "name"
     const val LONGITUDE = "lon"
     const val LATITUDE = "lat"
     const val RADIUS = "rad"
@@ -61,10 +71,10 @@ object QueryParams {
 }
 
 fun Routing.clubRoutes(controller: ClubController) {
-    authenticate {
+    authenticate("club-based") {
 
         // get club
-        get<ClubIdRoute> { route ->
+        get<ClubRoute> { route ->
             val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
             call.respond(HttpStatusCode.OK, club)
         }
@@ -86,7 +96,7 @@ fun Routing.clubRoutes(controller: ClubController) {
 
         // search clubs by name, distance or distance + day availability
         get("/clubs") { //clubs?criteria=ByName&name=padel-club
-            when (call.getEnumQueryParamOrDefault("criteria", ClubSearchCriteria.ByName)) {
+            when (call.getEnumQueryParamOrDefault(CRITERIA, ClubSearchCriteria.ByName)) {
                 ClubSearchCriteria.ByName -> searchClubsByName(controller)
                 ClubSearchCriteria.ByDistance -> searchClubsByDistance(controller)
                 ClubSearchCriteria.ByDistanceAndDayAvailability -> searchClubsByDistanceAndDayAvailability(controller)
@@ -94,55 +104,56 @@ fun Routing.clubRoutes(controller: ClubController) {
         }
 
         // all updates for club
-        put<ClubNameRoute> { route ->
+        put<ClubRoute.Name> { route ->
+            authorize(route.parent.clubId)
             val input = call.receive<UpdateClubNameInput>()
-            //todo check if authorized   payload.sub == club.contacts.email
-            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
 
             val updatedClub = controller.updateClubName(club, input.name)
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-        put<ClubAddressRoute> { route ->
-            val input = call.receive<UpdateClubAddressNameInput>()
-            //todo check if authorized   payload.sub == club.contacts.email
-            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+        put<ClubRoute.Address> { route ->
+            authorize(route.parent.clubId)
+            val input = call.receive<UpdateClubAddressInput>()
+            val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
             val updatedClub = controller.updateClubAddress(club, input.address, input.location)
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-        put<ClubContactsRoute> { route ->
+        put<ClubRoute.Contacts> { route ->
+            authorize(route.parent.clubId)
             val input = call.receive<UpdateClubContactsInput>()
-            //todo check if authorized
-            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
             val contacts = Contacts(input.phone, input.email)
             val updatedClub = controller.updateClubContacts(club, contacts)
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-        put<ClubAvgPriceRoute> { route ->
+        put<ClubRoute.AvgPrice> { route ->
+            authorize(route.parent.clubId)
             val input = call.receive<UpdateClubAvgPriceInput>()
-            //todo check if authorized
-            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
             val updatedClub = controller.updateClubAvgPrice(club, input.avgPrice)
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-        //fields (only add new field)
-        post<ClubFieldsRoute> { route ->
+        // add a new field to the list
+        post<ClubRoute.Fields> { route ->
+            authorize(route.parent.clubId)
             val input = call.receive<AddClubFieldInput>()
-            //todo check if authorized
-            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
             val updatedClub = controller.addToClubFields(
                 club, input.name, input.isIndoor, input.hasSand, input.wallsMaterial
             )
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-        put<ClubFieldRoute> { route ->
+        // update one field
+        put<ClubRoute.Field> { route ->
+            authorize(route.parent.clubId)
             val input = call.receive<UpdateClubFieldInput>()
-            //todo check if authorized
-            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
 
             val updatedClub = controller.updateClubField(
                 club,
@@ -156,13 +167,21 @@ fun Routing.clubRoutes(controller: ClubController) {
         }
 
         //availability
-        put<ClubAvailabilityRoute> { route ->
+        put<ClubRoute.Availability> { route ->
+            authorize(route.parent.clubId)
             val input = call.receive<UpdateClubAvailabilityInput>()
-            //todo check if authorized
-            val club = controller.getClub(route.clubId) ?: entityNotFound(route.clubId)
+            val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
             val updatedClub = controller.updateClubAvailability(club, input.availability)
             call.respond(HttpStatusCode.OK, updatedClub)
         }
+    }
+}
+
+private fun PipelineContext<Unit, ApplicationCall>.authorize(clubId: UUID) {
+    val principal = call.authentication.principal<JWTPrincipal>() ?: throw AuthorizationException("Missing principal")
+    val tokenClubId = principal.payload.subject
+    if (clubId.toString() != tokenClubId) {
+        throw AuthorizationException("Not authorized to update/delete club - not owned by $tokenClubId")
     }
 }
 
@@ -175,10 +194,10 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
     val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
     val day = call.getLocalDateQueryParam(DAY, DateTimeFormatter.ISO_LOCAL_DATE)
 
-    checkNotNull(longitude)
-    checkNotNull(latitude)
-    checkNotNull(radius)
-    checkNotNull(day)
+    checkNotNull(longitude) { "query param longitude cannot be null" }
+    checkNotNull(latitude) { "query param latitude cannot be null" }
+    checkNotNull(radius) { "query param radius cannot be null" }
+    checkNotNull(day) { "query param day cannot be null" }
 
     val clubs = controller.getAvailableNearestClubs(longitude, latitude, radius, radiusUnit, day)
     call.respond(HttpStatusCode.OK, clubs)
@@ -192,9 +211,9 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
     val radius = call.getDoubleQueryParam(RADIUS)
     val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
 
-    checkNotNull(longitude)
-    checkNotNull(latitude)
-    checkNotNull(radius)
+    checkNotNull(longitude) { "query param longitude cannot be null" }
+    checkNotNull(latitude) { "query param latitude cannot be null" }
+    checkNotNull(radius) { "query param radius cannot be null" }
 
     val clubs = controller.getNearestClubs(longitude, latitude, radius, radiusUnit)
     call.respond(HttpStatusCode.OK, clubs)
@@ -203,8 +222,8 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
 private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByName(
     controller: ClubController,
 ) {
-    val name = call.request.queryParameters["name"]
-    check(!name.isNullOrEmpty())
+    val name = call.request.queryParameters[NAME]
+    check(!name.isNullOrEmpty()) { "query param name cannot be null or empty" }
 
     val clubs = controller.searchClubsByName(name)
     call.respond(HttpStatusCode.OK, clubs)
