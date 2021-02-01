@@ -7,7 +7,7 @@ import com.octawizard.server.AuthorizationException
 import com.octawizard.server.input.AddClubFieldInput
 import com.octawizard.server.input.ClubSearchCriteria
 import com.octawizard.server.input.CreateClubInput
-import com.octawizard.server.input.UpdateClubAddressNameInput
+import com.octawizard.server.input.UpdateClubAddressInput
 import com.octawizard.server.input.UpdateClubAvailabilityInput
 import com.octawizard.server.input.UpdateClubAvgPriceInput
 import com.octawizard.server.input.UpdateClubContactsInput
@@ -113,7 +113,7 @@ fun Routing.clubRoutes(controller: ClubController) {
 
         put<ClubRoute.Address> { route ->
             authorize(route.parent.clubId)
-            val input = call.receive<UpdateClubAddressNameInput>()
+            val input = call.receive<UpdateClubAddressInput>()
             val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
             val updatedClub = controller.updateClubAddress(club, input.address, input.location)
             call.respond(HttpStatusCode.OK, updatedClub)

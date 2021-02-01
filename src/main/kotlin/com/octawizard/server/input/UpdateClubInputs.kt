@@ -10,7 +10,7 @@ import java.math.BigDecimal
 data class UpdateClubNameInput(val name: String)
 
 @Serializable
-data class UpdateClubAddressNameInput(val address: String, val location: GeoLocation)
+data class UpdateClubAddressInput(val address: String, val location: GeoLocation)
 
 @Serializable
 data class UpdateClubContactsInput(val phone: String, val email: Email)

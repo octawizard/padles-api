@@ -14,6 +14,7 @@ import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.server.AuthorizationException
 import com.octawizard.server.input.ClubSearchCriteria
 import com.octawizard.server.input.CreateClubInput
+import com.octawizard.server.input.UpdateClubAddressInput
 import com.octawizard.server.input.UpdateClubNameInput
 import io.ktor.application.*
 import io.ktor.auth.*
@@ -508,17 +509,159 @@ class ClubRoutesTest {
 
         @Test
         fun `Server should handle PUT club - update name`() {
+            val clubController = mockk<ClubController>(relaxed = true)
+            val club = getClub(UUID.randomUUID())
+            val clubName = "new club name"
+            val updatedClub = club.copy(name = clubName)
+
+            // 200 - Ok
+            coEvery { clubController.updateClubName(club, clubName) } returns updatedClub
+            coEvery { clubController.getClub(club.id) } returns club
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/name",
+                    club.id.toString(),
+                    body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
+                )) {
+                    assertEquals(HttpStatusCode.OK, response.status())
+                    assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
+                }
+            }
+
+            // 400 - Bad Request
+            coEvery { clubController.updateClubName(club, clubName) } returns updatedClub
+            coEvery { clubController.getClub(club.id) } returns club
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/name",
+                    club.id.toString(),
+                    body = """{ "wrong" : "body" }""",
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                }
+            }
+
+            // 404 - Not Found - club not found
+            coEvery { clubController.getClub(club.id) } returns null
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/name",
+                    club.id.toString(),
+                    body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
+                )) {
+                    assertEquals(HttpStatusCode.NotFound, response.status())
+                }
+            }
 
         }
 
         @Test
         fun `Server should handle PUT club - update name - unauthorized`() {
+            val clubController = mockk<ClubController>(relaxed = true)
+            val club = getClub(UUID.randomUUID())
+            val clubName = "new club name"
+            // 403
+            coEvery { clubController.updateClubName(club, clubName) } returns club
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/name",
+                    UUID.randomUUID().toString(),
+                    body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
+                )) {
+                    assertEquals(HttpStatusCode.Forbidden, response.status())
+                }
+            }
 
         }
 
         @Test
         fun `Server should handle PUT club - update name - unauthenticated`() {
+            // 401
+            withTestApplication({ testableModule(mockk(relaxed = true)) }) {
+                with(handleRequest(HttpMethod.Put, "/club/${UUID.randomUUID()}/name")) {
+                    assertEquals(HttpStatusCode.Unauthorized, response.status())
+                }
+            }
+        }
+    }
 
+    @Nested
+    inner class UpdateClubAddressRoute {
+
+        @Test
+        fun `Server should handle PUT club - update address`() {
+            val clubController = mockk<ClubController>(relaxed = true)
+            val club = getClub(UUID.randomUUID())
+            val address = "new club address"
+            val location = GeoLocation(30.0, 30.0)
+            val updatedClub = club.copy(address = address, geoLocation = location)
+
+            // 200 - Ok
+            coEvery { clubController.updateClubAddress(club, address, location) } returns updatedClub
+            coEvery { clubController.getClub(club.id) } returns club
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/address",
+                    club.id.toString(),
+                    body = JsonSerde.encodeToString(UpdateClubAddressInput(address, location)),
+                )) {
+                    assertEquals(HttpStatusCode.OK, response.status())
+                    assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
+                }
+            }
+
+            // 400 - Bad Request
+            coEvery { clubController.updateClubAddress(club, address, location) } returns updatedClub
+            coEvery { clubController.getClub(club.id) } returns club
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/address",
+                    club.id.toString(),
+                    body = """{ "wrong" : "body" }""",
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                }
+            }
+
+            // 404 - Not Found - club not found
+            coEvery { clubController.getClub(club.id) } returns null
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/address",
+                    club.id.toString(),
+                    body = JsonSerde.encodeToString(UpdateClubAddressInput(address, location)),
+                )) {
+                    assertEquals(HttpStatusCode.NotFound, response.status())
+                }
+            }
+
+        }
+
+        @Test
+        fun `Server should handle PUT club - update address - unauthorized`() {
+            val clubController = mockk<ClubController>(relaxed = true)
+            val club = getClub(UUID.randomUUID())
+            // 403
+            withTestApplication({ testableModule(clubController) }) {
+                with(handleRequestWithJWT(HttpMethod.Put,
+                    "/club/${club.id}/address",
+                    UUID.randomUUID().toString(),
+                    body = JsonSerde.encodeToString(UpdateClubAddressInput(club.address, club.geoLocation)),
+                )) {
+                    assertEquals(HttpStatusCode.Forbidden, response.status())
+                }
+            }
+
+        }
+
+        @Test
+        fun `Server should handle PUT club - update address - unauthenticated`() {
+            // 401
+            withTestApplication({ testableModule(mockk(relaxed = true)) }) {
+                with(handleRequest(HttpMethod.Put, "/club/${UUID.randomUUID()}/address")) {
+                    assertEquals(HttpStatusCode.Unauthorized, response.status())
+                }
+            }
         }
     }
 
