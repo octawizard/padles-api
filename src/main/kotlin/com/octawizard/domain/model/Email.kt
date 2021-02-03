@@ -6,9 +6,7 @@ import kotlinx.serialization.Serializable
 class Email(val value: String) {
 
     init {
-        check(value.isValidEmail()) {
-            "not a valid email: $value"
-        }
+        check(value.isValidEmail()) { "not a valid email: $value" }
     }
 
     override fun equals(other: Any?): Boolean {

@@ -44,7 +44,7 @@ import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
-fun Application.testableModule(clubController: ClubController) {
+private fun Application.testableModule(clubController: ClubController) {
     testableModuleWithDependencies(clubController)
 }
 
