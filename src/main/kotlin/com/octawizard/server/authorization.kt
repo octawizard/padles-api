@@ -1,6 +1,7 @@
 package com.octawizard.server
 
 import com.octawizard.domain.model.Email
+import com.octawizard.server.route.UserEmailParam
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -59,8 +60,8 @@ class AuthorizedRouteSelector(private val entity: String) : RouteSelector(RouteS
     override fun toString(): String = "(authorize by ${entity})"
 }
 
-fun Route.authorizeWithUserEmailInPath(pathParameter: String, build: Route.() -> Unit) =
-    authorizedRoute(pathParameter, build)
+fun Route.authorizeWithUserEmailInPath(build: Route.() -> Unit) =
+    authorizedRoute(UserEmailParam, build)
 
 private fun Route.authorizedRoute(pathParameter: String, build: Route.() -> Unit): Route {
     val authorizedRoute = createChild(AuthorizedRouteSelector(pathParameter))

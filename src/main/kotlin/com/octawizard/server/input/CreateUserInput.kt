@@ -3,7 +3,9 @@ package com.octawizard.server.input
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.Gender
 import com.octawizard.domain.model.User
+import kotlinx.serialization.Serializable
 
+@Serializable
 data class CreateUserInput(val email: Email, val name: String, val gender: Gender?, val phone: String?) {
     fun toUser(): User {
         return if (gender == null) {
