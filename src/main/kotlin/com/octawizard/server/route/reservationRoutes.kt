@@ -4,6 +4,7 @@ import com.octawizard.controller.reservation.ReservationController
 import com.octawizard.domain.model.MatchResult
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
+import com.octawizard.domain.model.isValidUUID
 import com.octawizard.server.AuthorizationException
 import com.octawizard.server.UserBasedAuthenticationConfig
 import com.octawizard.server.input.PatchMatchInput
@@ -21,7 +22,7 @@ import io.ktor.util.pipeline.*
 import java.util.*
 
 @Location("/reservation/{reservationId}")
-data class ReservationRoute(val reservationId: UUID)
+data class ReservationRoute(val reservationId: String)
 
 @Location("/reservation/{reservationId}/match")
 data class MatchRoute(val reservationId: UUID)
@@ -32,8 +33,9 @@ fun Routing.reservationRoutes(reservationController: ReservationController) {
 
         // get reservation
         get<ReservationRoute> { reservationRoute ->
-            val reservation = reservationController.getReservation(reservationRoute.reservationId)
-                ?: reservationNotFound(reservationRoute.reservationId)
+            check(reservationRoute.reservationId.isValidUUID()) { "not a valid reservation id" }
+            val reservationId = UUID.fromString(reservationRoute.reservationId)
+            val reservation = reservationController.getReservation(reservationId) ?: reservationNotFound(reservationId)
             call.respond(HttpStatusCode.OK, reservation)
         }
 
@@ -68,8 +70,10 @@ fun Routing.reservationRoutes(reservationController: ReservationController) {
 
         // cancel reservation
         delete<ReservationRoute> { reservationRoute ->
-            val reservation: Reservation = reservationController.getReservation(reservationRoute.reservationId)
-                ?: reservationNotFound(reservationRoute.reservationId)
+            check(reservationRoute.reservationId.isValidUUID()) { "not a valid reservation id" }
+            val reservationId = UUID.fromString(reservationRoute.reservationId)
+            val reservation: Reservation = reservationController.getReservation(reservationId)
+                ?: reservationNotFound(reservationId)
             authorizeReservationOwnerOnly(reservation)
             val canceledReservation = reservationController.cancelReservation(reservation)
             call.respond(HttpStatusCode.OK, canceledReservation)
