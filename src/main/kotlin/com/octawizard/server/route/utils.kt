@@ -29,3 +29,13 @@ private fun String.toLocalDateOrNull(dateTimeFormatter: DateTimeFormatter): Loca
         return null
     }
 }
+
+object QueryParams {
+    const val CRITERIA = "criteria"
+    const val NAME = "name"
+    const val LONGITUDE = "lon"
+    const val LATITUDE = "lat"
+    const val RADIUS = "rad"
+    const val RADIUS_UNIT = "radUnit"
+    const val DAY = "day"
+}

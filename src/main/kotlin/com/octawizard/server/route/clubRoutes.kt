@@ -60,16 +60,6 @@ data class ClubRoute(private val clubIdString: String) {
     data class Availability(val parent: ClubRoute)
 }
 
-object QueryParams {
-    const val CRITERIA = "criteria"
-    const val NAME = "name"
-    const val LONGITUDE = "lon"
-    const val LATITUDE = "lat"
-    const val RADIUS = "rad"
-    const val RADIUS_UNIT = "radUnit"
-    const val DAY = "day"
-}
-
 fun Routing.clubRoutes(controller: ClubController) {
     authenticate("club-based") {
 

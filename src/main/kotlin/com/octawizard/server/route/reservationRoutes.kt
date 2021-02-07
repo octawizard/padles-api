@@ -9,6 +9,10 @@ import com.octawizard.server.AuthorizationException
 import com.octawizard.server.UserBasedAuthenticationConfig
 import com.octawizard.server.input.PatchMatchInput
 import com.octawizard.server.input.CreateReservationInput
+import com.octawizard.server.route.QueryParams.LATITUDE
+import com.octawizard.server.route.QueryParams.LONGITUDE
+import com.octawizard.server.route.QueryParams.RADIUS
+import com.octawizard.server.route.QueryParams.RADIUS_UNIT
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -41,15 +45,15 @@ fun Routing.reservationRoutes(reservationController: ReservationController) {
 
         // get nearest available reservation
         get("/reservations") {
-            val longitude = call.request.queryParameters["lon"]?.toDoubleOrNull()
-            val latitude = call.request.queryParameters["lat"]?.toDoubleOrNull()
-            val radius = call.request.queryParameters["rad"]?.toDoubleOrNull()
-            val radiusUnit = call.request.queryParameters["radUnit"]?.let { RadiusUnit.valueOf(it) }
+            val longitude = call.request.queryParameters[LONGITUDE]?.toDoubleOrNull()
+            val latitude = call.request.queryParameters[LATITUDE]?.toDoubleOrNull()
+            val radius = call.request.queryParameters[RADIUS]?.toDoubleOrNull()
+            val radiusUnit = call.request.queryParameters[RADIUS_UNIT]?.let { RadiusUnit.valueOf(it) }
                 ?: RadiusUnit.Kilometers
 
-            checkNotNull(longitude)
-            checkNotNull(latitude)
-            checkNotNull(radius)
+            checkNotNull(longitude) { "longitude cannot be null" }
+            checkNotNull(latitude) { "latitude cannot be null" }
+            checkNotNull(radius) { "radius cannot be null" }
 
             val reservations = reservationController.getNearestAvailableReservations(
                 longitude, latitude, radius, radiusUnit

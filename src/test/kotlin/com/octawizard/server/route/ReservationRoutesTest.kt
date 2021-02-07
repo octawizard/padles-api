@@ -9,6 +9,7 @@ import com.octawizard.domain.model.Match
 import com.octawizard.domain.model.MatchResult
 import com.octawizard.domain.model.MatchSet
 import com.octawizard.domain.model.PaymentStatus
+import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
 import com.octawizard.domain.model.ReservationStatus
 import com.octawizard.domain.model.User
@@ -152,4 +153,106 @@ class ReservationRoutesTest {
 
     }
 
+    @Nested
+    inner class GetNearestAvailableReservationsRouteTest {
+        @Test
+        fun `Server should handle GET reservations`() {
+            val reservationController = mockk<ReservationController>(relaxed = true)
+            val reservationId = UUID.randomUUID()
+            val reservation = createReservation(reservationId)
+            val reservations = listOf(reservation)
+            val lon = 20.0
+            val lat = 20.0
+            val radius = 5.0
+            val radiusUnit = RadiusUnit.Kilometers
+
+            // 200 - Ok
+            coEvery {
+                reservationController.getNearestAvailableReservations(
+                    lon,
+                    lat,
+                    radius,
+                    radiusUnit,
+                )
+            } returns reservations
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequestWithJWT(
+                    HttpMethod.Get,
+                    "/reservations",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.LONGITUDE to lon.toString(),
+                        QueryParams.LATITUDE to lat.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                        QueryParams.RADIUS_UNIT to radiusUnit.name,
+                    ),
+                )) {
+                    assertEquals(HttpStatusCode.OK, response.status())
+                    assertEquals(JsonSerde.encodeToString(reservations), response.content)
+                }
+            }
+
+            // 400 - bad request - null longitude
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequestWithJWT(
+                    HttpMethod.Get,
+                    "/reservations",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.LATITUDE to lat.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                        QueryParams.RADIUS_UNIT to radiusUnit.name,
+                    ),
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                    assertEquals( "longitude cannot be null", response.content)
+                }
+            }
+
+            // 400 - bad request - null latitude
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequestWithJWT(
+                    HttpMethod.Get,
+                    "/reservations",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.LONGITUDE to lon.toString(),
+                        QueryParams.RADIUS to radius.toString(),
+                        QueryParams.RADIUS_UNIT to radiusUnit.name,
+                    ),
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                    assertEquals( "latitude cannot be null", response.content)
+                }
+            }
+
+            // 400 - bad request - null radius
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequestWithJWT(
+                    HttpMethod.Get,
+                    "/reservations",
+                    UUID.randomUUID().toString(),
+                    queryParams = mapOf(
+                        QueryParams.LONGITUDE to lon.toString(),
+                        QueryParams.LATITUDE to lat.toString(),
+                        QueryParams.RADIUS_UNIT to radiusUnit.name,
+                    ),
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                    assertEquals( "radius cannot be null", response.content)
+                }
+            }
+        }
+
+        @Test
+        fun `Server should handle GET reservations - unauthenticated`() {
+            val reservationController = mockk<ReservationController>(relaxed = true)
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequest(HttpMethod.Get, "/reservations")) {
+                    assertEquals(HttpStatusCode.Unauthorized, response.status())
+                }
+            }
+        }
+
+    }
 }
