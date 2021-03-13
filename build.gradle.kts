@@ -1,7 +1,7 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-    kotlin("jvm") version "1.4.30"
+    kotlin("jvm") version "1.4.31"
     kotlin("plugin.serialization") version "1.4.30"
     application
     jacoco
@@ -34,7 +34,7 @@ dependencies {
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
     testRuntimeOnly("com.h2database:h2:1.4.200")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.1")
 
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-html-builder:$ktorVersion")
