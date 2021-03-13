@@ -15,6 +15,7 @@ import com.octawizard.domain.model.ReservationStatus
 import com.octawizard.domain.model.User
 import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.server.AuthorizationException
+import com.octawizard.server.input.CreateReservationInput
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -205,7 +206,7 @@ class ReservationRoutesTest {
                     ),
                 )) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
-                    assertEquals( "longitude cannot be null", response.content)
+                    assertEquals("longitude cannot be null", response.content)
                 }
             }
 
@@ -222,7 +223,7 @@ class ReservationRoutesTest {
                     ),
                 )) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
-                    assertEquals( "latitude cannot be null", response.content)
+                    assertEquals("latitude cannot be null", response.content)
                 }
             }
 
@@ -239,7 +240,7 @@ class ReservationRoutesTest {
                     ),
                 )) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
-                    assertEquals( "radius cannot be null", response.content)
+                    assertEquals("radius cannot be null", response.content)
                 }
             }
         }
@@ -253,6 +254,81 @@ class ReservationRoutesTest {
                 }
             }
         }
-
     }
+
+    @Nested
+    inner class CreateReservationRouteTest {
+        @Test
+        fun `Server should handle POST reservation`() {
+            val reservationController = mockk<ReservationController>(relaxed = true)
+            val reservationId = UUID.randomUUID()
+            val reservation = createReservation(reservationId)
+            val input = CreateReservationInput(
+                reservation.reservedBy.email,
+                reservation.clubReservationInfo.clubId,
+                reservation.clubReservationInfo.field.id,
+                LocalDateTime.now(),
+                LocalDateTime.now(),
+                null,
+                null,
+                null,
+            )
+
+            // 200 - Ok
+            coEvery {
+                reservationController.createReservation(
+                    input.reservedBy,
+                    input.clubId,
+                    input.fieldId,
+                    input.startTime,
+                    input.endTime,
+                    input.matchEmailPlayer2,
+                    input.matchEmailPlayer3,
+                    input.matchEmailPlayer4,
+                )
+            } returns reservation
+
+            // 201 created
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequestWithJWT(
+                    HttpMethod.Post,
+                    "/reservation",
+                    UUID.randomUUID().toString(),
+                    body = JsonSerde.encodeToString(input),
+                )) {
+                    assertEquals(HttpStatusCode.Created, response.status())
+                    assertEquals(JsonSerde.encodeToString(reservation), response.content)
+                }
+            }
+
+            // 400 bad request
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequestWithJWT(
+                    HttpMethod.Post,
+                    "/reservation",
+                    UUID.randomUUID().toString(),
+                    body = """{"wrong": "request"}""",
+                )) {
+                    assertEquals(HttpStatusCode.BadRequest, response.status())
+                }
+            }
+        }
+
+        @Test
+        fun `Server should handle POST reservation - unauthenticated`() {
+            val reservationController = mockk<ReservationController>(relaxed = true)
+            withTestApplication({ testableModule(reservationController) }) {
+                with(handleRequest(HttpMethod.Post, "/reservation")) {
+                    assertEquals(HttpStatusCode.Unauthorized, response.status())
+                }
+            }
+        }
+    }
+
+
+    //todo cancel reservation
+
+    // todo update match result
+
+    //todo join/leave match result
 }
