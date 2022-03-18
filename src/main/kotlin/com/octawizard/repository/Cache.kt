@@ -1,6 +1,7 @@
 package com.octawizard.repository
 
 import org.redisson.Redisson
+import org.redisson.api.RMapCache
 import org.redisson.api.RedissonClient
 import org.redisson.config.Config
 import java.time.Duration
@@ -15,9 +16,14 @@ interface Cache<K, V> {
     fun delete(k: K)
 }
 
-class RedisCache<K, V>(redissonClient: RedissonClient, mapName: String, private val ttl: Duration) : Cache<K, V> {
+class RedisCache<K, V>(private val redisMap: RMapCache<K,V>, private val ttl: Duration) : Cache<K, V> {
 
-    private val redisMap = redissonClient.getMapCache<K, V>(mapName)
+    companion object Factory {
+        fun <K,V> create(redissonClient: RedissonClient, mapName: String, ttl: Duration): RedisCache<K,V> {
+            val redisMap = redissonClient.getMapCache<K, V>(mapName)
+            return RedisCache<K,V>(redisMap, ttl)
+        }
+    }
 
     override fun get(k: K): V? = redisMap[k]
 
