@@ -1,4 +1,4 @@
-# Padles API [![CircleCI](https://circleci.com/gh/octawizard/padles-api/tree/master.svg?style=svg)](https://circleci.com/gh/octawizard/padles-api/tree/master)(https://travis-ci.org/octawizard/padles-api) [![codecov](https://codecov.io/gh/octawizard/padles-api/branch/master/graph/badge.svg)](https://codecov.io/gh/octawizard/padles-api)
+# Padles API [![CircleCI](https://circleci.com/gh/octawizard/padles-api/tree/master.svg?style=shield)](https://circleci.com/gh/octawizard/padles-api/tree/master)(https://travis-ci.org/octawizard/padles-api) [![codecov](https://codecov.io/gh/octawizard/padles-api/branch/master/graph/badge.svg)](https://codecov.io/gh/octawizard/padles-api)
 
 This is a Kotlin project that exposes a REST API for Padel match reservations.
 
