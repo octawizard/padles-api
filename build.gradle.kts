@@ -21,7 +21,7 @@ repositories {
     }
 }
 
-val ktorVersion = "1.5.1"
+val ktorVersion = "1.5.2"
 val exposedVersion = "0.28.1"
 val kmongoVersion = "4.2.4"
 
