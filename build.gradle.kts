@@ -40,7 +40,7 @@ dependencies {
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-locations:$ktorVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     // Dependency Injection
     implementation("org.kodein.di:kodein-di-jvm:7.11.0")
 
