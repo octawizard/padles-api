@@ -40,9 +40,9 @@ dependencies {
     implementation("io.ktor:ktor-auth-jwt:$ktorVersion")
     implementation("io.ktor:ktor-locations:$ktorVersion")
 
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.3.2")
     // Dependency Injection
-    implementation("org.kodein.di:kodein-di-jvm:7.3.1")
+    implementation("org.kodein.di:kodein-di-jvm:7.11.0")
 
     // orm
     implementation("org.jetbrains.exposed", "exposed-core", exposedVersion)
@@ -51,7 +51,7 @@ dependencies {
     implementation("org.jetbrains.exposed", "exposed-java-time", exposedVersion)
 
     // driver and connection pool
-    implementation("org.postgresql:postgresql:42.2.18")
+    implementation("org.postgresql:postgresql:42.3.3")
     implementation("com.zaxxer:HikariCP:4.0.3")
 
     // configuration
