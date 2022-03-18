@@ -50,31 +50,7 @@ val repositoryModule = DI.Module("repository") {
     }
     bind<UserRepository>(tag = database) with singleton { DatabaseUserRepository() }
     bind<UserRepository>() with singleton { CacheUserRepository(instance(userCache), instance(database)) }
-    bind<RedissonClient>() with singleton {
-        val config = instance<RedisRepositoryConfiguration>()
-        val address = "${config.protocol}://${config.host}:${config.port}"
-        RedissonClientFactory.create(address, config.timeout)
-    }
 
-    bind<DataSource>() with singleton {
-        val config = HikariConfig().apply {
-            jdbcUrl = instance<DatabaseConfiguration>().jdbcUrl
-            driverClassName = instance<DatabaseConfiguration>().dbDriverClassName
-            username = instance<DatabaseConfiguration>().dbUsername
-            password = instance<DatabaseConfiguration>().dbPassword
-            maximumPoolSize = instance<DatabaseConfiguration>().dbMaximumPoolSize
-        }
-        HikariDataSource(config)
-    }
-    bind<DatabaseProvider>() with eagerSingleton { DatabaseProvider(instance()) }
-
-    bind<MongoClient>() with eagerSingleton {
-        val settings = MongoClientSettings.builder()
-            .uuidRepresentation(UuidRepresentation.STANDARD)
-            .applyConnectionString(ConnectionString(instance<MongoRepositoryConfiguration>().connectionString))
-            .build()
-        KMongo.createClient(settings)
-    }
     bind<MongoDatabase>() with eagerSingleton {
         instance<MongoClient>().getDatabase(instance<MongoRepositoryConfiguration>().database)
     }
@@ -125,4 +101,33 @@ internal object Tags {
     const val reservationsCollection = "reservationsCollection"
     const val userCache = "userCache"
     const val database = "database"
+}
+
+val dataSourcesModule = DI.Module("data-sources") {
+    bind<RedissonClient>() with singleton {
+        val config = instance<RedisRepositoryConfiguration>()
+        val address = "${config.protocol}://${config.host}:${config.port}"
+        RedissonClientFactory.create(address, config.timeout)
+    }
+
+    bind<DataSource>() with singleton {
+        val config = HikariConfig().apply {
+            jdbcUrl = instance<DatabaseConfiguration>().jdbcUrl
+            driverClassName = instance<DatabaseConfiguration>().dbDriverClassName
+            username = instance<DatabaseConfiguration>().dbUsername
+            password = instance<DatabaseConfiguration>().dbPassword
+            maximumPoolSize = instance<DatabaseConfiguration>().dbMaximumPoolSize
+        }
+        HikariDataSource(config)
+    }
+
+    bind<DatabaseProvider>() with eagerSingleton { DatabaseProvider(instance()) }
+
+    bind<MongoClient>() with eagerSingleton {
+        val settings = MongoClientSettings.builder()
+            .uuidRepresentation(UuidRepresentation.STANDARD)
+            .applyConnectionString(ConnectionString(instance<MongoRepositoryConfiguration>().connectionString))
+            .build()
+        KMongo.createClient(settings)
+    }
 }

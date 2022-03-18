@@ -5,6 +5,7 @@ import com.octawizard.controller.controllerModule
 import com.octawizard.controller.reservation.ReservationController
 import com.octawizard.controller.user.UserController
 import com.octawizard.domain.usecase.useCaseModule
+import com.octawizard.repository.dataSourcesModule
 import com.octawizard.repository.repositoryConfigurationModule
 import com.octawizard.repository.repositoryModule
 import com.octawizard.server.route.clubRoutes
@@ -37,6 +38,7 @@ fun main() {
         import(useCaseModule)
         import(repositoryConfigurationModule)
         import(repositoryModule)
+        import(dataSourcesModule)
     }
 
     val reservationController = kodein.direct.instance<ReservationController>()
