@@ -57,7 +57,7 @@ dependencies {
     implementation("com.zaxxer:HikariCP:4.0.3")
 
     // configuration
-    implementation("com.typesafe:config:1.4.1")
+    implementation("com.typesafe:config:1.4.2")
 
     // logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.4")
