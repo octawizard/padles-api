@@ -1,4 +1,5 @@
 package com.octawizard.repository
+
 import com.mongodb.client.MongoClient
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.MongoDatabase
@@ -13,8 +14,8 @@ import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.reservation.model.ReservationDTO
 import com.octawizard.repository.transaction.TransactionRepository
 import com.octawizard.repository.user.UserRepository
-import org.junit.ClassRule
-import org.junit.jupiter.api.AfterAll
+import io.mockk.every
+import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,89 +24,52 @@ import org.kodein.di.bind
 import org.kodein.di.direct
 import org.kodein.di.instance
 import org.kodein.di.singleton
+import org.redisson.api.RMapCache
 import org.redisson.api.RedissonClient
-import org.testcontainers.containers.GenericContainer
 import java.time.Duration
-import javax.sql.DataSource
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ModuleTest {
 
-    private val databaseConfig: DatabaseConfiguration
-    private val redisConfig: RedisRepositoryConfiguration
-    private val mongoConfig: MongoRepositoryConfiguration
+    private val databaseConfig = DatabaseConfiguration(
+        "jdbc:postgresql://localhost:6543/$db",
+        "org.postgresql.Driver",
+        dbUser,
+        dbPassword,
+        4
+    )
+    private val redisConfig: RedisRepositoryConfiguration = RedisRepositoryConfiguration(
+        "redis", "host", 1234, Duration.ofMillis(500), Duration.ofSeconds(1), "users"
+    )
+    private val mongoConfig = MongoRepositoryConfiguration(
+        "localhost",
+        1111,
+        "test",
+        "clubs",
+        "reservations",
+    )
 
     companion object {
-        val db = "test-db"
-        val dbUser= "test_user"
-        val dbPassword = "test_password"
-
-        @get:ClassRule
-        @JvmStatic
-        val redis: GenericContainer<Nothing> = object : GenericContainer<Nothing>("redis:6.0.8-alpine") {
-            init {
-                withExposedPorts(6379)
-            }
-        }
-
-        @get:ClassRule
-        @JvmStatic
-        val mongo: GenericContainer<Nothing> = object : GenericContainer<Nothing>("mongo") {
-            init {
-                withExposedPorts(27017)
-            }
-        }
-
-        @get:ClassRule
-        @JvmStatic
-        val postgres: GenericContainer<Nothing> = object : GenericContainer<Nothing>("postgres:13.0-alpine") {
-            init {
-                withExposedPorts(5432)
-                withEnv("POSTGRES_DB", db)
-                withEnv("POSTGRES_PASSWORD", dbPassword)
-                withEnv("POSTGRES_USER", dbUser)
-            }
-        }
+        const val db = "test-db"
+        const val dbUser = "test_user"
+        const val dbPassword = "test_password"
     }
 
-    init {
-        redis.start()
-        val host = redis.host
-        val port = redis.firstMappedPort
-        redisConfig = RedisRepositoryConfiguration(
-            "redis", host, port, Duration.ofMillis(500), Duration.ofSeconds(1), "users"
-        )
-
-        postgres.start()
-        databaseConfig = DatabaseConfiguration(
-            "jdbc:postgresql://localhost:${postgres.firstMappedPort}/$db",
-            "org.postgresql.Driver",
-            dbUser,
-            dbPassword,
-            4
-        )
-
-        mongo.start()
-        mongoConfig = MongoRepositoryConfiguration(
-            "localhost",
-            mongo.firstMappedPort,
-            "test",
-            "clubs",
-            "reservations",
-        )
-    }
-
-    @AfterAll
-    fun `shutdown Redis`() {
-        redis.stop()
-    }
 
     @Test
     fun `RepositoryModule should inject dependencies for repositories`() {
+        val redissonClient = mockk<RedissonClient>()
+        every { redissonClient.getMapCache<String, User>(any()) } returns mockk<RMapCache<String, User>>()
+        val mongoClient = mockk<MongoClient>()
+        val mongoDB = mockk<MongoDatabase>(relaxed = true)
+        every { mongoClient.getDatabase(any()) } returns mongoDB
+
         val kodein = DI {
             bind<DatabaseConfiguration>() with singleton { databaseConfig }
             bind<RedisRepositoryConfiguration>() with singleton { redisConfig }
             bind<MongoRepositoryConfiguration>() with singleton { mongoConfig }
+            bind<RedissonClient>() with singleton { redissonClient }
+            bind<MongoClient>() with singleton { mongoClient }
             import(repositoryModule)
         }
 
@@ -113,8 +77,6 @@ class ModuleTest {
         assertNotNull(kodein.direct.instance<RedissonClient>())
         assertNotNull(kodein.direct.instance<UserRepository>(tag = database))
         assertNotNull(kodein.direct.instance<UserRepository>())
-        assertNotNull(kodein.direct.instance<DatabaseProvider>())
-        assertNotNull(kodein.direct.instance<DataSource>())
         assertNotNull(kodein.direct.instance<MongoClient>())
         assertNotNull(kodein.direct.instance<MongoDatabase>())
         assertNotNull(kodein.direct.instance<MongoSessionProvider>())
