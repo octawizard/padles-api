@@ -46,7 +46,7 @@ import javax.sql.DataSource
 val repositoryModule = DI.Module("repository") {
     bind<RedisCache<String, User>>(tag = userCache) with singleton {
         val config = instance<RedisRepositoryConfiguration>()
-        RedisCache(instance(), config.userCacheName, config.userCacheTtl)
+        RedisCache.create(instance(), config.userCacheName, config.userCacheTtl)
     }
     bind<UserRepository>(tag = database) with singleton { DatabaseUserRepository() }
     bind<UserRepository>() with singleton { CacheUserRepository(instance(userCache), instance(database)) }
