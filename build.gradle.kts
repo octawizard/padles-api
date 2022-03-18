@@ -27,8 +27,6 @@ val kmongoVersion = "4.2.4"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
-    testImplementation("org.testcontainers:testcontainers:1.15.1")
-    testImplementation("org.testcontainers:junit-jupiter:1.16.3")
     testImplementation("io.mockk:mockk:1.10.5")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
@@ -53,11 +51,11 @@ dependencies {
     implementation("org.jetbrains.exposed", "exposed-java-time", exposedVersion)
 
     // driver and connection pool
-    implementation("org.postgresql:postgresql:42.2.18")
+    implementation("org.postgresql:postgresql:42.3.3")
     implementation("com.zaxxer:HikariCP:4.0.3")
 
     // configuration
-    implementation("com.typesafe:config:1.4.1")
+    implementation("com.typesafe:config:1.4.2")
 
     // logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.0.4")
