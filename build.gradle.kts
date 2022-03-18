@@ -27,7 +27,7 @@ val kmongoVersion = "4.2.4"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
-    testImplementation("io.mockk:mockk:1.10.5")
+    testImplementation("io.mockk:mockk:1.12.3")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
