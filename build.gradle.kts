@@ -42,7 +42,7 @@ dependencies {
 
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.0.1")
     // Dependency Injection
-    implementation("org.kodein.di:kodein-di-jvm:7.3.1")
+    implementation("org.kodein.di:kodein-di-jvm:7.11.0")
 
     // orm
     implementation("org.jetbrains.exposed", "exposed-core", exposedVersion)
