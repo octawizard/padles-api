@@ -11,10 +11,10 @@ import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.http.*
 import io.ktor.locations.*
+import io.ktor.locations.put
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
-import io.ktor.routing.put
 
 const val UserEmailParam = "userEmail"
 
