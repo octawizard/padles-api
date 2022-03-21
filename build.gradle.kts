@@ -22,17 +22,20 @@ repositories {
 }
 
 val ktorVersion = "1.5.2"
-val exposedVersion = "0.28.1"
+val exposedVersion = "0.37.3"
 val kmongoVersion = "4.2.4"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
+    implementation(kotlin("stdlib-jdk8"))
+
     testImplementation("io.mockk:mockk:1.12.3")
     testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
     testRuntimeOnly("com.h2database:h2:2.1.210")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
+    testImplementation("org.junit.vintage:junit-vintage-engine:5.8.2")
 
     implementation("io.ktor:ktor-server-netty:$ktorVersion")
     implementation("io.ktor:ktor-html-builder:$ktorVersion")
@@ -68,8 +71,6 @@ dependencies {
     // kmongo
     implementation("org.litote.kmongo:kmongo-id:$kmongoVersion")
     implementation("org.litote.kmongo:kmongo-native:$kmongoVersion")
-    implementation(kotlin("stdlib-jdk8"))
-
 }
 
 tasks.test {
