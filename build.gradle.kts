@@ -23,7 +23,7 @@ repositories {
 
 val ktorVersion = "1.6.8"
 val exposedVersion = "0.37.3"
-val kmongoVersion = "4.2.4"
+val kmongoVersion = "4.5.0"
 
 dependencies {
     testImplementation(kotlin("test-junit5"))
