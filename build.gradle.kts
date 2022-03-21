@@ -55,18 +55,18 @@ dependencies {
 
     // driver and connection pool
     implementation("org.postgresql:postgresql:42.3.3")
-    implementation("com.zaxxer:HikariCP:4.0.3")
+    implementation("com.zaxxer:HikariCP:5.0.1")
 
     // configuration
     implementation("com.typesafe:config:1.4.2")
 
     // logging
-    implementation("io.github.microutils:kotlin-logging-jvm:2.0.4")
+    implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     implementation("org.apache.logging.log4j:log4j-core:2.17.2")
     implementation("org.slf4j:slf4j-log4j12:1.7.30")
 
     // redis
-    implementation("org.redisson:redisson:3.16.8")
+    implementation("org.redisson:redisson:3.17.0")
 
     // kmongo
     implementation("org.litote.kmongo:kmongo-id:$kmongoVersion")
