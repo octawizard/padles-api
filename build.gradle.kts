@@ -55,7 +55,7 @@ dependencies {
 
     // driver and connection pool
     implementation("org.postgresql:postgresql:42.3.3")
-    implementation("com.zaxxer:HikariCP:4.0.3")
+    implementation("com.zaxxer:HikariCP:5.0.1")
 
     // configuration
     implementation("com.typesafe:config:1.4.2")
