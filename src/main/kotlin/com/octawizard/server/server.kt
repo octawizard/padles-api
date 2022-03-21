@@ -31,6 +31,7 @@ import org.kodein.di.instance
 
 private val logger = KotlinLogging.logger {}
 
+@KtorExperimentalLocationsAPI
 fun main() {
     logger.info { "Starting padles-api" }
     val kodein = DI {
