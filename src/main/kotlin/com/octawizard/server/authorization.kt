@@ -54,7 +54,7 @@ class UserEmailBasedAuthorization {
     }
 }
 
-class AuthorizedRouteSelector(private val entity: String) : RouteSelector(RouteSelectorEvaluation.qualityConstant) {
+class AuthorizedRouteSelector(private val entity: String) : RouteSelector() {
     override fun evaluate(context: RoutingResolveContext, segmentIndex: Int) = RouteSelectorEvaluation.Constant
 
     override fun toString(): String = "(authorize by ${entity})"
