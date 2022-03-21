@@ -28,10 +28,13 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.routing.post
+import io.ktor.routing.put
 import io.ktor.util.pipeline.*
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+@KtorExperimentalLocationsAPI
 @Location("/club/{clubIdString}")
 data class ClubRoute(private val clubIdString: String) {
     val clubId: UUID = UUID.fromString(clubIdString)
@@ -70,6 +73,7 @@ object QueryParams {
     const val DAY = "day"
 }
 
+@KtorExperimentalLocationsAPI
 fun Routing.clubRoutes(controller: ClubController) {
     authenticate("club-based") {
 

@@ -14,9 +14,11 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.routing.put
 
 const val UserEmailParam = "userEmail"
 
+@KtorExperimentalLocationsAPI
 fun Routing.userRoutes(controller: UserController) {
 
     @Location("/user/{$UserEmailParam}")
