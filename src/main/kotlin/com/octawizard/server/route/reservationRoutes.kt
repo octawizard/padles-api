@@ -6,8 +6,8 @@ import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
 import com.octawizard.server.AuthorizationException
 import com.octawizard.server.UserBasedAuthenticationConfig
-import com.octawizard.server.input.PatchMatchInput
 import com.octawizard.server.input.CreateReservationInput
+import com.octawizard.server.input.PatchMatchInput
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
@@ -17,15 +17,20 @@ import io.ktor.locations.*
 import io.ktor.request.*
 import io.ktor.response.*
 import io.ktor.routing.*
+import io.ktor.routing.patch
+import io.ktor.routing.put
 import io.ktor.util.pipeline.*
 import java.util.*
 
+@KtorExperimentalLocationsAPI
 @Location("/reservation/{reservationId}")
 data class ReservationRoute(val reservationId: UUID)
 
+@KtorExperimentalLocationsAPI
 @Location("/reservation/{reservationId}/match")
 data class MatchRoute(val reservationId: UUID)
 
+@KtorExperimentalLocationsAPI
 fun Routing.reservationRoutes(reservationController: ReservationController) {
 
     authenticate(UserBasedAuthenticationConfig) {
