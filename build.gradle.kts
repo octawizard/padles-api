@@ -63,7 +63,7 @@ dependencies {
     // logging
     implementation("io.github.microutils:kotlin-logging-jvm:2.1.21")
     implementation("org.apache.logging.log4j:log4j-core:2.17.2")
-    implementation("org.slf4j:slf4j-log4j12:1.7.30")
+    implementation("org.slf4j:slf4j-log4j12:1.7.36")
 
     // redis
     implementation("org.redisson:redisson:3.17.0")
