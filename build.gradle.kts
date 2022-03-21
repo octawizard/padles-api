@@ -30,7 +30,9 @@ dependencies {
     implementation(kotlin("stdlib-jdk8"))
 
     testImplementation("io.mockk:mockk:1.12.3")
-    testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion")
+    testImplementation("org.litote.kmongo:kmongo-flapdoodle:$kmongoVersion") {
+        exclude("org.jetbrains.kotlin", "kotlin-test-junit")
+    }
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
     testRuntimeOnly("com.h2database:h2:2.1.210")
