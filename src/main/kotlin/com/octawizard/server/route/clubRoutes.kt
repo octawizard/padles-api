@@ -32,6 +32,7 @@ import io.ktor.response.*
 import io.ktor.routing.get
 import io.ktor.routing.*
 import io.ktor.util.pipeline.*
+import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
 
@@ -193,11 +194,11 @@ private fun PipelineContext<Unit, ApplicationCall>.authorize(clubId: UUID) {
 private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistanceAndDayAvailability(
     controller: ClubController,
 ) {
-    val longitude = call.getDoubleQueryParam(LONGITUDE)
-    val latitude = call.getDoubleQueryParam(LATITUDE)
-    val radius = call.getDoubleQueryParam(RADIUS)
+    val longitude = call.getQueryParamOrDefault<Double>(LONGITUDE)
+    val latitude = call.getQueryParamOrDefault<Double>(LATITUDE)
+    val radius = call.getQueryParamOrDefault<Double>(RADIUS)
     val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
-    val day = call.getLocalDateQueryParam(DAY, DateTimeFormatter.ISO_LOCAL_DATE)
+    val day = call.getQueryParamOrDefault<LocalDate>(DAY, dateTimeFormatter = DateTimeFormatter.ISO_LOCAL_DATE)
 
     checkNotNull(longitude) { "query param longitude cannot be null" }
     checkNotNull(latitude) { "query param latitude cannot be null" }
@@ -211,9 +212,9 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
 private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance(
     controller: ClubController,
 ) {
-    val longitude = call.getDoubleQueryParam(LONGITUDE)
-    val latitude = call.getDoubleQueryParam(LATITUDE)
-    val radius = call.getDoubleQueryParam(RADIUS)
+    val longitude = call.getQueryParamOrDefault<Double>(LONGITUDE)
+    val latitude = call.getQueryParamOrDefault<Double>(LATITUDE)
+    val radius = call.getQueryParamOrDefault<Double>(RADIUS)
     val radiusUnit = call.getEnumQueryParamOrDefault(RADIUS_UNIT, RadiusUnit.Kilometers)
 
     checkNotNull(longitude) { "query param longitude cannot be null" }

@@ -12,6 +12,7 @@ import com.octawizard.server.route.clubRoutes
 import com.octawizard.server.route.reservationRoutes
 import com.octawizard.server.route.userRoutes
 import com.octawizard.server.serialization.contextualSerializers
+import com.typesafe.config.ConfigFactory
 import io.ktor.application.*
 import io.ktor.auth.*
 import io.ktor.features.*
@@ -46,6 +47,8 @@ fun main() {
     val userController = kodein.direct.instance<UserController>()
     val clubController = kodein.direct.instance<ClubController>()
 
+    val config = ConfigFactory.load()
+
     embeddedServer(Netty, port = 1111, host = "127.0.0.1") {
         install(ContentNegotiation) {
             json(Json {
@@ -57,7 +60,7 @@ fun main() {
         install(CallLogging)
         install(Locations)
         install(Authentication) {
-            authenticationConfig()
+            authenticationConfig(config)
         }
         install(UserEmailBasedAuthorization)
         install(StatusPages) {
