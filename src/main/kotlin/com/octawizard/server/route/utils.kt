@@ -10,19 +10,29 @@ inline fun <reified T> entityNotFound(id: Any): T {
     throw NotFoundException("${T::class.simpleName} $id not found")
 }
 
-fun ApplicationCall.getDoubleQueryParam(name: String): Double? {
-    return request.queryParameters[name]?.toDoubleOrNull()
-}
-
 inline fun <reified T : Enum<T>> ApplicationCall.getEnumQueryParamOrDefault(name: String, default: T): T {
     return request.queryParameters[name]?.let { enumValueOf<T>(it) } ?: default
 }
 
-fun ApplicationCall.getLocalDateQueryParam(name: String, dateTimeFormatter: DateTimeFormatter): LocalDate? {
-    return request.queryParameters[name]?.toLocalDateOrNull(dateTimeFormatter)
+inline fun <reified T> ApplicationCall.getQueryParamOrDefault(
+    name: String,
+    default: T? = null,
+    dateTimeFormatter: DateTimeFormatter? = null,
+): T? {
+    when (T::class.qualifiedName) {
+        Int::class.qualifiedName -> return request.queryParameters[name]?.toInt() as T? ?: default
+        Double::class.qualifiedName -> return request.queryParameters[name]?.toDouble() as T? ?: default
+        Long::class.qualifiedName -> return request.queryParameters[name]?.toLong() as T? ?: default
+        String::class.qualifiedName -> return request.queryParameters[name] as T? ?: default
+        LocalDate::class.qualifiedName -> {
+            checkNotNull(dateTimeFormatter)
+            return request.queryParameters[name]?.toLocalDateOrNull(dateTimeFormatter) as T? ?: default
+        }
+    }
+    return request.queryParameters[name] as T? ?: default
 }
 
-private fun String.toLocalDateOrNull(dateTimeFormatter: DateTimeFormatter): LocalDate? {
+fun String.toLocalDateOrNull(dateTimeFormatter: DateTimeFormatter): LocalDate? {
     return try {
         LocalDate.parse(this, dateTimeFormatter)
     } catch (e: DateTimeParseException) {

@@ -3,15 +3,14 @@ package com.octawizard.server
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.typesafe.config.ConfigFactory
+import com.typesafe.config.Config
 import io.ktor.auth.*
 import io.ktor.auth.jwt.*
 
 const val UserBasedAuthenticationConfig = "user-based"
 const val ClubBasedAuthenticationConfig = "club-based"
 
-fun Authentication.Configuration.authenticationConfig() {
-    val config = ConfigFactory.load()
+fun Authentication.Configuration.authenticationConfig(config: Config) {
     val jwtIssuer = config.getString("jwt.domain")
     val jwtAudience = config.getString("jwt.audience")
     val jwtRealm = config.getString("jwt.realm")
