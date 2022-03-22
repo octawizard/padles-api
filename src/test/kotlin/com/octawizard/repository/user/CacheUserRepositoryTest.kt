@@ -108,4 +108,18 @@ class CacheUserRepositoryTest {
         }
         assertEquals(user, createdUser)
     }
+
+    @Test
+    fun `CacheUserRepository should delete a user from repository and cache`() {
+        val user = User(Email("email@test.com"), "test")
+
+        coEvery { userRepository.createUser(user) } returns user
+
+        runBlocking { cacheUserRepository.deleteUser(user.email) }
+
+        coVerify(timeout = 50) {
+            userRepository.deleteUser(user.email)
+            cache.delete(user.email.value)
+        }
+    }
 }
