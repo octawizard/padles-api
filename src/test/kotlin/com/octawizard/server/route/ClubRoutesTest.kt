@@ -48,6 +48,7 @@ private fun Application.testableModule(clubController: ClubController) {
     testableModuleWithDependencies(clubController)
 }
 
+@KtorExperimentalLocationsAPI
 private fun Application.testableModuleWithDependencies(clubController: ClubController) {
     install(ContentNegotiation) {
         json(JsonSerde)
