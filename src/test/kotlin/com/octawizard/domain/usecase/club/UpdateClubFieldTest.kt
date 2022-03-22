@@ -8,6 +8,7 @@ import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -41,14 +42,16 @@ class UpdateClubFieldTest {
         val newWallsMaterial = WallsMaterial.Glass
 
 
-        val updatedClub = updateClubField.invoke(
-            club,
-            field.id,
-            newFieldName,
-            newIndoor,
-            newHasSand,
-            newWallsMaterial,
-        )
+        val updatedClub = runBlocking {
+            updateClubField.invoke(
+                club,
+                field.id,
+                newFieldName,
+                newIndoor,
+                newHasSand,
+                newWallsMaterial,
+            )
+        }
         val updatedField = updatedClub.fields.find { it.id == field.id }!!
         assertEquals(newFieldName, updatedField.name)
         assertEquals(newIndoor, updatedField.isIndoor)

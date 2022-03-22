@@ -2,8 +2,9 @@ package com.octawizard.domain.usecase.user
 
 import com.octawizard.domain.model.Email
 import com.octawizard.repository.user.UserRepository
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
 
@@ -16,7 +17,7 @@ class DeleteUserTest {
         val repository = mockk<UserRepository>(relaxed = true)
         val deleteUser = DeleteUser(repository)
 
-        deleteUser.invoke(email)
-        verify(exactly = 1) { repository.deleteUser(email) }
+        runBlocking { deleteUser.invoke(email) }
+        coVerify(exactly = 1) { repository.deleteUser(email) }
     }
 }

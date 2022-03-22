@@ -3,9 +3,12 @@ package com.octawizard.domain.usecase.user
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
 import com.octawizard.repository.user.UserRepository
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -20,9 +23,9 @@ class GetUserTest {
         val repository = mockk<UserRepository>(relaxed = true)
         val getUser = GetUser(repository)
 
-        every { repository.getUser(email) } returns user
+        coEvery { repository.getUser(email) } returns user
 
-        assertEquals(user, getUser.invoke(email))
-        verify(exactly = 1) { repository.getUser(email) }
+        assertEquals(user, runBlocking { getUser.invoke(email) })
+        coVerify(exactly = 1) { repository.getUser(email) }
     }
 }

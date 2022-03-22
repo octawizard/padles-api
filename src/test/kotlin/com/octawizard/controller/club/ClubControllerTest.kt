@@ -20,9 +20,9 @@ import com.octawizard.domain.usecase.club.UpdateClubContacts
 import com.octawizard.domain.usecase.club.UpdateClubField
 import com.octawizard.domain.usecase.club.UpdateClubName
 import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.coVerify
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -68,16 +68,16 @@ class ClubControllerTest {
     fun `ClubController should call GetClub to get a club`() {
         val club = mockk<Club>()
         val clubId = UUID.randomUUID()
-        every { getClub.invoke(any()) } returns club
+        coEvery { getClub.invoke(any()) } returns club
 
         assertEquals(club, runBlocking { controller.getClub(clubId) })
-        verify { getClub.invoke(clubId) }
+        coVerify { getClub.invoke(clubId) }
     }
 
     @Test
     fun `ClubController should call CreateClub to create a club`() {
         val club = mockk<Club>()
-        every { createClub.invoke(any(), any(), any(), any(), any(), any(), any()) } returns club
+        coEvery { createClub.invoke(any(), any(), any(), any(), any(), any(), any()) } returns club
         val name = ""
         val address = ""
         val location = GeoLocation(1.1, 0.5)
@@ -89,40 +89,40 @@ class ClubControllerTest {
 
         assertEquals(club,
             runBlocking { controller.createClub(name, address, location, avgPrice, contacts, fields, availability) })
-        verify { createClub.invoke(name, address, location, avgPrice, contacts, fields, availability) }
+        coVerify { createClub.invoke(name, address, location, avgPrice, contacts, fields, availability) }
     }
 
     @Test
     fun `ClubController should call GetNearestClubs to get a list of near clubs`() {
         val clubs = listOf(mockk<Club>())
-        every { getNearestClubs.invoke(any(), any(), any(), any()) } returns clubs
+        coEvery { getNearestClubs.invoke(any(), any(), any(), any()) } returns clubs
 
         assertEquals(
             clubs, runBlocking { controller.getNearestClubs(1.0, 1.0, 1.0, RadiusUnit.Miles) }
         )
-        verify { getNearestClubs.invoke(1.0, 1.0, 1.0, RadiusUnit.Miles) }
+        coVerify { getNearestClubs.invoke(1.0, 1.0, 1.0, RadiusUnit.Miles) }
     }
 
     @Test
     fun `ClubController should call GetNearestClubs to get a list of near available clubs`() {
         val clubs = listOf(mockk<Club>())
-        every { getNearestClubs.invoke(any(), any(), any(), any(), any()) } returns clubs
+        coEvery { getNearestClubs.invoke(any(), any(), any(), any(), any()) } returns clubs
 
         assertEquals(
             clubs,
             runBlocking { controller.getAvailableNearestClubs(1.0, 1.0, 1.0, RadiusUnit.Miles, LocalDate.now()) }
         )
-        verify { getNearestClubs.invoke(1.0, 1.0, 1.0, RadiusUnit.Miles, LocalDate.now()) }
+        coVerify { getNearestClubs.invoke(1.0, 1.0, 1.0, RadiusUnit.Miles, LocalDate.now()) }
     }
 
     @Test
     fun `ClubController should call UpdateClubName to update the club's name`() {
         val club = mockk<Club>()
         val name = "new name"
-        every { updateClubName.invoke(any(), any()) } returns club
+        coEvery { updateClubName.invoke(any(), any()) } returns club
 
         assertEquals(club, runBlocking { controller.updateClubName(club, name) })
-        verify { updateClubName.invoke(club, name) }
+        coVerify { updateClubName.invoke(club, name) }
     }
 
     @Test
@@ -130,30 +130,30 @@ class ClubControllerTest {
         val club = mockk<Club>()
         val address = "new name"
         val location = GeoLocation(44.1, 44.2)
-        every { updateClubAddress.invoke(any(), any(), any()) } returns club
+        coEvery { updateClubAddress.invoke(any(), any(), any()) } returns club
 
         assertEquals(club, runBlocking { controller.updateClubAddress(club, address, location) })
-        verify { updateClubAddress.invoke(club, address, location) }
+        coVerify { updateClubAddress.invoke(club, address, location) }
     }
 
     @Test
     fun `ClubController should call UpdateClubContacts to update the club's contacts`() {
         val club = mockk<Club>()
         val clubContacts = Contacts("123456", Email("club@padles.com"))
-        every { updateClubContacts.invoke(any(), any()) } returns club
+        coEvery { updateClubContacts.invoke(any(), any()) } returns club
 
         assertEquals(club, runBlocking { controller.updateClubContacts(club, clubContacts) })
-        verify { updateClubContacts.invoke(club, clubContacts) }
+        coVerify { updateClubContacts.invoke(club, clubContacts) }
     }
 
     @Test
     fun `ClubController should call UpdateClubAvgPrice to update the club's average price`() {
         val club = mockk<Club>()
         val avgPrice = BigDecimal(15)
-        every { updateClubAvgPrice.invoke(any(), any()) } returns club
+        coEvery { updateClubAvgPrice.invoke(any(), any()) } returns club
 
         assertEquals(club, runBlocking { controller.updateClubAvgPrice(club, avgPrice) })
-        verify { updateClubAvgPrice.invoke(club, avgPrice) }
+        coVerify { updateClubAvgPrice.invoke(club, avgPrice) }
     }
 
     @Test
@@ -163,10 +163,10 @@ class ClubControllerTest {
         val indoor = true
         val hasSand = false
         val wallsMaterial = WallsMaterial.Glass
-        every { addFieldToClub.invoke(any(), any(), any(), any(), any()) } returns club
+        coEvery { addFieldToClub.invoke(any(), any(), any(), any(), any()) } returns club
 
         assertEquals(club, runBlocking { controller.addToClubFields(club, name, indoor, hasSand, wallsMaterial) })
-        verify { addFieldToClub.invoke(club, name, indoor, hasSand, wallsMaterial) }
+        coVerify { addFieldToClub.invoke(club, name, indoor, hasSand, wallsMaterial) }
     }
 
     @Test
@@ -177,29 +177,29 @@ class ClubControllerTest {
         val indoor = true
         val hasSand = false
         val wallsMaterial = WallsMaterial.Glass
-        every { updateClubField.invoke(any(), any(), any(), any(), any(), any()) } returns club
+        coEvery { updateClubField.invoke(any(), any(), any(), any(), any(), any()) } returns club
 
         assertEquals(club,
             runBlocking { controller.updateClubField(club, fieldId, name, indoor, hasSand, wallsMaterial) })
-        verify { updateClubField.invoke(club, fieldId, name, indoor, hasSand, wallsMaterial) }
+        coVerify { updateClubField.invoke(club, fieldId, name, indoor, hasSand, wallsMaterial) }
     }
 
     @Test
     fun `ClubController should call UpdateClubAvailability to update club's fields availability`() {
         val club = mockk<Club>()
-        every { updateClubAvailability.invoke(any(), any()) } returns club
+        coEvery { updateClubAvailability.invoke(any(), any()) } returns club
 
         assertEquals(club, runBlocking { controller.updateClubAvailability(club, EmptyAvailability) })
-        verify { updateClubAvailability.invoke(club, EmptyAvailability) }
+        coVerify { updateClubAvailability.invoke(club, EmptyAvailability) }
     }
 
     @Test
     fun `ClubController should call SearchClubsByName to search clubs given a name`() {
         val club = mockk<Club>()
-        every { searchClubsByName.invoke(any()) } returns listOf(club)
+        coEvery { searchClubsByName.invoke(any()) } returns listOf(club)
 
         val name = "search"
         assertEquals(listOf(club), runBlocking { controller.searchClubsByName(name) })
-        verify { searchClubsByName.invoke(name) }
+        coVerify { searchClubsByName.invoke(name) }
     }
 }

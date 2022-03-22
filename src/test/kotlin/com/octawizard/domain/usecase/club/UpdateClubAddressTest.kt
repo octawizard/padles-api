@@ -7,6 +7,7 @@ import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,7 +26,7 @@ class UpdateClubAddressTest {
         val address = "new address"
         val location = GeoLocation(30.1, 30.1)
 
-        val updatedClub = updateClubAddress.invoke(club, address, location)
+        val updatedClub = runBlocking { updateClubAddress.invoke(club, address, location) }
 
         assertEquals(address, updatedClub.address)
         assertEquals(location, updatedClub.geoLocation)

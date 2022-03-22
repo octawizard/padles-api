@@ -21,6 +21,7 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
 import io.mockk.verifyAll
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -78,7 +79,7 @@ class CancelReservationTest {
         )
         val expectedReservation = reservation.copy(status = ReservationStatus.Canceled)
 
-        val updatedReservation = cancelReservation.invoke(reservation.id)
+        val updatedReservation = runBlocking { cancelReservation.invoke(reservation.id) }
 
         assertEquals(expectedReservation, updatedReservation)
         verify(exactly = 1) {
@@ -99,7 +100,7 @@ class CancelReservationTest {
         val expectedReservation =
             reservation.copy(status = ReservationStatus.Canceled)
 
-        val updatedReservation = cancelReservation(reservation.id)
+        val updatedReservation = runBlocking { cancelReservation(reservation.id) }
 
         assertEquals(expectedReservation, updatedReservation)
         verify(exactly = 1) {
@@ -120,7 +121,7 @@ class CancelReservationTest {
         val expectedReservation =
             reservation.copy(status = ReservationStatus.Canceled, paymentStatus = PaymentStatus.ToBeRefunded)
 
-        val updatedReservation = cancelReservation(reservation.id)
+        val updatedReservation = runBlocking { cancelReservation(reservation.id) }
 
         assertEquals(expectedReservation, updatedReservation)
         verify(exactly = 1) {
@@ -135,7 +136,7 @@ class CancelReservationTest {
                 reservation.copy(startTime = reservation.startTime.minusHours(1))
 
         assertThrows(BadRequestException::class.java) {
-            cancelReservation(reservation.id)
+            runBlocking { cancelReservation(reservation.id) }
         }
         verifyAll {
             reservationRepository.getReservation(reservation.id)
@@ -147,7 +148,7 @@ class CancelReservationTest {
     fun `CancelReservation throws exception when cancelling a reservation that doesn't exist`() {
         every { reservationRepository.getReservation(reservation.id) } returns null
         assertThrows(NotFoundException::class.java) {
-            cancelReservation(reservation.id)
+            runBlocking { cancelReservation(reservation.id) }
         }
         verifyAll {
             reservationRepository.getReservation(reservation.id)
@@ -161,7 +162,7 @@ class CancelReservationTest {
                 reservation.copy(status = ReservationStatus.Canceled)
 
         assertThrows(BadRequestException::class.java) {
-            cancelReservation(reservation.id)
+            runBlocking { cancelReservation(reservation.id) }
         }
         verifyAll {
             reservationRepository.getReservation(reservation.id)

@@ -4,9 +4,12 @@ import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.User
 import com.octawizard.repository.RedisCache
 import io.mockk.clearAllMocks
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
@@ -29,12 +32,13 @@ class CacheUserRepositoryTest {
         val email = Email("email@test.com")
         val user = User(email, "test")
 
-        every { cache.get(email.value) } returns user
+        coEvery { cache.get(email.value) } returns user
 
-        val returnedUser = cacheUserRepository.getUser(email)
-
-        verify(timeout = 50) { cache.get(email.value) }
-        verify(inverse = true) { userRepository.getUser(email) }
+        val returnedUser = runBlocking {
+            cacheUserRepository.getUser(email)
+        }
+        coVerify(timeout = 50) { cache.get(email.value) }
+        coVerify(inverse = true) { userRepository.getUser(email) }
         assertEquals(user, returnedUser)
     }
 
@@ -43,12 +47,12 @@ class CacheUserRepositoryTest {
         val email = Email("email@test.com")
         val user = User(email, "test")
 
-        every { cache.get(email.value) } returns null
-        every { userRepository.getUser(email) } returns user
+        coEvery { cache.get(email.value) } returns null
+        coEvery { userRepository.getUser(email) } returns user
 
-        val returnedUser = cacheUserRepository.getUser(email)
+        val returnedUser = runBlocking { cacheUserRepository.getUser(email) }
 
-        verify(timeout = 50) {
+        coVerify(timeout = 50) {
             cache.get(email.value)
             userRepository.getUser(email)
             cache.put(email.value, returnedUser!!)
@@ -60,16 +64,18 @@ class CacheUserRepositoryTest {
     fun `CacheUserRepository should return missing user from repository when it's missing from the cache too`() {
         val email = Email("email@test.com")
 
-        every { cache.get(email.value) } returns null
-        every { userRepository.getUser(email) } returns null
+        coEvery { cache.get(email.value) } returns null
+        coEvery { userRepository.getUser(email) } returns null
 
-        val returnedUser = cacheUserRepository.getUser(email)
+        val returnedUser = runBlocking {
+            cacheUserRepository.getUser(email)
+        }
 
-        verify(timeout = 50) {
+        coVerify(timeout = 50) {
             cache.get(email.value)
             userRepository.getUser(email)
         }
-        verify(inverse = true, timeout = 50) { cache.put(email.value, any()) }
+        coVerify(inverse = true, timeout = 50) { cache.put(email.value, any()) }
         assertNull(returnedUser)
     }
 
@@ -77,11 +83,11 @@ class CacheUserRepositoryTest {
     fun `CacheUserRepository should update user from repository and put the updated version in cache`() {
         val user = User(Email("email@test.com"), "test")
 
-        every { userRepository.updateUser(user) } returns user
+        coEvery { userRepository.updateUser(user) } returns user
 
-        val updatedUser = cacheUserRepository.updateUser(user)
+        val updatedUser = runBlocking { cacheUserRepository.updateUser(user) }
 
-        verify(timeout = 50) {
+        coVerify(timeout = 50) {
             userRepository.updateUser(user)
             cache.put(user.email.value, updatedUser)
         }
@@ -92,11 +98,11 @@ class CacheUserRepositoryTest {
     fun `CacheUserRepository should create user from repository and put it in cache`() {
         val user = User(Email("email@test.com"), "test")
 
-        every { userRepository.createUser(user) } returns user
+        coEvery { userRepository.createUser(user) } returns user
 
-        val createdUser = cacheUserRepository.createUser(user)
+        val createdUser = runBlocking { cacheUserRepository.createUser(user) }
 
-        verify(timeout = 50) {
+        coVerify(timeout = 50) {
             userRepository.createUser(user)
             cache.put(createdUser.email.value, createdUser)
         }

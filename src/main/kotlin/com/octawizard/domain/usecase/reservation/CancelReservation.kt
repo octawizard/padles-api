@@ -1,5 +1,6 @@
 package com.octawizard.domain.usecase.reservation
 
+import com.octawizard.controller.async
 import com.octawizard.domain.model.FieldAvailability
 import com.octawizard.domain.model.PaymentStatus
 import com.octawizard.domain.model.Reservation
@@ -9,8 +10,6 @@ import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.retry
 import io.ktor.features.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.time.LocalDateTime
 import java.util.*
 
@@ -19,7 +18,7 @@ class CancelReservation(
     private val clubRepository: ClubRepository,
 ) {
 
-    operator fun invoke(reservationId: UUID): Reservation {
+    suspend operator fun invoke(reservationId: UUID): Reservation {
         val reservation = reservationRepository.getReservation(reservationId)
             ?: throw NotFoundException("reservation$reservationId not found")
         if (reservation.startTime.isBefore(LocalDateTime.now())) {
@@ -42,7 +41,7 @@ class CancelReservation(
             reservationRepository.updateReservation(canceledReservation)
             canceledReservation
         }.onSuccess {
-            GlobalScope.launch {
+            async {
                 val fieldAvailability = FieldAvailability(
                     TimeSlot(reservation.startTime, reservation.endTime),
                     reservation.clubReservationInfo.field,

@@ -6,6 +6,7 @@ import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import io.mockk.mockk
 import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -23,7 +24,7 @@ class UpdateClubNameTest {
         val updateClubName = UpdateClubName(clubRepository, reservationRepository)
 
         val newName = "new club name"
-        val updatedClub = updateClubName.invoke(club, newName)
+        val updatedClub = runBlocking { updateClubName.invoke(club, newName) }
 
         assertEquals(newName, updatedClub.name)
         verify(exactly = 1) {

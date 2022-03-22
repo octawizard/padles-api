@@ -5,5 +5,5 @@ import com.octawizard.repository.user.UserRepository
 
 class UpdateUser(private val userRepository: UserRepository) {
 
-    operator fun invoke(user: User): User = userRepository.updateUser(user)
+    suspend operator fun invoke(user: User): User = userRepository.updateUser(user)
 }

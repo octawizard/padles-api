@@ -14,9 +14,9 @@ import com.octawizard.domain.usecase.reservation.UpdateMatchResult
 import com.octawizard.server.input.OpType
 import com.octawizard.server.input.PatchMatchInput
 import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.coVerify
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -53,11 +53,11 @@ class ReservationControllerTest {
     @Test
     fun `ReservationController should call GetReservation to get a reservation`() {
         val reservation = mockk<Reservation>()
-        every { getReservation(any()) } returns reservation
+        coEvery { getReservation(any()) } returns reservation
 
         val reservationId = UUID.randomUUID()
         assertEquals(reservation, runBlocking { controller.getReservation(reservationId) })
-        verify { getReservation.invoke(reservationId) }
+        coVerify { getReservation.invoke(reservationId) }
     }
 
     @Test
@@ -68,7 +68,7 @@ class ReservationControllerTest {
         val fieldId = UUID.randomUUID()
         val startTime = LocalDateTime.now()
         val endTime = startTime.plusHours(2)
-        every { createReservation(any(), any(), any(), any(), any(), any(), any(), any()) } returns reservation
+        coEvery { createReservation(any(), any(), any(), any(), any(), any(), any(), any()) } returns reservation
 
         assertEquals(reservation,
             runBlocking {
@@ -81,57 +81,57 @@ class ReservationControllerTest {
                     null,
                     null)
             })
-        verify { createReservation(reservedBy, clubId, fieldId, startTime, endTime, null, null, null) }
+        coVerify { createReservation(reservedBy, clubId, fieldId, startTime, endTime, null, null, null) }
     }
 
     @Test
     fun `ReservationController should call CancelReservation to cancel a reservation`() {
         val reservation = mockk<Reservation>()
         val reservationId = UUID.randomUUID()
-        every { reservation.id } returns reservationId
-        every { cancelReservation(any()) } returns reservation
+        coEvery { reservation.id } returns reservationId
+        coEvery { cancelReservation(any()) } returns reservation
 
         assertEquals(reservation, runBlocking { controller.cancelReservation(reservation) })
-        verify { cancelReservation.invoke(reservationId) }
+        coVerify { cancelReservation.invoke(reservationId) }
     }
 
     @Test
     fun `ReservationController should call UpdateReservationMatchResult to update the match result of the reservation`() {
         val reservation = mockk<Reservation>()
         val matchResult = mockk<MatchResult>()
-        every { updateMatchResult(any(), any()) } returns reservation
+        coEvery { updateMatchResult(any(), any()) } returns reservation
 
         assertEquals(reservation, runBlocking { controller.updateReservationMatchResult(reservation, matchResult) })
-        verify { updateMatchResult.invoke(reservation, matchResult) }
+        coVerify { updateMatchResult.invoke(reservation, matchResult) }
     }
 
     @Test
     fun `ReservationController should call GetNearestAvailableReservations to get the near available reservations`() {
         val reservations = listOf(mockk<Reservation>())
-        every { getNearestAvailableReservations(any(), any(), any(), any()) } returns reservations
+        coEvery { getNearestAvailableReservations(any(), any(), any(), any()) } returns reservations
 
         assertEquals(reservations,
             runBlocking { controller.getNearestAvailableReservations(1.0, 1.0, 1.0, RadiusUnit.Kilometers) })
-        verify { getNearestAvailableReservations.invoke(1.0, 1.0, 1.0, RadiusUnit.Kilometers) }
+        coVerify { getNearestAvailableReservations.invoke(1.0, 1.0, 1.0, RadiusUnit.Kilometers) }
     }
 
     @Test
     fun `ReservationController should call PatchReservationMatch to add a player to a match`() {
         val reservation = mockk<Reservation>()
-        every { joinMatch(any(), any()) } returns reservation
+        coEvery { joinMatch(any(), any()) } returns reservation
         val input = PatchMatchInput(op = OpType.add, value = "user@padles.com")
 
         assertEquals(reservation, runBlocking { controller.patchReservationMatch(input, reservation) })
-        verify { joinMatch(Email(input.value), reservation) }
+        coVerify { joinMatch(Email(input.value), reservation) }
     }
 
     @Test
     fun `ReservationController should call PatchReservationMatch to remove a player from a match`() {
         val reservation = mockk<Reservation>()
-        every { leaveMatch(any(), any()) } returns reservation
+        coEvery { leaveMatch(any(), any()) } returns reservation
         val input = PatchMatchInput(op = OpType.remove, value = "user@padles.com")
 
         assertEquals(reservation, runBlocking { controller.patchReservationMatch(input, reservation) })
-        verify { leaveMatch(Email(input.value), reservation) }
+        coVerify { leaveMatch(Email(input.value), reservation) }
     }
 }

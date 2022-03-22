@@ -2,7 +2,6 @@ package com.octawizard.domain.usecase.reservation
 
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.Reservation
-import com.octawizard.domain.model.User
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.user.UserRepository
 import com.octawizard.server.route.entityNotFound
@@ -10,7 +9,7 @@ import io.ktor.features.*
 
 class JoinMatch(private val reservationRepository: ReservationRepository, private val userRepository: UserRepository) {
 
-    operator fun invoke(userEmail: Email, reservation: Reservation): Reservation {
+    suspend operator fun invoke(userEmail: Email, reservation: Reservation): Reservation {
         val user = userRepository.getUser(userEmail) ?: entityNotFound(userEmail)
         if (reservation.match.players.size == 4) {
             throw BadRequestException("match has already four players")

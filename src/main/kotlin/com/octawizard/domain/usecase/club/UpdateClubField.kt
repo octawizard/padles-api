@@ -1,13 +1,12 @@
 package com.octawizard.domain.usecase.club
 
+import com.octawizard.controller.async
 import com.octawizard.domain.model.Club
 import com.octawizard.domain.model.Field
 import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.retry
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
 import java.util.*
 
 class UpdateClubField(
@@ -15,7 +14,7 @@ class UpdateClubField(
     private val reservationRepository: ReservationRepository
 ) {
 
-    operator fun invoke(
+    suspend operator fun invoke(
         club: Club,
         fieldId: UUID,
         name: String,
@@ -33,7 +32,7 @@ class UpdateClubField(
             }
         }.toSet()
         val updatedClub = club.copy(fields = updatedFields)
-        GlobalScope.launch { retry { reservationRepository.updateClubField(updatedField) } }
+        async { retry { reservationRepository.updateClubField(updatedField) } }
         return updatedClub
     }
 

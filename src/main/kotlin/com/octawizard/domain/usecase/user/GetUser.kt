@@ -6,5 +6,5 @@ import com.octawizard.repository.user.UserRepository
 
 class GetUser(private val userRepository: UserRepository) {
 
-    operator fun invoke(email: Email): User? = userRepository.getUser(email)
+    suspend operator fun invoke(email: Email): User? = userRepository.getUser(email)
 }
