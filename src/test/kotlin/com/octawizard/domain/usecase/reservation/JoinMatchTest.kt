@@ -11,9 +11,10 @@ import com.octawizard.repository.user.UserRepository
 import io.ktor.features.*
 import io.mockk.Called
 import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.coEvery
 import io.mockk.mockk
-import io.mockk.verify
+import io.mockk.coVerify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -51,22 +52,22 @@ class JoinMatchTest {
             PaymentStatus.PendingPayment,
         )
         val expectedReservation = reservation.copy(match = match)
-        every { userRepository.getUser(playerToAdd.email) } returns playerToAdd
+        coEvery { userRepository.getUser(playerToAdd.email) } returns playerToAdd
 
-        val updatedReservation = joinMatch(playerToAdd.email, reservation)
+        val updatedReservation = runBlocking { joinMatch(playerToAdd.email, reservation) }
         assertEquals(expectedReservation, updatedReservation)
 
-        verify(exactly = 1) { reservationRepository.updateReservation(expectedReservation) }
+        coVerify(exactly = 1) { reservationRepository.updateReservation(expectedReservation) }
     }
 
     @Test
     fun `JoinMatch throws exception when adding a player to a reservation match if match already has 4 players`() {
         val reservation = mockk<Reservation>()
         val match = Match(players = listOf(mockk(), mockk(), mockk(), mockk()))
-        every { reservation.match } returns match
+        coEvery { reservation.match } returns match
 
         assertThrows(BadRequestException::class.java) {
-            joinMatch(mockk(), reservation)
+            runBlocking { joinMatch(mockk(), reservation) }
         }
     }
 
@@ -75,21 +76,21 @@ class JoinMatchTest {
         val expectedReservation = mockk<Reservation>()
         val user = User(Email("test@test.com"), "")
         val match = Match(players = listOf(user))
-        every { expectedReservation.match } returns match
-        every { userRepository.getUser(user.email) } returns user
+        coEvery { expectedReservation.match } returns match
+        coEvery { userRepository.getUser(user.email) } returns user
 
-        val reservation = joinMatch(user.email, expectedReservation)
+        val reservation = runBlocking { joinMatch(user.email, expectedReservation) }
         assertEquals(expectedReservation, reservation)
-        verify { reservationRepository wasNot Called }
+        coVerify { reservationRepository wasNot Called }
     }
 
     @Test
     fun `JoinMatch throws exception when adding a player to a reservation match if player doesn't exist`() {
         val email = Email("test@test.com")
-        every { userRepository.getUser(email) } returns null
+        coEvery { userRepository.getUser(email) } returns null
 
         assertThrows(NotFoundException::class.java) {
-            joinMatch(email, mockk())
+            runBlocking { joinMatch(email, mockk()) }
         }
     }
 }

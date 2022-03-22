@@ -16,7 +16,7 @@ class CreateReservation(
     private val transactionRepository: TransactionRepository,
 ) {
 
-    operator fun invoke(
+    suspend operator fun invoke(
         reservedBy: Email,
         clubId: UUID,
         fieldId: UUID,

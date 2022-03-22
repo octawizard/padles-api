@@ -5,8 +5,8 @@ import com.octawizard.domain.model.User
 
 interface UserRepository {
 
-    fun createUser(user: User): User
-    fun getUser(email: Email): User?
-    fun updateUser(user: User): User
-    fun deleteUser(email: Email)
+    suspend fun createUser(user: User): User
+    suspend fun getUser(email: Email): User?
+    suspend fun updateUser(user: User): User
+    suspend fun deleteUser(email: Email)
 }

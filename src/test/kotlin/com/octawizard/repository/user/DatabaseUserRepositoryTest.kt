@@ -4,6 +4,8 @@ import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.Gender
 import com.octawizard.domain.model.User
 import io.ktor.features.*
+import kotlinx.coroutines.runBlocking
+import kotlinx.html.InputType
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
@@ -20,10 +22,10 @@ class DatabaseUserRepositoryTest {
     @BeforeAll
     fun `init database`() {
         Database.connect(
-                url = "jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
-                driver = "org.h2.Driver",
-                user = "test",
-                password = "")
+            url = "jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
+            driver = "org.h2.Driver",
+            user = "test",
+            password = "")
 
 
         transaction {
@@ -43,12 +45,12 @@ class DatabaseUserRepositoryTest {
     @Test
     fun `DatabaseUserRepository creates and returns a user`() {
         val user = User(Email("user@padles.com"), "tony")
-        assertEquals(user, repository.createUser(user))
+        assertEquals(user, runBlocking { repository.createUser(user) })
     }
 
     @Test
     fun `DatabaseUserRepository returns a null user when user is not found`() {
-        assertNull(repository.getUser(Email("test@test.com")))
+        assertNull(runBlocking { repository.getUser(Email("test@test.com")) })
     }
 
     @Test
@@ -61,7 +63,7 @@ class DatabaseUserRepositoryTest {
                 createdAt = LocalDateTime.now()
             }
         }
-        assertEquals(email, repository.getUser(email)?.email)
+        assertEquals(email, runBlocking { repository.getUser(email)?.email })
     }
 
     @Test
@@ -80,7 +82,7 @@ class DatabaseUserRepositoryTest {
                 this.createdAt = createdAt
             }
         }
-        val updatedUser = repository.updateUser(user)
+        val updatedUser = runBlocking { repository.updateUser(user) }
         assertEquals(email, updatedUser.email)
         assertEquals(updatedName, updatedUser.name)
         assertEquals(gender, updatedUser.gender)
@@ -96,21 +98,25 @@ class DatabaseUserRepositoryTest {
         val phone = "phone"
         val user = User(email, updatedName, Gender.Female, phone, createdAt)
 
-        assertThrows(NotFoundException::class.java) { repository.updateUser(user)  }
+        assertThrows(NotFoundException::class.java) { runBlocking { repository.updateUser(user) } }
     }
 
     @Test
     fun `DatabaseUserRepository should delete a user if exists`() {
         val user = User(Email("user@padles.com"), "tony")
-        repository.createUser(user)
+        runBlocking { repository.createUser(user) }
 
-        repository.deleteUser(user.email)
+        runBlocking { repository.deleteUser(user.email) }
 
-        assertNull(repository.getUser(user.email))
+        assertNull(runBlocking { repository.getUser(user.email) })
     }
 
     @Test
     fun `DatabaseUserRepository should throw an exception when deleting a user that doesn't exist`() {
-        assertThrows(NotFoundException::class.java) { repository.deleteUser(Email("test@test.com"))  }
+        assertThrows(NotFoundException::class.java) {
+            runBlocking {
+                repository.deleteUser(Email("test@test.com"))
+            }
+        }
     }
 }

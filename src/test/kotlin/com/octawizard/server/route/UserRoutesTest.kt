@@ -31,6 +31,7 @@ private fun Application.testableModule(userController: UserController) {
     testableModuleWithDependencies(userController)
 }
 
+@KtorExperimentalLocationsAPI
 private fun Application.testableModuleWithDependencies(userController: UserController) {
     install(ContentNegotiation) {
         json(JsonSerde)
@@ -65,7 +66,6 @@ class UserRoutesTest {
         val userController = mockk<UserController>(relaxed = true)
         withTestApplication({ testableModule(userController) }) {
             with(handleRequest(HttpMethod.Get, "/not-valid")) {
-                Assertions.assertFalse(requestHandled)
                 Assertions.assertEquals(HttpStatusCode.NotFound, response.status())
             }
         }

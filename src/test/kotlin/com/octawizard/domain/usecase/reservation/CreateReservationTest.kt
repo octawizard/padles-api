@@ -21,15 +21,15 @@ import com.octawizard.repository.user.UserRepository
 import io.ktor.features.*
 import io.mockk.Called
 import io.mockk.clearAllMocks
-import io.mockk.every
+import io.mockk.coEvery
+import io.mockk.coVerify
 import io.mockk.mockk
-import io.mockk.verify
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import java.lang.IllegalArgumentException
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
@@ -88,14 +88,14 @@ class CreateReservationTest {
             ReservationStatus.Pending,
             PaymentStatus.PendingPayment,
         )
-        every { userRepository.getUser(email1) } returns user1
-        every { userRepository.getUser(email2) } returns user2
-        every { userRepository.getUser(email3) } returns user3
-        every { userRepository.getUser(email4) } returns user4
-        every { clubRepository.getClub(club.id) } returns club
-        every { availability.byDate } returns mapOf(startTime.toLocalDate() to listOf(fieldAvailability))
+        coEvery { userRepository.getUser(email1) } returns user1
+        coEvery { userRepository.getUser(email2) } returns user2
+        coEvery { userRepository.getUser(email3) } returns user3
+        coEvery { userRepository.getUser(email4) } returns user4
+        coEvery { clubRepository.getClub(club.id) } returns club
+        coEvery { availability.byDate } returns mapOf(startTime.toLocalDate() to listOf(fieldAvailability))
 
-        every {
+        coEvery {
             transactionRepository.createReservation(
                 user1,
                 clubReservationInfo,
@@ -106,19 +106,21 @@ class CreateReservationTest {
             )
         } returns expectedReservation
 
-        val createdReservation = createReservation.invoke(
-            email1,
-            club.id,
-            fieldId,
-            startTime,
-            endTime,
-            email2,
-            email3,
-            email4,
-        )
+        val createdReservation = runBlocking {
+            createReservation.invoke(
+                email1,
+                club.id,
+                fieldId,
+                startTime,
+                endTime,
+                email2,
+                email3,
+                email4,
+            )
+        }
 
         Assertions.assertEquals(expectedReservation, createdReservation)
-        verify(exactly = 1) {
+        coVerify(exactly = 1) {
             transactionRepository.createReservation(
                 user1,
                 clubReservationInfo,
@@ -128,8 +130,8 @@ class CreateReservationTest {
                 match
             )
         }
-        verify(exactly = 1) { clubRepository.getClub(club.id) }
-        verify {
+        coVerify(exactly = 1) { clubRepository.getClub(club.id) }
+        coVerify {
             userRepository.getUser(email1)
             userRepository.getUser(email2)
             userRepository.getUser(email3)
@@ -139,79 +141,95 @@ class CreateReservationTest {
 
     @Test
     fun `CreateReservation throws exception creating a reservation when reservation owner does not exist`() {
-        every { userRepository.getUser(email1) } returns null
+        coEvery { userRepository.getUser(email1) } returns null
 
-        assertThrows(NotFoundException::class.java) { createReservation.invoke(
-            email1,
-            club.id,
-            fieldId,
-            startTime,
-            endTime,
-            email2,
-            email3,
-            email4,
-        ) }
-        verify(exactly = 1) { userRepository.getUser(email1) }
-        verify { listOf(transactionRepository, clubRepository) wasNot Called }
+        assertThrows(NotFoundException::class.java) {
+            runBlocking {
+                createReservation.invoke(
+                    email1,
+                    club.id,
+                    fieldId,
+                    startTime,
+                    endTime,
+                    email2,
+                    email3,
+                    email4,
+                )
+            }
+        }
+        coVerify(exactly = 1) { userRepository.getUser(email1) }
+        coVerify { listOf(transactionRepository, clubRepository) wasNot Called }
     }
 
     @Test
     fun `CreateReservation throws exception creating a reservation when club does not exist`() {
-        every { userRepository.getUser(email1) } returns user1
-        every { clubRepository.getClub(club.id) } returns null
+        coEvery { userRepository.getUser(email1) } returns user1
+        coEvery { clubRepository.getClub(club.id) } returns null
 
-        assertThrows(NotFoundException::class.java) { createReservation.invoke(
-            email1,
-            club.id,
-            fieldId,
-            startTime,
-            endTime,
-            email2,
-            email3,
-            email4,
-        ) }
-        verify(exactly = 1) { userRepository.getUser(email1) }
-        verify(exactly = 1) { clubRepository.getClub(club.id) }
-        verify { transactionRepository wasNot Called }
+        assertThrows(NotFoundException::class.java) {
+            runBlocking {
+                createReservation.invoke(
+                    email1,
+                    club.id,
+                    fieldId,
+                    startTime,
+                    endTime,
+                    email2,
+                    email3,
+                    email4,
+                )
+            }
+        }
+        coVerify(exactly = 1) { userRepository.getUser(email1) }
+        coVerify(exactly = 1) { clubRepository.getClub(club.id) }
+        coVerify { transactionRepository wasNot Called }
     }
 
     @Test
     fun `CreateReservation throws exception creating a reservation when field does not exist in the club`() {
-        every { userRepository.getUser(email1) } returns user1
-        every { clubRepository.getClub(club.id) } returns club.copy(fields = emptySet())
+        coEvery { userRepository.getUser(email1) } returns user1
+        coEvery { clubRepository.getClub(club.id) } returns club.copy(fields = emptySet())
 
-        assertThrows(NotFoundException::class.java) { createReservation.invoke(
-            email1,
-            club.id,
-            fieldId,
-            startTime,
-            endTime,
-            email2,
-            email3,
-            email4,
-        ) }
-        verify(exactly = 1) { userRepository.getUser(email1) }
-        verify(exactly = 1) { clubRepository.getClub(club.id) }
-        verify { transactionRepository wasNot Called }
+        assertThrows(NotFoundException::class.java) {
+            runBlocking {
+                createReservation.invoke(
+                    email1,
+                    club.id,
+                    fieldId,
+                    startTime,
+                    endTime,
+                    email2,
+                    email3,
+                    email4,
+                )
+            }
+        }
+        coVerify(exactly = 1) { userRepository.getUser(email1) }
+        coVerify(exactly = 1) { clubRepository.getClub(club.id) }
+        coVerify { transactionRepository wasNot Called }
     }
 
     @Test
     fun `CreateReservation throws exception creating a reservation when field isn't available in the given timeslot`() {
-        every { userRepository.getUser(email1) } returns user1
-        every { clubRepository.getClub(club.id) } returns club
+        coEvery { userRepository.getUser(email1) } returns user1
+        coEvery { clubRepository.getClub(club.id) } returns club
 
-        assertThrows(IllegalArgumentException::class.java) { createReservation.invoke(
-            email1,
-            club.id,
-            fieldId,
-            startTime,
-            endTime,
-            email2,
-            email3,
-            email4,
-        ) }
-        verify(exactly = 1) { userRepository.getUser(email1) }
-        verify(exactly = 1) { clubRepository.getClub(club.id) }
-        verify { transactionRepository wasNot Called }
+        assertThrows(IllegalArgumentException::class.java) {
+            runBlocking {
+                createReservation.invoke(
+                    email1,
+                    club.id,
+                    fieldId,
+                    startTime,
+                    endTime,
+                    email2,
+                    email3,
+                    email4,
+                )
+            }
+        }
+        coVerify(exactly = 1) { userRepository.getUser(email1) }
+        coVerify(exactly = 1) { clubRepository.getClub(club.id) }
+        coVerify { transactionRepository wasNot Called }
     }
 }

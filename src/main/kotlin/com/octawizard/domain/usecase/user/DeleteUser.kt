@@ -5,5 +5,5 @@ import com.octawizard.repository.user.UserRepository
 
 class DeleteUser(private val userRepository: UserRepository) {
 
-    operator fun invoke(email: Email) = userRepository.deleteUser(email)
+    suspend operator fun invoke(email: Email) = userRepository.deleteUser(email)
 }

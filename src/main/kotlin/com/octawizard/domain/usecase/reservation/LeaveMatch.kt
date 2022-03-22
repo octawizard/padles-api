@@ -8,7 +8,7 @@ import com.octawizard.server.route.entityNotFound
 
 class LeaveMatch(private val reservationRepository: ReservationRepository, private val userRepository: UserRepository) {
 
-    operator fun invoke(userEmail: Email, reservation: Reservation): Reservation {
+    suspend operator fun invoke(userEmail: Email, reservation: Reservation): Reservation {
         val user = userRepository.getUser(userEmail) ?: entityNotFound(userEmail)
         // if user is the reserved, fail
         if (reservation.reservedBy.email == user.email) {

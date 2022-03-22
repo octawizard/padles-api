@@ -14,7 +14,7 @@ import org.jetbrains.exposed.sql.transactions.transaction
 import java.time.LocalDateTime
 
 class DatabaseUserRepository : UserRepository {
-    override fun createUser(user: User): User {
+    override suspend fun createUser(user: User): User {
         transaction {
             Users.insert {
                 it[id] = EntityID(user.email.value, Users)
@@ -27,13 +27,13 @@ class DatabaseUserRepository : UserRepository {
         return user
     }
 
-    override fun getUser(email: Email): User? {
+    override suspend fun getUser(email: Email): User? {
         return transaction {
             UsersEntity.findById(email.value)?.toUser()
         }
     }
 
-    override fun updateUser(user: User): User {
+    override suspend fun updateUser(user: User): User {
         val updated = transaction {
             Users.update({ Users.id eq user.email.value }) {
                 it[id] = EntityID(user.email.value, Users)
@@ -49,7 +49,7 @@ class DatabaseUserRepository : UserRepository {
         }
     }
 
-    override fun deleteUser(email: Email) {
+    override suspend fun deleteUser(email: Email) {
         val res = transaction {
             Users.deleteWhere { Users.id eq email.value }
         }
