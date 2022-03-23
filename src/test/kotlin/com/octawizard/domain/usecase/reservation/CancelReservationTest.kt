@@ -92,7 +92,8 @@ class CancelReservationTest {
 
     @Test
     fun `CancelReservation cancel a confirmed reservation and restore field availability`() {
-        every { reservationRepository.getReservation(reservation.id) } returns reservation.copy(status = ReservationStatus.Confirmed)
+        every { reservationRepository.getReservation(reservation.id) } returns
+            reservation.copy(status = ReservationStatus.Confirmed)
         val fieldAvailability = FieldAvailability(
             TimeSlot(reservation.startTime, reservation.endTime),
             reservation.clubReservationInfo.field,
@@ -113,7 +114,7 @@ class CancelReservationTest {
     @Test
     fun `CancelReservation cancel a confirmed and payed reservation and restore field availability`() {
         every { reservationRepository.getReservation(reservation.id) } returns
-                reservation.copy(status = ReservationStatus.Confirmed, paymentStatus = PaymentStatus.Payed)
+            reservation.copy(status = ReservationStatus.Confirmed, paymentStatus = PaymentStatus.Payed)
         val fieldAvailability = FieldAvailability(
             TimeSlot(reservation.startTime, reservation.endTime),
             reservation.clubReservationInfo.field,
@@ -134,7 +135,7 @@ class CancelReservationTest {
     @Test
     fun `CancelReservation throws exception when cancelling a reservation of a past match`() {
         every { reservationRepository.getReservation(reservation.id) } returns
-                reservation.copy(startTime = reservation.startTime.minusHours(1))
+            reservation.copy(startTime = reservation.startTime.minusHours(1))
 
         assertThrows(BadRequestException::class.java) {
             runBlocking { cancelReservation(reservation.id) }
@@ -160,7 +161,7 @@ class CancelReservationTest {
     @Test
     fun `CancelReservation throws exception when cancelling a reservation that is already cancelled`() {
         every { reservationRepository.getReservation(reservation.id) } returns
-                reservation.copy(status = ReservationStatus.Canceled)
+            reservation.copy(status = ReservationStatus.Canceled)
 
         assertThrows(BadRequestException::class.java) {
             runBlocking { cancelReservation(reservation.id) }

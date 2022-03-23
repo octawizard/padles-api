@@ -35,7 +35,7 @@ formatting:
     ignoreBackTickedIdentifier: true
   Indentation:
     indentSize: 4
-    continuationIndentSize: 8
+    continuationIndentSize: 4
     autoCorrect: true
 
 style:

@@ -39,7 +39,8 @@ class UserEmailBasedAuthorization {
 
             if (userId != tokenUserId) {
                 val message =
-                    "Authorization failed for ${call.request.path()}. User $tokenUserId can't perform updates on user $userId"
+                    "Authorization failed for ${call.request.path()}. User $tokenUserId can't perform updates " +
+                        "on user $userId"
                 logger.warn { message }
                 throw AuthorizationException(message)
             }
