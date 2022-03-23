@@ -10,5 +10,3 @@ data class PatchMatchInput(val op: OpType, val value: String)
 enum class OpType {
     REMOVE, ADD
 }
-
-

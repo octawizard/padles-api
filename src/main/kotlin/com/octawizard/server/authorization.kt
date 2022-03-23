@@ -39,8 +39,7 @@ class UserEmailBasedAuthorization {
 
             if (userId != tokenUserId) {
                 val message =
-                    "Authorization failed for ${call.request.path()}. User $tokenUserId can't perform updates on " +
-                            "user $userId"
+                    "Authorization failed for ${call.request.path()}. User $tokenUserId can't perform updates on user $userId"
                 logger.warn { message }
                 throw AuthorizationException(message)
             }
@@ -64,7 +63,7 @@ class UserEmailBasedAuthorization {
 class AuthorizedRouteSelector(private val entity: String) : RouteSelector() {
     override fun evaluate(context: RoutingResolveContext, segmentIndex: Int) = RouteSelectorEvaluation.Constant
 
-    override fun toString(): String = "(authorize by ${entity})"
+    override fun toString(): String = "(authorize by $entity)"
 }
 
 fun Route.authorizeWithUserEmailInPath(build: Route.() -> Unit) = authorizedRoute(USER_EMAIL_PARAM, build)

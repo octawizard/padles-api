@@ -106,7 +106,7 @@ fun Routing.clubRoutes(controller: ClubController) {
         }
 
         // search clubs by name, distance or distance + day availability
-        get("/clubs") { //clubs?criteria=ByName&name=padel-club
+        get("/clubs") { // clubs?criteria=ByName&name=padel-club
             when (call.getEnumQueryParamOrDefault(CRITERIA, ClubSearchCriteria.ByName)) {
                 ClubSearchCriteria.ByName -> searchClubsByName(controller)
                 ClubSearchCriteria.ByDistance -> searchClubsByDistance(controller)

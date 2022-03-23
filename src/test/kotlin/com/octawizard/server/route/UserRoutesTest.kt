@@ -200,12 +200,14 @@ class UserRoutesTest {
 
             // 400 - Bad Request
             withTestApplication({ testableModule(userController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/user/${email.value}",
-                    email.value,
-                    body = """{"x": "y" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/user/${email.value}",
+                        email.value,
+                        body = """{"x": "y" }""",
+                    )
+                ) {
                     Assertions.assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -213,12 +215,14 @@ class UserRoutesTest {
             // 404 - not found
             coEvery { userController.updateUser(any()) } returns null
             withTestApplication({ testableModule(userController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/user/${email.value}",
-                    email.value,
-                    body = JsonSerde.encodeToString(input),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/user/${email.value}",
+                        email.value,
+                        body = JsonSerde.encodeToString(input),
+                    )
+                ) {
                     Assertions.assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
@@ -259,11 +263,13 @@ class UserRoutesTest {
 
             // 200 - Ok
             withTestApplication({ testableModule(userController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Delete,
-                    "/user/${email.value}",
-                    email.value,
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Delete,
+                        "/user/${email.value}",
+                        email.value,
+                    )
+                ) {
                     Assertions.assertEquals(HttpStatusCode.NoContent, response.status())
                     coVerify { userController.deleteUser(email) }
                 }
@@ -272,11 +278,13 @@ class UserRoutesTest {
             // 400 - Bad Request
             clearMocks(userController)
             withTestApplication({ testableModule(userController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Delete,
-                    "/user/not-valid-email",
-                    email.value,
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Delete,
+                        "/user/not-valid-email",
+                        email.value,
+                    )
+                ) {
                     Assertions.assertEquals(HttpStatusCode.BadRequest, response.status())
                     coVerify(exactly = 0) { userController.deleteUser(email) }
                 }

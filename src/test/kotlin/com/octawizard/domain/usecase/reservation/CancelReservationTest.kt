@@ -14,6 +14,7 @@ import com.octawizard.domain.model.User
 import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
+import io.ktor.client.utils.EmptyContent.status
 import io.ktor.features.BadRequestException
 import io.ktor.features.NotFoundException
 import io.mockk.Called
@@ -91,8 +92,7 @@ class CancelReservationTest {
 
     @Test
     fun `CancelReservation cancel a confirmed reservation and restore field availability`() {
-        every { reservationRepository.getReservation(reservation.id) } returns
-                reservation.copy(status = ReservationStatus.Confirmed)
+        every { reservationRepository.getReservation(reservation.id) } returns reservation.copy(status = ReservationStatus.Confirmed)
         val fieldAvailability = FieldAvailability(
             TimeSlot(reservation.startTime, reservation.endTime),
             reservation.clubReservationInfo.field,

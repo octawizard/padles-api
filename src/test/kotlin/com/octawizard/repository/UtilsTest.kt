@@ -47,5 +47,4 @@ class UtilsTest {
 
         assertThrows(IllegalArgumentException::class.java) { runBlocking { retry(0) { block() } } }
     }
-
 }
