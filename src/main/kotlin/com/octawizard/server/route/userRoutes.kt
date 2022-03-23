@@ -3,28 +3,32 @@ package com.octawizard.server.route
 import com.octawizard.controller.user.UserController
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.isValidEmail
-import com.octawizard.server.UserBasedAuthenticationConfig
+import com.octawizard.server.USER_BASED_AUTH_CONFIG
 import com.octawizard.server.authorizeWithUserEmailInPath
 import com.octawizard.server.input.CreateUserInput
 import com.octawizard.server.input.UserUpdateInput
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.http.*
-import io.ktor.locations.*
+import io.ktor.application.call
+import io.ktor.auth.authenticate
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Location
+import io.ktor.locations.delete
+import io.ktor.locations.get
 import io.ktor.locations.put
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.routing.Routing
+import io.ktor.routing.post
 
-const val UserEmailParam = "userEmail"
+const val USER_EMAIL_PARAM = "userEmail"
 
 @KtorExperimentalLocationsAPI
 fun Routing.userRoutes(controller: UserController) {
 
-    @Location("/user/{$UserEmailParam}")
+    @Location("/user/{$USER_EMAIL_PARAM}")
     data class UserRoute(val userEmail: String)
 
-    authenticate(UserBasedAuthenticationConfig) {
+    authenticate(USER_BASED_AUTH_CONFIG) {
 
         get<UserRoute> { route ->
             check(route.userEmail.isValidEmail())

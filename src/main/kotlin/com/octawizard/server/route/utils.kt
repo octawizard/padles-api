@@ -1,7 +1,7 @@
 package com.octawizard.server.route
 
-import io.ktor.application.*
-import io.ktor.features.*
+import io.ktor.application.ApplicationCall
+import io.ktor.features.NotFoundException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException

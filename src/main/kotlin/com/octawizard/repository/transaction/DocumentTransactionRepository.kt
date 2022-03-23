@@ -38,7 +38,6 @@ import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
 
-
 class DocumentTransactionRepository(
     private val clubs: MongoCollection<ClubDTO>,
     private val reservations: MongoCollection<ReservationDTO>,

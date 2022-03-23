@@ -16,12 +16,12 @@ interface Cache<K, V> {
     fun delete(k: K)
 }
 
-class RedisCache<K, V>(private val redisMap: RMapCache<K,V>, private val ttl: Duration) : Cache<K, V> {
+class RedisCache<K, V>(private val redisMap: RMapCache<K, V>, private val ttl: Duration) : Cache<K, V> {
 
     companion object Factory {
-        fun <K,V> create(redissonClient: RedissonClient, mapName: String, ttl: Duration): RedisCache<K,V> {
+        fun <K, V> create(redissonClient: RedissonClient, mapName: String, ttl: Duration): RedisCache<K, V> {
             val redisMap = redissonClient.getMapCache<K, V>(mapName)
-            return RedisCache<K,V>(redisMap, ttl)
+            return RedisCache<K, V>(redisMap, ttl)
         }
     }
 
@@ -34,7 +34,6 @@ class RedisCache<K, V>(private val redisMap: RMapCache<K,V>, private val ttl: Du
     override fun delete(k: K) {
         redisMap.fastRemove(k)
     }
-
 }
 
 object RedissonClientFactory {

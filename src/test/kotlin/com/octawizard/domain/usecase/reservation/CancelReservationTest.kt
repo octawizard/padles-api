@@ -14,7 +14,8 @@ import com.octawizard.domain.model.User
 import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
-import io.ktor.features.*
+import io.ktor.features.BadRequestException
+import io.ktor.features.NotFoundException
 import io.mockk.Called
 import io.mockk.clearAllMocks
 import io.mockk.every

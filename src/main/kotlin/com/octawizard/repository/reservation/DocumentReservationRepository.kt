@@ -3,23 +3,26 @@ package com.octawizard.repository.reservation
 import com.mongodb.client.MongoCollection
 import com.mongodb.client.model.geojson.Point
 import com.mongodb.client.model.geojson.Position
-import com.octawizard.domain.model.*
+import com.octawizard.domain.model.Field
+import com.octawizard.domain.model.GeoLocation
+import com.octawizard.domain.model.MATCH_MAX_NUMBER_OF_PLAYERS
+import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.domain.model.Reservation
 import com.octawizard.repository.reservation.model.ClubReservationInfoDTO
 import com.octawizard.repository.reservation.model.MatchDTO
 import com.octawizard.repository.reservation.model.ReservationDTO
 import com.octawizard.repository.reservation.model.toReservation
 import com.octawizard.repository.reservation.model.toReservationDTO
-import io.ktor.features.*
+import io.ktor.features.NotFoundException
 import org.bson.conversions.Bson
 import org.litote.kmongo.div
 import org.litote.kmongo.eq
 import org.litote.kmongo.findOneById
 import org.litote.kmongo.gt
-import org.litote.kmongo.id.StringId
 import org.litote.kmongo.lt
 import org.litote.kmongo.setTo
-import org.litote.kmongo.updateOneById
 import org.litote.kmongo.updateMany
+import org.litote.kmongo.updateOneById
 import java.time.LocalDateTime
 import java.util.*
 
@@ -52,9 +55,14 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
         radiusUnit: RadiusUnit,
     ): List<Reservation> {
         val field = ReservationDTO::clubReservationInfo / ClubReservationInfoDTO::location
-        val filter = filterGeoWithinSphere(field, longitude, latitude, radius, radiusUnit) and
-                filterReservationWithMissingPlayers and
-                (ReservationDTO::startTime gt LocalDateTime.now())
+        val filter =
+            filterGeoWithinSphere(
+                field,
+                longitude,
+                latitude,
+                radius,
+                radiusUnit
+            ) and filterReservationWithMissingPlayers and (ReservationDTO::startTime gt LocalDateTime.now())
         return reservations.find(filter).map { it.toReservation() }.toList()
     }
 
@@ -80,4 +88,3 @@ class DocumentReservationRepository(private val reservations: MongoCollection<Re
         )
     }
 }
-

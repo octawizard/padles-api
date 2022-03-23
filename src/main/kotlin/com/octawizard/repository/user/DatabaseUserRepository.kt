@@ -4,13 +4,16 @@ import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.Gender
 import com.octawizard.domain.model.User
 import com.octawizard.repository.StringIdTable
-import io.ktor.features.*
+import io.ktor.features.NotFoundException
 import org.jetbrains.exposed.dao.Entity
 import org.jetbrains.exposed.dao.EntityClass
 import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Column
+import org.jetbrains.exposed.sql.deleteWhere
+import org.jetbrains.exposed.sql.insert
 import org.jetbrains.exposed.sql.javatime.datetime
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.jetbrains.exposed.sql.update
 import java.time.LocalDateTime
 
 class DatabaseUserRepository : UserRepository {
@@ -61,7 +64,7 @@ class DatabaseUserRepository : UserRepository {
 
 object Users : StringIdTable("users", "email", 250) {
     val name: Column<String> = varchar("name", 50)
-    val gender: Column<Gender> = enumerationByName("gender",15, Gender::class)
+    val gender: Column<Gender> = enumerationByName("gender", 15, Gender::class)
     val phone: Column<String?> = varchar("phone", 16).nullable()
     val createdAt: Column<LocalDateTime> = datetime("created_at")
 }

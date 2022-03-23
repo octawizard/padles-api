@@ -9,7 +9,8 @@ import com.octawizard.domain.model.TimeSlot
 import com.octawizard.repository.club.ClubRepository
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.retry
-import io.ktor.features.*
+import io.ktor.features.BadRequestException
+import io.ktor.features.NotFoundException
 import java.time.LocalDateTime
 import java.util.*
 
@@ -20,7 +21,7 @@ class CancelReservation(
 
     suspend operator fun invoke(reservationId: UUID): Reservation {
         val reservation = reservationRepository.getReservation(reservationId)
-            ?: throw NotFoundException("reservation$reservationId not found")
+            ?: throw NotFoundException("reservation $reservationId not found")
         if (reservation.startTime.isBefore(LocalDateTime.now())) {
             throw BadRequestException("cannot cancel a reservation for a match that should be already started")
         }
@@ -36,7 +37,8 @@ class CancelReservation(
                         reservation.copy(status = ReservationStatus.Canceled)
                     }
                 }
-                ReservationStatus.Canceled -> throw BadRequestException("reservation $reservationId is already canceled")
+                ReservationStatus.Canceled ->
+                    throw BadRequestException("reservation $reservationId is already canceled")
             }
             reservationRepository.updateReservation(canceledReservation)
             canceledReservation

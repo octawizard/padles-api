@@ -25,7 +25,8 @@ class DatabaseUserRepositoryTest {
             url = "jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
             driver = "org.h2.Driver",
             user = "test",
-            password = "")
+            password = ""
+        )
 
 
         transaction {

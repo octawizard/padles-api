@@ -17,4 +17,3 @@ fun filterGeoWithinSphere(
     radiusUnit: RadiusUnit,
 ): Bson =
     kProperty.geoWithinCenterSphere(longitude, latitude, radius / radiusUnit.earthRadius)
-

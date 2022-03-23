@@ -1,7 +1,23 @@
 package com.octawizard.domain.usecase
 
-import com.octawizard.domain.usecase.club.*
-import com.octawizard.domain.usecase.reservation.*
+import com.octawizard.domain.usecase.club.AddFieldToClub
+import com.octawizard.domain.usecase.club.CreateClub
+import com.octawizard.domain.usecase.club.GetClub
+import com.octawizard.domain.usecase.club.GetNearestClubs
+import com.octawizard.domain.usecase.club.SearchClubsByName
+import com.octawizard.domain.usecase.club.UpdateClubAddress
+import com.octawizard.domain.usecase.club.UpdateClubAvailability
+import com.octawizard.domain.usecase.club.UpdateClubAvgPrice
+import com.octawizard.domain.usecase.club.UpdateClubContacts
+import com.octawizard.domain.usecase.club.UpdateClubField
+import com.octawizard.domain.usecase.club.UpdateClubName
+import com.octawizard.domain.usecase.reservation.CancelReservation
+import com.octawizard.domain.usecase.reservation.CreateReservation
+import com.octawizard.domain.usecase.reservation.GetNearestAvailableReservations
+import com.octawizard.domain.usecase.reservation.GetReservation
+import com.octawizard.domain.usecase.reservation.JoinMatch
+import com.octawizard.domain.usecase.reservation.LeaveMatch
+import com.octawizard.domain.usecase.reservation.UpdateMatchResult
 import com.octawizard.domain.usecase.user.CreateUser
 import com.octawizard.domain.usecase.user.DeleteUser
 import com.octawizard.domain.usecase.user.GetUser
@@ -14,7 +30,11 @@ import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertNotNull
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.kodein.di.*
+import org.kodein.di.DI
+import org.kodein.di.bind
+import org.kodein.di.direct
+import org.kodein.di.instance
+import org.kodein.di.singleton
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ModuleTest {
@@ -62,5 +82,4 @@ class ModuleTest {
         assertNotNull(kodein.direct.instance<UpdateClubName>())
         assertNotNull(kodein.direct.instance<SearchClubsByName>())
     }
-
 }

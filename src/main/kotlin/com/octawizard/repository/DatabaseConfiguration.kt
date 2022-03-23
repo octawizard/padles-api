@@ -74,5 +74,4 @@ object RedisRepositoryConfigurationFactory : ConfigurationFactory<RedisRepositor
             userCacheName = config.getString("redis.map.user.name"),
         )
     }
-
 }

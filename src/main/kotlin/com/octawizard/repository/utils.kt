@@ -14,7 +14,7 @@ open class StringIdTable(name: String = "", columnName: String = "id", columnLen
 
 suspend fun retry(times: Int = 3, block: suspend () -> Unit) {
     require(times > 0)
-    for (i in 1..times) {
+    (1..times).forEach { i ->
         try {
             return block()
         } catch (e: Exception) { /* retry */ }

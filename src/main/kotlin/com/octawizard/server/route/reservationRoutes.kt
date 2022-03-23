@@ -5,21 +5,28 @@ import com.octawizard.domain.model.MatchResult
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.domain.model.Reservation
 import com.octawizard.server.AuthorizationException
-import com.octawizard.server.UserBasedAuthenticationConfig
+import com.octawizard.server.USER_BASED_AUTH_CONFIG
 import com.octawizard.server.input.CreateReservationInput
 import com.octawizard.server.input.PatchMatchInput
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.auth.jwt.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.request.*
-import io.ktor.response.*
-import io.ktor.routing.*
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
+import io.ktor.auth.jwt.JWTPrincipal
+import io.ktor.features.NotFoundException
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Location
+import io.ktor.locations.delete
+import io.ktor.locations.get
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.routing.Routing
+import io.ktor.routing.get
 import io.ktor.routing.patch
+import io.ktor.routing.post
 import io.ktor.routing.put
-import io.ktor.util.pipeline.*
+import io.ktor.util.pipeline.PipelineContext
 import java.util.*
 
 @KtorExperimentalLocationsAPI
@@ -33,7 +40,7 @@ data class MatchRoute(val reservationId: UUID)
 @KtorExperimentalLocationsAPI
 fun Routing.reservationRoutes(reservationController: ReservationController) {
 
-    authenticate(UserBasedAuthenticationConfig) {
+    authenticate(USER_BASED_AUTH_CONFIG) {
 
         // get reservation
         get<ReservationRoute> { reservationRoute ->
@@ -99,7 +106,6 @@ fun Routing.reservationRoutes(reservationController: ReservationController) {
             call.respond(HttpStatusCode.OK, updatedReservation)
         }
 
-
         // join or leave a match
         patch<MatchRoute> { matchRoute ->
             val reservation = reservationController.getReservation(matchRoute.reservationId)
@@ -109,7 +115,6 @@ fun Routing.reservationRoutes(reservationController: ReservationController) {
             call.respond(HttpStatusCode.OK, updateMatch)
         }
     }
-
 }
 
 private fun reservationNotFound(reservationId: UUID): Reservation {

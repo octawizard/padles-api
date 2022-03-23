@@ -27,12 +27,11 @@ class Email(val value: String) {
     override fun toString(): String {
         return "Email(value='$value')"
     }
-
 }
 
-private const val Prefix = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}"
-private const val Suffix = "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+"
-private val EmailRegex = "$Prefix@$Suffix".toRegex()
+private const val PREFIX = "[a-zA-Z0-9\\+\\.\\_\\%\\-\\+]{1,256}"
+private const val SUFFIX = "[a-zA-Z0-9][a-zA-Z0-9\\-]{0,64}(\\.[a-zA-Z0-9][a-zA-Z0-9\\-]{0,25})+"
+private val EmailRegex = "$PREFIX@$SUFFIX".toRegex()
 
 fun String.isValidEmail(): Boolean {
     return !this.isBlank() && EmailRegex.matches(this)

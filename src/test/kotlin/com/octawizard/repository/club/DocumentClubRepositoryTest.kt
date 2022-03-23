@@ -14,7 +14,7 @@ import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.MongoBaseTestWithUUIDRepr
 import com.octawizard.repository.club.model.ClubDTO
 import com.octawizard.repository.club.model.toClubDTO
-import io.ktor.features.*
+import io.ktor.features.NotFoundException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows

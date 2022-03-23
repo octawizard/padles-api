@@ -15,9 +15,9 @@ data class ClubReservationInfoDTO(
 ) {
     fun toClubReservationInfo(): ClubReservationInfo {
         return ClubReservationInfo(
-            id, name, field, GeoLocation(
-                location.coordinates.values[0], location.coordinates
-                    .values[1]
+            id, name, field,
+            GeoLocation(
+                location.coordinates.values[0], location.coordinates.values[1]
             )
         )
     }

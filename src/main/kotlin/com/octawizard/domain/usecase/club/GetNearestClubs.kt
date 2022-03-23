@@ -4,7 +4,6 @@ import com.octawizard.domain.model.Club
 import com.octawizard.domain.model.RadiusUnit
 import com.octawizard.repository.club.ClubRepository
 import java.time.LocalDate
-import java.util.*
 
 class GetNearestClubs(private val clubRepository: ClubRepository) {
 

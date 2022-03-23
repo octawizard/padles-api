@@ -22,15 +22,23 @@ import com.octawizard.server.input.UpdateClubAvgPriceInput
 import com.octawizard.server.input.UpdateClubContactsInput
 import com.octawizard.server.input.UpdateClubFieldInput
 import com.octawizard.server.input.UpdateClubNameInput
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import io.ktor.server.testing.*
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.features.StatusPages
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Locations
+import io.ktor.response.respond
+import io.ktor.routing.routing
+import io.ktor.serialization.json
+import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.serialization.encodeToString
@@ -143,7 +151,6 @@ class ClubRoutesTest {
                 }
             }
         }
-
     }
 
     @Nested
@@ -565,7 +572,6 @@ class ClubRoutesTest {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
-
         }
 
         @Test
@@ -585,7 +591,6 @@ class ClubRoutesTest {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -669,7 +674,6 @@ class ClubRoutesTest {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -1133,8 +1137,5 @@ class ClubRoutesTest {
                 }
             }
         }
-
     }
-
 }
-

@@ -19,11 +19,10 @@ class LeaveMatch(private val reservationRepository: ReservationRepository, priva
         if (updatedPlayers == reservation.match.players) {
             return reservation
         }
-        val updatedMatch = reservation.match.copy(players = updatedPlayers) //todo use arrow-kt lens
+        val updatedMatch = reservation.match.copy(players = updatedPlayers) // todo use arrow-kt lens
         val updatedReservation = reservation.copy(match = updatedMatch)
 
         reservationRepository.updateReservation(updatedReservation)
         return updatedReservation
     }
-
 }

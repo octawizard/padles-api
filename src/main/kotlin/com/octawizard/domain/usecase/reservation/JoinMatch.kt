@@ -5,7 +5,7 @@ import com.octawizard.domain.model.Reservation
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.user.UserRepository
 import com.octawizard.server.route.entityNotFound
-import io.ktor.features.*
+import io.ktor.features.BadRequestException
 
 class JoinMatch(private val reservationRepository: ReservationRepository, private val userRepository: UserRepository) {
 
@@ -18,7 +18,7 @@ class JoinMatch(private val reservationRepository: ReservationRepository, privat
             return reservation
         }
 
-        val updatedMatch = reservation.match.copy(players = reservation.match.players + user) //todo use arrow-kt lens
+        val updatedMatch = reservation.match.copy(players = reservation.match.players + user) // todo use arrow-kt lens
         val updatedReservation = reservation.copy(match = updatedMatch)
 
         reservationRepository.updateReservation(updatedReservation)

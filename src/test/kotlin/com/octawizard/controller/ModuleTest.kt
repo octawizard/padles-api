@@ -75,5 +75,4 @@ class ModuleTest {
         Assertions.assertNotNull(kodein.direct.instance<ReservationController>())
         Assertions.assertNotNull(kodein.direct.instance<UserController>())
     }
-
 }

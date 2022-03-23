@@ -21,8 +21,9 @@ import com.octawizard.domain.usecase.club.UpdateClubField
 import com.octawizard.domain.usecase.club.UpdateClubName
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
-import io.mockk.mockk
 import io.mockk.coVerify
+import io.mockk.mockk
+import kotlin.test.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -30,7 +31,6 @@ import org.junit.jupiter.api.TestInstance
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
-import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ClubControllerTest {
@@ -86,9 +86,10 @@ class ClubControllerTest {
         val fields = emptySet<Field>()
         val availability = EmptyAvailability
 
-
-        assertEquals(club,
-            runBlocking { controller.createClub(name, address, location, avgPrice, contacts, fields, availability) })
+        assertEquals(
+            club,
+            runBlocking { controller.createClub(name, address, location, avgPrice, contacts, fields, availability) }
+        )
         coVerify { createClub.invoke(name, address, location, avgPrice, contacts, fields, availability) }
     }
 
@@ -179,8 +180,10 @@ class ClubControllerTest {
         val wallsMaterial = WallsMaterial.Glass
         coEvery { updateClubField.invoke(any(), any(), any(), any(), any(), any()) } returns club
 
-        assertEquals(club,
-            runBlocking { controller.updateClubField(club, fieldId, name, indoor, hasSand, wallsMaterial) })
+        assertEquals(
+            club,
+            runBlocking { controller.updateClubField(club, fieldId, name, indoor, hasSand, wallsMaterial) }
+        )
         coVerify { updateClubField.invoke(club, fieldId, name, indoor, hasSand, wallsMaterial) }
     }
 

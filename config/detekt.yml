@@ -1,0 +1,48 @@
+#exclusion-patterns:
+#  - patterns:
+#      - ../src/test/**
+#    rules:
+#      - LongMethod
+
+complexity:
+  LongMethod:
+    excludes: ['**/route/**', '**/test/**']
+  LongParameterList:
+    active: true
+    functionThreshold: 10
+    constructorThreshold: 15
+    ignoreDefaultParameters: true
+    ignoreDataClasses: true
+    ignoreAnnotatedParameter: [ ]
+
+  TooManyFunctions:
+    active: true
+    thresholdInFiles: 15
+    thresholdInClasses: 15
+    thresholdInInterfaces: 15
+    thresholdInObjects: 15
+    thresholdInEnums: 15
+    ignoreDeprecated: false
+    ignorePrivate: false
+    ignoreOverridden: true
+
+formatting:
+  NoWildcardImports:
+    active: false
+  NoConsecutiveBlankLines:
+    excludes: [ '**/test/**']
+  MaximumLineLength:
+    ignoreBackTickedIdentifier: true
+  Indentation:
+    indentSize: 4
+    continuationIndentSize: 8
+    autoCorrect: true
+
+style:
+  WildcardImport:
+    active: true
+    excludes: [ '**/test/**', '**/jvmTest/**']
+    excludeImports: ['java.util.*']
+  MagicNumber:
+    excludes: ['**/notcommit/**', '**/test/**']
+

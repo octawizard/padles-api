@@ -20,21 +20,26 @@ import com.octawizard.server.route.QueryParams.LONGITUDE
 import com.octawizard.server.route.QueryParams.NAME
 import com.octawizard.server.route.QueryParams.RADIUS
 import com.octawizard.server.route.QueryParams.RADIUS_UNIT
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.auth.jwt.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.locations.post
+import io.ktor.application.ApplicationCall
+import io.ktor.application.call
+import io.ktor.auth.authenticate
+import io.ktor.auth.authentication
+import io.ktor.auth.jwt.JWTPrincipal
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Location
+import io.ktor.locations.get
 import io.ktor.locations.put
-import io.ktor.request.*
-import io.ktor.response.*
+import io.ktor.request.receive
+import io.ktor.response.respond
+import io.ktor.routing.Routing
 import io.ktor.routing.get
-import io.ktor.routing.*
-import io.ktor.util.pipeline.*
+import io.ktor.routing.post
+import io.ktor.util.pipeline.PipelineContext
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.util.*
+import io.ktor.locations.post as lPost
 
 @KtorExperimentalLocationsAPI
 @Location("/club/{clubIdString}")
@@ -145,7 +150,7 @@ fun Routing.clubRoutes(controller: ClubController) {
         }
 
         // add a new field to the list
-        post<ClubRoute.Fields> { route ->
+        lPost<ClubRoute.Fields> { route ->
             authorize(route.parent.clubId)
             val input = call.receive<AddClubFieldInput>()
             val club = controller.getClub(route.parent.clubId) ?: entityNotFound(route.parent.clubId)
@@ -172,7 +177,7 @@ fun Routing.clubRoutes(controller: ClubController) {
             call.respond(HttpStatusCode.OK, updatedClub)
         }
 
-        //availability
+        // availability
         put<ClubRoute.Availability> { route ->
             authorize(route.parent.clubId)
             val input = call.receive<UpdateClubAvailabilityInput>()
@@ -209,9 +214,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
     call.respond(HttpStatusCode.OK, clubs)
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance(
-    controller: ClubController,
-) {
+private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance(controller: ClubController) {
     val longitude = call.getQueryParamOrDefault<Double>(LONGITUDE)
     val latitude = call.getQueryParamOrDefault<Double>(LATITUDE)
     val radius = call.getQueryParamOrDefault<Double>(RADIUS)
@@ -225,9 +228,7 @@ private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByDistance
     call.respond(HttpStatusCode.OK, clubs)
 }
 
-private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByName(
-    controller: ClubController,
-) {
+private suspend fun PipelineContext<Unit, ApplicationCall>.searchClubsByName(controller: ClubController) {
     val name = call.request.queryParameters[NAME]
     check(!name.isNullOrEmpty()) { "query param name cannot be null or empty" }
 

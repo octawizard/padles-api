@@ -9,4 +9,3 @@ val repositoryConfigurationModule = DI.Module("repositoryConfig") {
     bind<RedisRepositoryConfiguration>() with singleton { RedisRepositoryConfigurationFactory.build() }
     bind<MongoRepositoryConfiguration>() with singleton { MongoRepositoryConfigurationFactory.build() }
 }
-

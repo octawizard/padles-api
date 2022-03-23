@@ -11,7 +11,7 @@ import java.util.*
 
 class UpdateClubField(
     private val clubRepository: ClubRepository,
-    private val reservationRepository: ReservationRepository
+    private val reservationRepository: ReservationRepository,
 ) {
 
     suspend operator fun invoke(
@@ -35,5 +35,4 @@ class UpdateClubField(
         async { retry { reservationRepository.updateClubField(updatedField) } }
         return updatedClub
     }
-
 }

@@ -1,6 +1,9 @@
 package com.octawizard.repository.reservation
 
-import com.octawizard.domain.model.*
+import com.octawizard.domain.model.Field
+import com.octawizard.domain.model.GeoLocation
+import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.domain.model.Reservation
 import java.util.*
 
 interface ReservationRepository {
