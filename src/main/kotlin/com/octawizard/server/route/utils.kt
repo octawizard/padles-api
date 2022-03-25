@@ -1,7 +1,7 @@
 package com.octawizard.server.route
 
-import io.ktor.application.*
-import io.ktor.features.*
+import io.ktor.application.ApplicationCall
+import io.ktor.features.NotFoundException
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.DateTimeParseException
@@ -19,17 +19,17 @@ inline fun <reified T> ApplicationCall.getQueryParamOrDefault(
     default: T? = null,
     dateTimeFormatter: DateTimeFormatter? = null,
 ): T? {
-    when (T::class.qualifiedName) {
-        Int::class.qualifiedName -> return request.queryParameters[name]?.toInt() as T? ?: default
-        Double::class.qualifiedName -> return request.queryParameters[name]?.toDouble() as T? ?: default
-        Long::class.qualifiedName -> return request.queryParameters[name]?.toLong() as T? ?: default
-        String::class.qualifiedName -> return request.queryParameters[name] as T? ?: default
+    return when (T::class.qualifiedName) {
+        Int::class.qualifiedName -> request.queryParameters[name]?.toInt() as T? ?: default
+        Double::class.qualifiedName -> request.queryParameters[name]?.toDouble() as T? ?: default
+        Long::class.qualifiedName -> request.queryParameters[name]?.toLong() as T? ?: default
+        String::class.qualifiedName -> request.queryParameters[name] as T? ?: default
         LocalDate::class.qualifiedName -> {
             checkNotNull(dateTimeFormatter)
             return request.queryParameters[name]?.toLocalDateOrNull(dateTimeFormatter) as T? ?: default
         }
+        else -> request.queryParameters[name] as T? ?: default
     }
-    return request.queryParameters[name] as T? ?: default
 }
 
 fun String.toLocalDateOrNull(dateTimeFormatter: DateTimeFormatter): LocalDate? {

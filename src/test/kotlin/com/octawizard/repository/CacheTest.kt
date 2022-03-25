@@ -13,7 +13,6 @@ import java.time.Duration
 import java.util.concurrent.TimeUnit
 import kotlin.test.assertNotNull
 
-
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class CacheTest {
     private val timeout = Duration.ofSeconds(1)
@@ -27,7 +26,7 @@ class CacheTest {
     fun `RedisCache create`() {
         val client = mockk<RedissonClient>()
         val mapName = "name"
-        every { client.getMapCache<Int, Int>(mapName)} returns mockk<RMapCache<Int, Int>>()
+        every { client.getMapCache<Int, Int>(mapName) } returns mockk<RMapCache<Int, Int>>()
 
         assertNotNull(RedisCache.create<Int, Int>(client, mapName, timeout))
     }

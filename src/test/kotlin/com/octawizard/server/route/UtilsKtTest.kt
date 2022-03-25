@@ -142,7 +142,7 @@ internal class UtilsKtTest {
             val call = mockk<ApplicationCall>()
             val request = mockk<ApplicationRequest>()
             val parametersBuilder = ParametersBuilder(size = 1)
-            parametersBuilder["key"] =  "not a date"
+            parametersBuilder["key"] = "not a date"
             val params = parametersBuilder.build()
             every { request.queryParameters } returns params
             every { call.request } returns request

@@ -22,15 +22,23 @@ import com.octawizard.server.input.UpdateClubAvgPriceInput
 import com.octawizard.server.input.UpdateClubContactsInput
 import com.octawizard.server.input.UpdateClubFieldInput
 import com.octawizard.server.input.UpdateClubNameInput
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import io.ktor.server.testing.*
+import io.ktor.application.Application
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.features.StatusPages
+import io.ktor.http.HttpMethod
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Locations
+import io.ktor.response.respond
+import io.ktor.routing.routing
+import io.ktor.serialization.json
+import io.ktor.server.testing.handleRequest
+import io.ktor.server.testing.withTestApplication
 import io.mockk.coEvery
 import io.mockk.mockk
 import kotlinx.serialization.encodeToString
@@ -87,10 +95,12 @@ class ClubRoutesTest {
             "club address",
             GeoLocation(1.1, 1.1),
             setOf(field),
-            Availability(mapOf(
-                LocalDate.now() to listOf(FieldAvailability(timeslot, field, BigDecimal.TEN)),
-                LocalDate.now().plusDays(1) to emptyList()
-            )),
+            Availability(
+                mapOf(
+                    LocalDate.now() to listOf(FieldAvailability(timeslot, field, BigDecimal.TEN)),
+                    LocalDate.now().plusDays(1) to emptyList()
+                )
+            ),
             BigDecimal.TEN,
             Contacts("21451", Email("club@test.com")),
         )
@@ -143,7 +153,6 @@ class ClubRoutesTest {
                 }
             }
         }
-
     }
 
     @Nested
@@ -179,10 +188,14 @@ class ClubRoutesTest {
 
             // 201 - Created
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Post,
-                    "/club",
-                    "anonymous",
-                    body = JsonSerde.encodeToString(input))) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Post,
+                        "/club",
+                        "anonymous",
+                        body = JsonSerde.encodeToString(input)
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Created, response.status())
                     assertEquals(JsonSerde.encodeToString(club), response.content)
                 }
@@ -190,11 +203,14 @@ class ClubRoutesTest {
 
             // 400 - bad input
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Post,
-                    "/club",
-                    "anonymous",
-                    body = JsonSerde.encodeToString(UpdateClubNameInput("wrong"))
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Post,
+                        "/club",
+                        "anonymous",
+                        body = JsonSerde.encodeToString(UpdateClubNameInput("wrong"))
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -222,14 +238,17 @@ class ClubRoutesTest {
             // 200 - Ok
             coEvery { clubController.searchClubsByName(club.name) } returns clubs
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByName.name,
-                        QueryParams.NAME to club.name,
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByName.name,
+                            QueryParams.NAME to club.name,
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
@@ -238,11 +257,14 @@ class ClubRoutesTest {
             // 400 - Bad Request - null name
             coEvery { clubController.searchClubsByName(club.name) } returns clubs
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(QueryParams.CRITERIA to ClubSearchCriteria.ByName.name)
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(QueryParams.CRITERIA to ClubSearchCriteria.ByName.name)
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param name cannot be null or empty", response.content)
                 }
@@ -251,14 +273,17 @@ class ClubRoutesTest {
             // 400 - Bad Request - empty name
             coEvery { clubController.searchClubsByName(club.name) } returns clubs
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByName.name,
-                        QueryParams.NAME to "",
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByName.name,
+                            QueryParams.NAME to "",
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param name cannot be null or empty", response.content)
                 }
@@ -282,17 +307,20 @@ class ClubRoutesTest {
                 )
             } returns clubs
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
-                        QueryParams.RADIUS_UNIT to RadiusUnit.Miles.name,
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                            QueryParams.RADIUS_UNIT to RadiusUnit.Miles.name,
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
@@ -308,16 +336,19 @@ class ClubRoutesTest {
                 )
             } returns clubs
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
@@ -325,15 +356,18 @@ class ClubRoutesTest {
 
             // 400 - Bad Request - null longitude
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param longitude cannot be null", response.content)
                 }
@@ -341,15 +375,18 @@ class ClubRoutesTest {
 
             // 400 - Bad Request - null latitude
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param latitude cannot be null", response.content)
                 }
@@ -357,15 +394,18 @@ class ClubRoutesTest {
 
             // 400 - Bad Request - null radius
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistance.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param radius cannot be null", response.content)
                 }
@@ -391,18 +431,21 @@ class ClubRoutesTest {
                 )
             } returns clubs
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
-                        QueryParams.RADIUS_UNIT to RadiusUnit.Miles.name,
-                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                            QueryParams.RADIUS_UNIT to RadiusUnit.Miles.name,
+                            QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
@@ -419,17 +462,20 @@ class ClubRoutesTest {
                 )
             } returns clubs
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
-                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                            QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(clubs), response.content)
                 }
@@ -437,16 +483,19 @@ class ClubRoutesTest {
 
             // 400 - bad request - longitude null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
-                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                            QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param longitude cannot be null", response.content)
                 }
@@ -454,16 +503,19 @@ class ClubRoutesTest {
 
             // 400 - bad request - latitude null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
-                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                            QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param latitude cannot be null", response.content)
                 }
@@ -471,16 +523,19 @@ class ClubRoutesTest {
 
             // 400 - bad request - day null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.RADIUS to radius.toString(),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.RADIUS to radius.toString(),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param day cannot be null", response.content)
                 }
@@ -488,16 +543,19 @@ class ClubRoutesTest {
 
             // 400 - bad request - radius null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(HttpMethod.Get,
-                    "/clubs",
-                    UUID.randomUUID().toString(),
-                    queryParams = mapOf(
-                        QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
-                        QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
-                        QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
-                        QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Get,
+                        "/clubs",
+                        UUID.randomUUID().toString(),
+                        queryParams = mapOf(
+                            QueryParams.CRITERIA to ClubSearchCriteria.ByDistanceAndDayAvailability.name,
+                            QueryParams.LONGITUDE to club.geoLocation.longitude.toString(),
+                            QueryParams.LATITUDE to club.geoLocation.latitude.toString(),
+                            QueryParams.DAY to day.format(DateTimeFormatter.ISO_LOCAL_DATE),
+                        )
                     )
-                )) {
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                     assertEquals("query param radius cannot be null", response.content)
                 }
@@ -528,12 +586,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubName(club, clubName) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/name",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/name",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
                 }
@@ -543,12 +603,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubName(club, clubName) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/name",
-                    club.id.toString(),
-                    body = """{ "wrong" : "body" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/name",
+                        club.id.toString(),
+                        body = """{ "wrong" : "body" }""",
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -556,16 +618,17 @@ class ClubRoutesTest {
             // 404 - Not Found - club not found
             coEvery { clubController.getClub(club.id) } returns null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/name",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/name",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
-
         }
 
         @Test
@@ -576,16 +639,17 @@ class ClubRoutesTest {
             // 403
             coEvery { clubController.updateClubName(club, clubName) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/name",
-                    UUID.randomUUID().toString(),
-                    body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/name",
+                        UUID.randomUUID().toString(),
+                        body = JsonSerde.encodeToString(UpdateClubNameInput(clubName)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -614,12 +678,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubAddress(club, address, location) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/address",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAddressInput(address, location)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/address",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAddressInput(address, location)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
                 }
@@ -629,12 +695,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubAddress(club, address, location) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/address",
-                    club.id.toString(),
-                    body = """{ "wrong" : "body" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/address",
+                        club.id.toString(),
+                        body = """{ "wrong" : "body" }""",
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -642,16 +710,17 @@ class ClubRoutesTest {
             // 404 - Not Found - club not found
             coEvery { clubController.getClub(club.id) } returns null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/address",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAddressInput(address, location)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/address",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAddressInput(address, location)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
-
         }
 
         @Test
@@ -660,16 +729,17 @@ class ClubRoutesTest {
             val club = getClub(UUID.randomUUID())
             // 403
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/address",
-                    UUID.randomUUID().toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAddressInput(club.address, club.geoLocation)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/address",
+                        UUID.randomUUID().toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAddressInput(club.address, club.geoLocation)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -697,12 +767,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubContacts(club, contacts) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/contacts",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubContactsInput(contacts.phone, contacts.email)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/contacts",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubContactsInput(contacts.phone, contacts.email)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
                 }
@@ -712,12 +784,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubContacts(club, contacts) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/contacts",
-                    club.id.toString(),
-                    body = """{ "wrong" : "body" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/contacts",
+                        club.id.toString(),
+                        body = """{ "wrong" : "body" }""",
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -725,16 +799,17 @@ class ClubRoutesTest {
             // 404 - Not Found - club not found
             coEvery { clubController.getClub(club.id) } returns null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/contacts",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubContactsInput(contacts.phone, contacts.email)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/contacts",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubContactsInput(contacts.phone, contacts.email)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
-
         }
 
         @Test
@@ -744,16 +819,17 @@ class ClubRoutesTest {
             val contacts = Contacts("new phone", Email("email@test.com"))
             // 403
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/contacts",
-                    UUID.randomUUID().toString(),
-                    body = JsonSerde.encodeToString(UpdateClubContactsInput(contacts.phone, contacts.email)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/contacts",
+                        UUID.randomUUID().toString(),
+                        body = JsonSerde.encodeToString(UpdateClubContactsInput(contacts.phone, contacts.email)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -781,12 +857,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubAvgPrice(club, avgPrice) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/avg_price",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAvgPriceInput(avgPrice)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/avg_price",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAvgPriceInput(avgPrice)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
                 }
@@ -796,12 +874,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubAvgPrice(club, avgPrice) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/avg_price",
-                    club.id.toString(),
-                    body = """{ "wrong" : "body" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/avg_price",
+                        club.id.toString(),
+                        body = """{ "wrong" : "body" }""",
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -809,12 +889,14 @@ class ClubRoutesTest {
             // 404 - Not Found - club not found
             coEvery { clubController.getClub(club.id) } returns null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/avg_price",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAvgPriceInput(avgPrice)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/avg_price",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAvgPriceInput(avgPrice)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
@@ -826,16 +908,17 @@ class ClubRoutesTest {
             val club = getClub(UUID.randomUUID())
             // 403
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/avg_price",
-                    UUID.randomUUID().toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAvgPriceInput(BigDecimal.ONE)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/avg_price",
+                        UUID.randomUUID().toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAvgPriceInput(BigDecimal.ONE)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -871,17 +954,21 @@ class ClubRoutesTest {
             } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Post,
-                    "/club/${club.id}/fields",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(AddClubFieldInput(
-                        field.name,
-                        field.isIndoor,
-                        field.wallsMaterial,
-                        field.hasSand,
-                    )),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Post,
+                        "/club/${club.id}/fields",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(
+                            AddClubFieldInput(
+                                field.name,
+                                field.isIndoor,
+                                field.wallsMaterial,
+                                field.hasSand,
+                            )
+                        ),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
                 }
@@ -890,12 +977,14 @@ class ClubRoutesTest {
             // 400 - Bad Request
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Post,
-                    "/club/${club.id}/fields",
-                    club.id.toString(),
-                    body = """{ "wrong" : "body" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Post,
+                        "/club/${club.id}/fields",
+                        club.id.toString(),
+                        body = """{ "wrong" : "body" }""",
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -903,17 +992,21 @@ class ClubRoutesTest {
             // 404 - Not Found - club not found
             coEvery { clubController.getClub(club.id) } returns null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Post,
-                    "/club/${club.id}/fields",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(AddClubFieldInput(
-                        field.name,
-                        field.isIndoor,
-                        field.wallsMaterial,
-                        field.hasSand,
-                    )),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Post,
+                        "/club/${club.id}/fields",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(
+                            AddClubFieldInput(
+                                field.name,
+                                field.isIndoor,
+                                field.wallsMaterial,
+                                field.hasSand,
+                            )
+                        ),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
@@ -925,21 +1018,24 @@ class ClubRoutesTest {
             val club = getClub(UUID.randomUUID())
             // 403
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Post,
-                    "/club/${club.id}/fields",
-                    UUID.randomUUID().toString(),
-                    body = JsonSerde.encodeToString(AddClubFieldInput(
-                        field.name,
-                        field.isIndoor,
-                        field.wallsMaterial,
-                        field.hasSand,
-                    )),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Post,
+                        "/club/${club.id}/fields",
+                        UUID.randomUUID().toString(),
+                        body = JsonSerde.encodeToString(
+                            AddClubFieldInput(
+                                field.name,
+                                field.isIndoor,
+                                field.wallsMaterial,
+                                field.hasSand,
+                            )
+                        ),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -975,17 +1071,21 @@ class ClubRoutesTest {
             } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/field/${field.id}",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubFieldInput(
-                        field.name,
-                        field.isIndoor,
-                        field.wallsMaterial,
-                        field.hasSand,
-                    )),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/field/${field.id}",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(
+                            UpdateClubFieldInput(
+                                field.name,
+                                field.isIndoor,
+                                field.wallsMaterial,
+                                field.hasSand,
+                            )
+                        ),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
                 }
@@ -994,12 +1094,14 @@ class ClubRoutesTest {
             // 400 - Bad Request
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/field/${field.id}",
-                    club.id.toString(),
-                    body = """{ "wrong" : "body" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/field/${field.id}",
+                        club.id.toString(),
+                        body = """{ "wrong" : "body" }""",
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -1007,17 +1109,21 @@ class ClubRoutesTest {
             // 404 - Not Found - club not found
             coEvery { clubController.getClub(club.id) } returns null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/field/${field.id}",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubFieldInput(
-                        field.name,
-                        field.isIndoor,
-                        field.wallsMaterial,
-                        field.hasSand,
-                    )),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/field/${field.id}",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(
+                            UpdateClubFieldInput(
+                                field.name,
+                                field.isIndoor,
+                                field.wallsMaterial,
+                                field.hasSand,
+                            )
+                        ),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
@@ -1029,21 +1135,24 @@ class ClubRoutesTest {
             val club = getClub(UUID.randomUUID())
             // 403
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/field/${field.id}",
-                    UUID.randomUUID().toString(),
-                    body = JsonSerde.encodeToString(UpdateClubFieldInput(
-                        field.name,
-                        field.isIndoor,
-                        field.wallsMaterial,
-                        field.hasSand,
-                    )),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/field/${field.id}",
+                        UUID.randomUUID().toString(),
+                        body = JsonSerde.encodeToString(
+                            UpdateClubFieldInput(
+                                field.name,
+                                field.isIndoor,
+                                field.wallsMaterial,
+                                field.hasSand,
+                            )
+                        ),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
-
         }
 
         @Test
@@ -1069,12 +1178,14 @@ class ClubRoutesTest {
             coEvery { clubController.updateClubAvailability(club, EmptyAvailability) } returns updatedClub
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/availability",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAvailabilityInput(EmptyAvailability)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/availability",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAvailabilityInput(EmptyAvailability)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.OK, response.status())
                     assertEquals(JsonSerde.encodeToString(updatedClub), response.content)
                 }
@@ -1083,12 +1194,14 @@ class ClubRoutesTest {
             // 400 - Bad Request
             coEvery { clubController.getClub(club.id) } returns club
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/availability",
-                    club.id.toString(),
-                    body = """{ "wrong" : "body" }""",
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/availability",
+                        club.id.toString(),
+                        body = """{ "wrong" : "body" }""",
+                    )
+                ) {
                     assertEquals(HttpStatusCode.BadRequest, response.status())
                 }
             }
@@ -1096,12 +1209,14 @@ class ClubRoutesTest {
             // 404 - Not Found - club not found
             coEvery { clubController.getClub(club.id) } returns null
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/availability",
-                    club.id.toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAvailabilityInput(EmptyAvailability)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/availability",
+                        club.id.toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAvailabilityInput(EmptyAvailability)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.NotFound, response.status())
                 }
             }
@@ -1113,12 +1228,14 @@ class ClubRoutesTest {
             val club = getClub(UUID.randomUUID())
             // 403
             withTestApplication({ testableModule(clubController) }) {
-                with(handleRequestWithJWT(
-                    HttpMethod.Put,
-                    "/club/${club.id}/availability",
-                    UUID.randomUUID().toString(),
-                    body = JsonSerde.encodeToString(UpdateClubAvailabilityInput(EmptyAvailability)),
-                )) {
+                with(
+                    handleRequestWithJWT(
+                        HttpMethod.Put,
+                        "/club/${club.id}/availability",
+                        UUID.randomUUID().toString(),
+                        body = JsonSerde.encodeToString(UpdateClubAvailabilityInput(EmptyAvailability)),
+                    )
+                ) {
                     assertEquals(HttpStatusCode.Forbidden, response.status())
                 }
             }
@@ -1133,8 +1250,5 @@ class ClubRoutesTest {
                 }
             }
         }
-
     }
-
 }
-

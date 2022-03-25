@@ -3,7 +3,6 @@ package com.octawizard.domain.usecase.club
 import com.octawizard.domain.model.Club
 import com.octawizard.domain.model.EmptyAvailability
 import com.octawizard.domain.model.Field
-import com.octawizard.domain.model.GeoLocation
 import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.club.ClubRepository
 import io.mockk.every

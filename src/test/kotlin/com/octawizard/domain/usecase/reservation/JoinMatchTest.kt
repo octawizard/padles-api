@@ -8,12 +8,13 @@ import com.octawizard.domain.model.ReservationStatus
 import com.octawizard.domain.model.User
 import com.octawizard.repository.reservation.ReservationRepository
 import com.octawizard.repository.user.UserRepository
-import io.ktor.features.*
+import io.ktor.features.BadRequestException
+import io.ktor.features.NotFoundException
 import io.mockk.Called
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
-import io.mockk.mockk
 import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Assertions.assertEquals

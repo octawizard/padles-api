@@ -1,5 +1,6 @@
 package com.octawizard.repository.transaction
 
+import com.mongodb.MongoException
 import com.mongodb.ReadConcern
 import com.mongodb.ReadPreference
 import com.mongodb.TransactionOptions
@@ -37,7 +38,6 @@ import org.litote.kmongo.unset
 import java.math.BigDecimal
 import java.time.LocalDateTime
 import java.util.*
-
 
 class DocumentTransactionRepository(
     private val clubs: MongoCollection<ClubDTO>,
@@ -115,7 +115,7 @@ class DocumentTransactionRepository(
 
         try {
             return clientSession.withTransaction(txnBody, txnOptions)
-        } catch (e: RuntimeException) {
+        } catch (e: MongoException) {
             logger.error("Failed to create reservation: ${e.message}", e)
             throw e
         } finally {

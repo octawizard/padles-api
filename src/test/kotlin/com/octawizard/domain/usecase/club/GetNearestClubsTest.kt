@@ -2,9 +2,7 @@ package com.octawizard.domain.usecase.club
 
 import com.octawizard.domain.model.Club
 import com.octawizard.domain.model.RadiusUnit
-import com.octawizard.domain.usecase.reservation.JoinMatch
 import com.octawizard.repository.club.ClubRepository
-import com.octawizard.repository.reservation.ReservationRepository
 import io.mockk.clearAllMocks
 import io.mockk.every
 import io.mockk.mockk

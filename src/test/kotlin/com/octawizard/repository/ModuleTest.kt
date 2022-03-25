@@ -55,7 +55,6 @@ class ModuleTest {
         const val dbPassword = "test_password"
     }
 
-
     @Test
     fun `RepositoryModule should inject dependencies for repositories`() {
         val redissonClient = mockk<RedissonClient>()

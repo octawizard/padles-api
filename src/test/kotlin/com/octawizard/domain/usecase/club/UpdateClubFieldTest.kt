@@ -41,7 +41,6 @@ class UpdateClubFieldTest {
         val newHasSand = false
         val newWallsMaterial = WallsMaterial.Glass
 
-
         val updatedClub = runBlocking {
             updateClubField.invoke(
                 club,

@@ -13,16 +13,21 @@ import com.octawizard.server.route.reservationRoutes
 import com.octawizard.server.route.userRoutes
 import com.octawizard.server.serialization.contextualSerializers
 import com.typesafe.config.ConfigFactory
-import io.ktor.application.*
-import io.ktor.auth.*
-import io.ktor.features.*
-import io.ktor.http.*
-import io.ktor.locations.*
-import io.ktor.response.*
-import io.ktor.routing.*
-import io.ktor.serialization.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
+import io.ktor.application.call
+import io.ktor.application.install
+import io.ktor.auth.Authentication
+import io.ktor.features.CallLogging
+import io.ktor.features.ContentNegotiation
+import io.ktor.features.DefaultHeaders
+import io.ktor.features.StatusPages
+import io.ktor.http.HttpStatusCode
+import io.ktor.locations.KtorExperimentalLocationsAPI
+import io.ktor.locations.Locations
+import io.ktor.response.respond
+import io.ktor.routing.routing
+import io.ktor.serialization.json
+import io.ktor.server.engine.embeddedServer
+import io.ktor.server.netty.Netty
 import kotlinx.serialization.SerializationException
 import kotlinx.serialization.json.Json
 import mu.KotlinLogging
@@ -51,10 +56,12 @@ fun main() {
 
     embeddedServer(Netty, port = 1111, host = "127.0.0.1") {
         install(ContentNegotiation) {
-            json(Json {
-                serializersModule = contextualSerializers
-                allowStructuredMapKeys = true
-            })
+            json(
+                Json {
+                    serializersModule = contextualSerializers
+                    allowStructuredMapKeys = true
+                }
+            )
         }
         install(DefaultHeaders)
         install(CallLogging)
@@ -85,4 +92,3 @@ private fun StatusPages.Configuration.exceptionHandler() {
         call.respond(HttpStatusCode.BadRequest, cause.localizedMessage)
     }
 }
-

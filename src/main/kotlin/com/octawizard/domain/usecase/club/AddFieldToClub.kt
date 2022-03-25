@@ -17,5 +17,4 @@ class AddFieldToClub(private val clubRepository: ClubRepository) {
         val field: Field = clubRepository.addFieldToClub(club.id, name, indoor, hasSand, wallsMaterial)
         return club.copy(fields = club.fields + field)
     }
-
 }

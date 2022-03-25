@@ -1,6 +1,13 @@
 package com.octawizard.repository.club
 
-import com.octawizard.domain.model.*
+import com.octawizard.domain.model.Availability
+import com.octawizard.domain.model.Club
+import com.octawizard.domain.model.Contacts
+import com.octawizard.domain.model.Field
+import com.octawizard.domain.model.FieldAvailability
+import com.octawizard.domain.model.GeoLocation
+import com.octawizard.domain.model.RadiusUnit
+import com.octawizard.domain.model.WallsMaterial
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
@@ -19,8 +26,8 @@ interface ClubRepository {
         availability: Availability,
     ): Club
 
-    fun updateClubName(clubId: UUID, name: String) //side effects on reservations
-    fun updateClubAddress(clubId: UUID, address: String, geoLocation: GeoLocation) //side effects on reservations
+    fun updateClubName(clubId: UUID, name: String) // side effects on reservations
+    fun updateClubAddress(clubId: UUID, address: String, geoLocation: GeoLocation) // side effects on reservations
     fun updateClubContacts(clubId: UUID, contacts: Contacts)
     fun updateClubAvgPrice(clubId: UUID, avgPrice: BigDecimal)
     fun updateClubField(

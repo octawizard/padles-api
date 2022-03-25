@@ -15,8 +15,8 @@ import com.octawizard.server.input.OpType
 import com.octawizard.server.input.PatchMatchInput
 import io.mockk.clearAllMocks
 import io.mockk.coEvery
-import io.mockk.mockk
 import io.mockk.coVerify
+import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -70,17 +70,21 @@ class ReservationControllerTest {
         val endTime = startTime.plusHours(2)
         coEvery { createReservation(any(), any(), any(), any(), any(), any(), any(), any()) } returns reservation
 
-        assertEquals(reservation,
+        assertEquals(
+            reservation,
             runBlocking {
-                controller.createReservation(reservedBy,
+                controller.createReservation(
+                    reservedBy,
                     clubId,
                     fieldId,
                     startTime,
                     endTime,
                     null,
                     null,
-                    null)
-            })
+                    null
+                )
+            }
+        )
         coVerify { createReservation(reservedBy, clubId, fieldId, startTime, endTime, null, null, null) }
     }
 
@@ -96,7 +100,7 @@ class ReservationControllerTest {
     }
 
     @Test
-    fun `ReservationController should call UpdateReservationMatchResult to update the match result of the reservation`() {
+    fun `ReservationController should call UpdateReservationMatchResult to update the reservation match result`() {
         val reservation = mockk<Reservation>()
         val matchResult = mockk<MatchResult>()
         coEvery { updateMatchResult(any(), any()) } returns reservation
@@ -110,8 +114,10 @@ class ReservationControllerTest {
         val reservations = listOf(mockk<Reservation>())
         coEvery { getNearestAvailableReservations(any(), any(), any(), any()) } returns reservations
 
-        assertEquals(reservations,
-            runBlocking { controller.getNearestAvailableReservations(1.0, 1.0, 1.0, RadiusUnit.Kilometers) })
+        assertEquals(
+            reservations,
+            runBlocking { controller.getNearestAvailableReservations(1.0, 1.0, 1.0, RadiusUnit.Kilometers) }
+        )
         coVerify { getNearestAvailableReservations.invoke(1.0, 1.0, 1.0, RadiusUnit.Kilometers) }
     }
 
@@ -119,7 +125,7 @@ class ReservationControllerTest {
     fun `ReservationController should call PatchReservationMatch to add a player to a match`() {
         val reservation = mockk<Reservation>()
         coEvery { joinMatch(any(), any()) } returns reservation
-        val input = PatchMatchInput(op = OpType.add, value = "user@padles.com")
+        val input = PatchMatchInput(op = OpType.ADD, value = "user@padles.com")
 
         assertEquals(reservation, runBlocking { controller.patchReservationMatch(input, reservation) })
         coVerify { joinMatch(Email(input.value), reservation) }
@@ -129,7 +135,7 @@ class ReservationControllerTest {
     fun `ReservationController should call PatchReservationMatch to remove a player from a match`() {
         val reservation = mockk<Reservation>()
         coEvery { leaveMatch(any(), any()) } returns reservation
-        val input = PatchMatchInput(op = OpType.remove, value = "user@padles.com")
+        val input = PatchMatchInput(op = OpType.REMOVE, value = "user@padles.com")
 
         assertEquals(reservation, runBlocking { controller.patchReservationMatch(input, reservation) })
         coVerify { leaveMatch(Email(input.value), reservation) }

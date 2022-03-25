@@ -4,9 +4,9 @@ import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import kotlinx.coroutines.runBlocking
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
-import org.junit.jupiter.api.Assertions.assertThrows
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class UtilsTest {
@@ -16,7 +16,7 @@ class UtilsTest {
         val block = mockk<suspend () -> Unit>()
         coEvery { block() } throws RuntimeException("test retry")
 
-        runBlocking { retry { block() } }
+        assertThrows(RuntimeException::class.java) { runBlocking { retry { block() } } }
 
         coVerify(exactly = 3) { block() }
     }
@@ -26,7 +26,7 @@ class UtilsTest {
         val block = mockk<suspend () -> Unit>()
         coEvery { block() } throws RuntimeException("test retry")
 
-        runBlocking { retry(1) { block() } }
+        assertThrows(RuntimeException::class.java) { runBlocking { retry(1) { block() } } }
 
         coVerify(exactly = 1) { block() }
     }
@@ -47,5 +47,4 @@ class UtilsTest {
 
         assertThrows(IllegalArgumentException::class.java) { runBlocking { retry(0) { block() } } }
     }
-
 }

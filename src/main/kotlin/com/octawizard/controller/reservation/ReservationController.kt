@@ -59,7 +59,10 @@ class ReservationController(
     }
 
     suspend fun getNearestAvailableReservations(
-        longitude: Double, latitude: Double, radius: Double, radiusUnit: RadiusUnit,
+        longitude: Double,
+        latitude: Double,
+        radius: Double,
+        radiusUnit: RadiusUnit,
     ): List<Reservation> {
         return async { getNearestAvailableReservations.invoke(longitude, latitude, radius, radiusUnit) }
     }
@@ -67,8 +70,8 @@ class ReservationController(
     suspend fun patchReservationMatch(input: PatchMatchInput, reservation: Reservation): Reservation {
         val userEmail = Email(input.value)
         return when (input.op) {
-            OpType.remove -> async { leaveMatch(userEmail, reservation) }
-            OpType.add -> async { joinMatch(userEmail, reservation) }
+            OpType.REMOVE -> async { leaveMatch(userEmail, reservation) }
+            OpType.ADD -> async { joinMatch(userEmail, reservation) }
         }
     }
 }

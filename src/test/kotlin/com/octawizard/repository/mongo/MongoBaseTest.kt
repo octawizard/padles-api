@@ -18,6 +18,9 @@ import org.litote.kmongo.util.KMongoUtil
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KClass
 
+annotation class IgnoreDetekt
+
+@IgnoreDetekt
 abstract class MongoBaseTestWithUUIDRepr<T : Any>(standalone: Boolean = true) {
 
     @Suppress("LeakingThis")
@@ -38,7 +41,6 @@ abstract class MongoBaseTestWithUUIDRepr<T : Any>(standalone: Boolean = true) {
     @Suppress("UNCHECKED_CAST")
     fun getDefaultCollectionClass(): KClass<T> =
         ((this::class.java.genericSuperclass as ParameterizedType).actualTypeArguments[0] as Class<T>).kotlin
-
 }
 
 internal val MongodProcess.host get() = "127.0.0.1:${config.net().port}"

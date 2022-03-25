@@ -70,7 +70,7 @@ class DocumentClubRepository(private val clubs: MongoCollection<ClubDTO>) : Club
 
     private fun updateClubById(clubId: UUID, updateStatement: Any) {
         val idFilter = ClubDTO::id eq clubId
-        val result = when(updateStatement){
+        val result = when (updateStatement) {
             is SetTo<*> -> clubs.updateOne(idFilter, updateStatement)
             is Bson -> clubs.updateOne(idFilter, updateStatement)
             else -> throw IllegalArgumentException("unrecognized update statement")

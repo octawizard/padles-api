@@ -57,7 +57,6 @@ internal object ReplicaSetEmbeddedMongo {
         )
         .build()
 
-
     private val mongodProcesses: List<MongodProcess> by lazy { createInstances() }
 
     fun connectionString(): ConnectionString {
@@ -82,7 +81,8 @@ internal object ReplicaSetEmbeddedMongo {
                             val s = BsonDocument("_id", BsonInt32(i))
                             s.put("host", BsonString(p.host))
                             s
-                        })
+                        }
+                    )
                 )
             }
         val initCommand = BsonDocument("replSetInitiate", conf)
@@ -99,5 +99,4 @@ internal object ReplicaSetEmbeddedMongo {
             MongodStarter.getInstance(EmbeddedMongoLog.embeddedConfig).prepare(rep2).start(),
             MongodStarter.getInstance(EmbeddedMongoLog.embeddedConfig).prepare(rep3).start()
         )
-
 }

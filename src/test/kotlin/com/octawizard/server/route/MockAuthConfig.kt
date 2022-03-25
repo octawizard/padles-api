@@ -3,8 +3,8 @@ package com.octawizard.server.route
 import com.auth0.jwt.JWT
 import com.auth0.jwt.JWTVerifier
 import com.auth0.jwt.algorithms.Algorithm
-import com.octawizard.server.ClubBasedAuthenticationConfig
-import com.octawizard.server.UserBasedAuthenticationConfig
+import com.octawizard.server.CLUB_BASED_AUTH_CONFIG
+import com.octawizard.server.USER_BASED_AUTH_CONFIG
 import com.octawizard.server.route.MockAuthConfig.algorithm
 import com.octawizard.server.route.MockAuthConfig.jwtAudience
 import com.octawizard.server.route.MockAuthConfig.jwtIssuer
@@ -16,10 +16,10 @@ import java.util.*
 
 object MockAuthConfig {
 
-    val jwtIssuer = "padles.issuer"
-    val jwtAudience = "padles.audience"
-    val jwtRealm = "padles.realm"
-    val secret = "dummy.secret"
+    const val jwtIssuer = "padles.issuer"
+    const val jwtAudience = "padles.audience"
+    const val jwtRealm = "padles.realm"
+    const val secret = "dummy.secret"
     val algorithm = Algorithm.HMAC256(secret)
 
     /**
@@ -47,7 +47,7 @@ fun Authentication.Configuration.mockAuthConfig() {
     val userJwtVerifier: (String, String) -> JWTVerifier = makeJWTVerifier(algorithm)
     val clubJwtVerifier: (String, String) -> JWTVerifier = makeJWTVerifier(algorithm)
 
-    jwt(UserBasedAuthenticationConfig) {
+    jwt(USER_BASED_AUTH_CONFIG) {
         realm = jwtRealm
         verifier {
             userJwtVerifier(jwtIssuer, jwtAudience)
@@ -61,7 +61,7 @@ fun Authentication.Configuration.mockAuthConfig() {
         }
     }
 
-    jwt(ClubBasedAuthenticationConfig) {
+    jwt(CLUB_BASED_AUTH_CONFIG) {
         realm = jwtRealm
         verifier {
             clubJwtVerifier(jwtIssuer, jwtAudience)

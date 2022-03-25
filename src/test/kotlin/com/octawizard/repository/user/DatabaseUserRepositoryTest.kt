@@ -3,13 +3,19 @@ package com.octawizard.repository.user
 import com.octawizard.domain.model.Email
 import com.octawizard.domain.model.Gender
 import com.octawizard.domain.model.User
-import io.ktor.features.*
+import io.ktor.features.NotFoundException
 import kotlinx.coroutines.runBlocking
-import kotlinx.html.InputType
-import org.jetbrains.exposed.sql.*
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
+import org.jetbrains.exposed.sql.deleteAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertEquals
+import org.junit.jupiter.api.Assertions.assertNotEquals
+import org.junit.jupiter.api.Assertions.assertNull
+import org.junit.jupiter.api.Assertions.assertThrows
 import org.junit.jupiter.api.BeforeAll
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance
@@ -25,7 +31,8 @@ class DatabaseUserRepositoryTest {
             url = "jdbc:h2:mem:test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1",
             driver = "org.h2.Driver",
             user = "test",
-            password = "")
+            password = ""
+        )
 
 
         transaction {

@@ -1,23 +1,24 @@
 package com.octawizard.repository
 
-import org.jetbrains.exposed.dao.id.EntityID
-import org.jetbrains.exposed.dao.id.IdTable
-import org.jetbrains.exposed.sql.Column
+import mu.KotlinLogging
 
-/*
- * Base class for table objects with string id
- */
-open class StringIdTable(name: String = "", columnName: String = "id", columnLength: Int = 10) : IdTable<String>(name) {
-    override val id: Column<EntityID<String>> = varchar(columnName, columnLength).entityId()
-    override val primaryKey by lazy { super.primaryKey ?: PrimaryKey(id) }
-}
+private val logger = KotlinLogging.logger { }
 
+annotation class IgnoreTooGenericExceptionCaught
+
+@IgnoreTooGenericExceptionCaught
 suspend fun retry(times: Int = 3, block: suspend () -> Unit) {
     require(times > 0)
-    for (i in 1..times) {
+    (1..times).forEach { i ->
         try {
             return block()
-        } catch (e: Exception) { /* retry */ }
+        } catch (e: Exception) {
+            logger.warn(e) { "Try attempt $i failed" }
+            /* retry */
+            if (i >= times) {
+                throw e
+            }
+        }
     }
     // ignore add in cache, todo send some metric to track it
 }

@@ -14,7 +14,7 @@ import com.octawizard.domain.model.WallsMaterial
 import com.octawizard.repository.MongoBaseTestWithUUIDRepr
 import com.octawizard.repository.reservation.model.ReservationDTO
 import com.octawizard.repository.reservation.model.toReservationDTO
-import io.ktor.features.*
+import io.ktor.features.NotFoundException
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertNull
 import org.junit.jupiter.api.Assertions.assertThrows
@@ -304,7 +304,8 @@ class DocumentReservationRepositoryTest : MongoBaseTestWithUUIDRepr<ReservationD
         )
         val reservation2 = reservation1.copy(id = UUID.randomUUID())
         val reservationOfOtherClub = reservation1.copy(
-            id = UUID.randomUUID(), clubReservationInfo = otherClubInfo)
+            id = UUID.randomUUID(), clubReservationInfo = otherClubInfo
+        )
         col.insertMany(listOf(reservation1, reservation2, reservationOfOtherClub).map { it.toReservationDTO() })
 
         val newField = field.copy(name = "updated field", isIndoor = true)

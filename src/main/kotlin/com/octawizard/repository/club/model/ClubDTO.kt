@@ -2,7 +2,10 @@ package com.octawizard.repository.club.model
 
 import com.mongodb.client.model.geojson.Point
 import com.mongodb.client.model.geojson.Position
-import com.octawizard.domain.model.*
+import com.octawizard.domain.model.Club
+import com.octawizard.domain.model.Contacts
+import com.octawizard.domain.model.Field
+import com.octawizard.domain.model.GeoLocation
 import java.math.BigDecimal
 import java.util.*
 

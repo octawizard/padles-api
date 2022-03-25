@@ -15,5 +15,3 @@ data class CreateUserInput(val email: Email, val name: String, val gender: Gende
         }
     }
 }
-
-
