@@ -35,6 +35,8 @@ formatting:
     indentSize: 4
     continuationIndentSize: 4
     autoCorrect: true
+  MaximumLineLength:
+    ignoreBackTickedIdentifier: true
 
 style:
   WildcardImport:
@@ -44,6 +46,8 @@ style:
   MagicNumber:
     excludes: ['**/notcommit/**', '**/test/**']
   MaxLineLength:
-    excludeCommentStatements: true
+    active: false
   ThrowsCount:
     max: 5
+  UnnecessaryAbstractClass:
+    excludeAnnotatedClasses: ['IgnoreDetekt']

@@ -18,6 +18,9 @@ import org.litote.kmongo.util.KMongoUtil
 import java.lang.reflect.ParameterizedType
 import kotlin.reflect.KClass
 
+annotation class IgnoreDetekt
+
+@IgnoreDetekt
 abstract class MongoBaseTestWithUUIDRepr<T : Any>(standalone: Boolean = true) {
 
     @Suppress("LeakingThis")
