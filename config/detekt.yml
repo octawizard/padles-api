@@ -47,4 +47,3 @@ style:
     excludeCommentStatements: true
   ThrowsCount:
     max: 5
-
