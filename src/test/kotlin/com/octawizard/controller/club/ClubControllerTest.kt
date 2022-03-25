@@ -23,7 +23,6 @@ import io.mockk.clearAllMocks
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
-import kotlin.test.assertEquals
 import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.Test
@@ -31,6 +30,7 @@ import org.junit.jupiter.api.TestInstance
 import java.math.BigDecimal
 import java.time.LocalDate
 import java.util.*
+import kotlin.test.assertEquals
 
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class ClubControllerTest {

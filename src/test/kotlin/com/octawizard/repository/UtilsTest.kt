@@ -16,7 +16,7 @@ class UtilsTest {
         val block = mockk<suspend () -> Unit>()
         coEvery { block() } throws RuntimeException("test retry")
 
-        runBlocking { retry { block() } }
+        assertThrows(RuntimeException::class.java) { runBlocking { retry { block() } } }
 
         coVerify(exactly = 3) { block() }
     }
@@ -26,7 +26,7 @@ class UtilsTest {
         val block = mockk<suspend () -> Unit>()
         coEvery { block() } throws RuntimeException("test retry")
 
-        runBlocking { retry(1) { block() } }
+        assertThrows(RuntimeException::class.java) { runBlocking { retry(1) { block() } } }
 
         coVerify(exactly = 1) { block() }
     }
