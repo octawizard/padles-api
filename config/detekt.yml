@@ -31,8 +31,6 @@ formatting:
     active: false
   NoConsecutiveBlankLines:
     excludes: [ '**/test/**']
-  MaximumLineLength:
-    ignoreBackTickedIdentifier: true
   Indentation:
     indentSize: 4
     continuationIndentSize: 4
@@ -45,4 +43,8 @@ style:
     excludeImports: ['java.util.*']
   MagicNumber:
     excludes: ['**/notcommit/**', '**/test/**']
+  MaxLineLength:
+    excludeCommentStatements: true
+  ThrowsCount:
+    max: 5
 

@@ -62,10 +62,15 @@ class DatabaseUserRepository : UserRepository {
     }
 }
 
-object Users : StringIdTable("users", "email", 250) {
-    val name: Column<String> = varchar("name", 50)
-    val gender: Column<Gender> = enumerationByName("gender", 15, Gender::class)
-    val phone: Column<String?> = varchar("phone", 16).nullable()
+private const val email_column_length = 250
+private const val name_column_length = 50
+private const val gender_column_length = 15
+private const val phone_column_length = 16
+
+object Users : StringIdTable("users", "email", email_column_length) {
+    val name: Column<String> = varchar("name", name_column_length)
+    val gender: Column<Gender> = enumerationByName("gender", gender_column_length, Gender::class)
+    val phone: Column<String?> = varchar("phone", phone_column_length).nullable()
     val createdAt: Column<LocalDateTime> = datetime("created_at")
 }
 
