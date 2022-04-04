@@ -5,7 +5,7 @@ plugins {
     kotlin("plugin.serialization") version "1.6.10"
     application
     jacoco
-    id("io.gitlab.arturbosch.detekt") version "1.20.0-RC1"
+    id("io.gitlab.arturbosch.detekt") version "1.20.0-RC2"
 }
 
 group = "com.octawizard"
