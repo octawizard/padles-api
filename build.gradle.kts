@@ -6,6 +6,7 @@ plugins {
     application
     jacoco
     id("io.gitlab.arturbosch.detekt") version "1.20.0-RC2"
+    id("com.osacky.doctor") version "0.8.0"
 }
 
 group = "com.octawizard"
@@ -79,6 +80,10 @@ dependencies {
     detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0-RC2")
 }
 
+jacoco {
+    toolVersion = "0.8.7"
+}
+
 tasks.test {
     useJUnitPlatform()
     finalizedBy(tasks.jacocoTestReport)
@@ -90,23 +95,24 @@ tasks.jacocoTestReport {
     }
     dependsOn(tasks.test)
 }
-//
+
 application {
     mainClassName = "ServerKt"
 }
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
 val compileTestKotlin: KotlinCompile by tasks
 compileTestKotlin.kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
 
 detekt {
     buildUponDefaultConfig = true // preconfigure defaults
     allRules = false // activate all available (even unstable) rules.
-    config = files("$projectDir/config/detekt.yml") // point to your custom config defining rules to run, overwriting default behavior
+    config =
+        files("$projectDir/config/detekt.yml") // point to your custom config defining rules to run, overwriting default behavior
     baseline = file("$projectDir/config/baseline.xml") // a way of suppressing issues before introducing detekt
 }
 
@@ -117,9 +123,9 @@ tasks.detekt.configure { //.withType<io.gitlab.arturbosch.detekt.Detekt>().confi
         txt.required.set(true) // similar to the console output, contains issue signature to manually edit baseline files
         sarif.required.set(true) // standardized SARIF format (https://sarifweb.azurewebsites.net/) to support integrations with Github Code Scanning
     }
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
 
 tasks.withType<io.gitlab.arturbosch.detekt.DetektCreateBaselineTask>().configureEach {
-    jvmTarget = "1.8"
+    jvmTarget = "11"
 }
