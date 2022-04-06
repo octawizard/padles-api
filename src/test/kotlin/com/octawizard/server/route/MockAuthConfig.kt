@@ -9,8 +9,9 @@ import com.octawizard.server.route.MockAuthConfig.algorithm
 import com.octawizard.server.route.MockAuthConfig.jwtAudience
 import com.octawizard.server.route.MockAuthConfig.jwtIssuer
 import com.octawizard.server.route.MockAuthConfig.jwtRealm
-import io.ktor.auth.*
-import io.ktor.auth.jwt.*
+import io.ktor.auth.Authentication
+import io.ktor.auth.jwt.JWTPrincipal
+import io.ktor.auth.jwt.jwt
 import java.time.Instant
 import java.util.*
 

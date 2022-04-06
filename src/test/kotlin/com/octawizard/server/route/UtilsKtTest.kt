@@ -1,8 +1,9 @@
 package com.octawizard.server.route
 
-import io.ktor.application.*
-import io.ktor.http.*
-import io.ktor.request.*
+import io.ktor.application.ApplicationCall
+import io.ktor.http.Parameters
+import io.ktor.http.ParametersBuilder
+import io.ktor.request.ApplicationRequest
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Assertions.assertEquals
