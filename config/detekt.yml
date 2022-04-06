@@ -20,8 +20,6 @@ complexity:
     ignoreOverridden: true
 
 formatting:
-  NoWildcardImports:
-    active: false
   NoConsecutiveBlankLines:
     excludes: [ '**/test/**']
   Indentation:
