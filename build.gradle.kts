@@ -37,7 +37,7 @@ dependencies {
     }
     testImplementation("io.ktor:ktor-server-test-host:$ktorVersion")
 
-    testRuntimeOnly("com.h2database:h2:2.1.210")
+    testRuntimeOnly("com.h2database:h2:2.1.212")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.8.2")
     testImplementation("org.junit.vintage:junit-vintage-engine:5.8.2")
 
