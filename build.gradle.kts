@@ -5,7 +5,7 @@ plugins {
     kotlin("plugin.serialization") version "1.6.20"
     application
     jacoco
-    id("io.gitlab.arturbosch.detekt") version "1.20.0-RC2"
+    id("io.gitlab.arturbosch.detekt") version "1.21.0-RC1"
     id("com.osacky.doctor") version "0.8.0"
 }
 
