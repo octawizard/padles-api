@@ -77,7 +77,7 @@ dependencies {
     implementation("org.litote.kmongo:kmongo-native:$kmongoVersion")
 
     // detekt
-    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.20.0-RC2")
+    detektPlugins("io.gitlab.arturbosch.detekt:detekt-formatting:1.22.0-RC3")
 }
 
 jacoco {
